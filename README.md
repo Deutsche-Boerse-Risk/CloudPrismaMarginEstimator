@@ -6,7 +6,9 @@ Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
 - **[DBG Digital Business Platform - gateway for accessing the API](https://console.developer.deutsche-boerse.com/)**
 - **[cPME GUI](https://eurexmargins.prod.dbgservice.com)**
 
-# FAQ
+# FAQ
+
+## Interpreting Margin Result
 
 ### How precise is the margin?
 
