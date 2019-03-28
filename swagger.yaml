@@ -31,7 +31,7 @@ info:
 
     ## Example in Python
 
-    The **[crossmargining.py](examples/python/crossmargining.py)** generates a portfolio in CSV format. The portfolio consists of a 10Y EUR interest rate swap starting on the 15th of next month and a short position in Euro-Bund futures. Initial margin is calculated with and without cross margining (xm = True and xm = False, respectively) and results are printed. Replace xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx by your API key (see above).
+    The **[crossmargining.py](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator-API/blob/master/examples/python/crossmargining.py)** generates a portfolio in CSV format. The portfolio consists of a 10Y EUR interest rate swap starting on the 15th of next month and a short position in Euro-Bund futures. Initial margin is calculated with and without cross margining (xm = True and xm = False, respectively) and results are printed. Replace xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx by your API key (see above).
 
 
     ## Compressing request and response
