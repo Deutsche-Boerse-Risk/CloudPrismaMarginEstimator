@@ -16,6 +16,11 @@ No, cash market instruments (equities, bonds, subscription rights) are not in sc
 
 Other OTC instruments, such as inflation swaps and FX swaps, are not yet supported.
 
+### What about flexible instruments?
+
+Eurex clears also flexible contracts on futures and options (with non-standard expiry, strike or exercise style). If you have them in your real portfolio then cPME will calculate margin.
+Hypothetical flexible contracts are not supported, cPME can price only existing contracts.
+
 ### Is it possible to calculate margin as of historical date?
 
 Yes, see "Business date and time" section in [API definition](https://app.swaggerhub.com/apis-docs/dbgservice/cPME/1.0). The historical data are available from March 18 2019.
@@ -39,3 +44,8 @@ Liquidation group is further divided into splits, but currently only PFI01 liqui
 ### How to validate cPME result against Eurex reports?
 
 Compare the margin on liquidation group level against CC050 report. The margin on account level (CC060) cannot be obtained from cPME as the account may contain cash market instruments that are not in cPME scope.
+
+### Is margin from simulation environment similar to production?
+
+No, simulation (a.k.a. sandbox) uses different scenarios and has different prices than production, therefore it calculates different margin for the same portfolio.
+
