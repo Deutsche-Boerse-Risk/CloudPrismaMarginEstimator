@@ -12,7 +12,9 @@ Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
 
 ### Can cPME calculate margin for all instruments?
 
-No, cash market instruments (equities, bonds, subscription rights) are not in scope. cPME can evaluate derivatives, both exchange traded (ETD) and OTC.
+No, cash market instruments (equities, bonds, subscription rights) are not in scope. cPME can evaluate derivatives, both exchange traded (ETD) and OTC interest rate instruments.
+
+Other OTC instruments, such as inflation swaps and FX swaps, are not yet supported.
 
 ### Is it possible to calculate margin as of historical date?
 
