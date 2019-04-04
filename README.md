@@ -16,6 +16,10 @@ No, cash market instruments (equities, bonds, subscription rights) are not in sc
 
 Other OTC instruments, such as inflation swaps and FX swaps, are not yet supported.
 
+### What to do when the request fails for a big portfolio?
+
+Especially the XML formats of portfolio can be quite large which can cause connection problems. Try compressing the portfolio, see "Compressing request and response" in the [API definition](https://app.swaggerhub.com/apis-docs/dbgservice/cPME/1.0).
+
 ### What about flexible instruments?
 
 Eurex clears also flexible contracts on futures and options (with non-standard expiry, strike or exercise style). If you have them in your real portfolio then cPME will calculate margin.
@@ -40,6 +44,10 @@ For OTC trades, the margin is approximated and can differ a few percent from the
 List of liquidation groups and assignment of exchange traded products to groups can be found at [Risk Parameters page](https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters).
 
 Liquidation group is further divided into splits, but currently only PFI01 liquidation group (Fixed Income, Money Market and OTC IRS) has two splits, others have only one split.
+
+### How cross-margining works?
+
+Fixed Income/Money Market positions and OTC IRS trades are both in PFI01 liquidation group. Without cross-margining, FI/MM positions are assigned to 2-day holding period split PFI01_HP2 and OTC trades are assigned to 5-day holding period split PFI01_HP5. Margin in each split is calculated independently. With cross-margining, some FI/MM positions are moved (or partially moved) to PFI01_HP5 split to offset the risk of OTC trades and lower the overall margin.
 
 ### How to validate cPME result against Eurex reports?
 
