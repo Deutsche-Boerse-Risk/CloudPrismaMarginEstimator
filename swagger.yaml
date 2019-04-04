@@ -553,7 +553,7 @@ paths:
                     type: string
                     description: FpML describing trades as a single string
                 required:
-                  - otc_portfolio_party
+                  - party
                   - xml
       responses:
         '200':
