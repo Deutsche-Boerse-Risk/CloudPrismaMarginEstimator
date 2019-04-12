@@ -1,21 +1,26 @@
-"""The following example generates a portfolio in CSV format. The portfolio
-consists of a 10Y EUR interest rate swap starting on the 15th of next month
+"""
+The following example generates a portfolio in CSV format. The portfolio
+consists of a 10Y EUR interest rate swap starting two days from today
 and a short position in Euro-Bund futures. Initial margin is calculated
-with and without cross margining (xm = True and xm = False, respectively)
-and results are printed.
-Replace xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx by your API key (see above)."""
+with (xm = True) and without (xm = False) cross margining and results are 
+printed. 
+
+Remember to replace x's in api_header with your own API-key
+
+To register for an API-key please visit
+
+https://console.developer.deutsche-boerse.com/apis
+"""
 
 import requests 
 import json 
 import datetime
-from dateutil import relativedelta
 
 url_base = ("https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/")
 api_header = {"X-DBP-APIKEY": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"}
 
-effective_date = datetime.date.today() + relativedelta.relativedelta(months=1)
-effective_date = effective_date.replace(day=15) 
-maturity_date = effective_date + relativedelta.relativedelta(years=10)
+effective_date = datetime.date.today() + datetime.timedelta(days=2)
+maturity_date = effective_date.replace(year=effective_date.year+10)
 
 otc_header = ('internalTradeID,tradeType,currency,effectiveDate,terminationDate,'
               'payLegType,payLegSpread,payLegIndex,payInterestFixedAmount,'
@@ -74,4 +79,3 @@ for xm in [False, True]:
 benefit = [-lgs['initial_margin']*(-1)**xm for xm in [True, False] 
                for lgs in results[xm]['portfolio_margin']]
 print('XM benefit:   {:>11,.0f}'.format(sum(benefit)))
-
