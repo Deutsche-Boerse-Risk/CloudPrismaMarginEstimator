@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Cloud Prisma Margin Estimator API
-  version: "1.0"
+  version: "2.0"
   description: >-
     Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
     according to Eurex Prisma methodology. The application is available to both members
@@ -62,11 +62,11 @@ info:
     The application finds the latest snapshot from the requested business date
     with timestamp equal or smaller than the requested time.
     If time is not given then the latest timestamp of the business date is used.
-    
+
     It takes about one minute to start the instance for specified snapshot.
     That instance can then serve subsequent requests for the same snapshot.
     After some inactive time the instance is shutdown.
-    
+
     Example of requesting the latest snapshot of given date, in GET and POST type of request:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
@@ -76,8 +76,8 @@ info:
         'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/estimator' \
         --data-binary @-
     </pre>
-    
-    
+
+
     If business date is not given, the latest business date is used.
 
     Response contains identification of the selected snapshot,
@@ -329,7 +329,7 @@ paths:
         ## ETD portfolio as JSON array
 
         `etd_portfolio` instruments are specified either by full key  or by technical `iid`. The technical `iid` takes precedence if both keys are sent. The position always needs `line_no` and `net_ls_balance`.
-        
+
         The full key for series depends on instrument type, these are the mandatory fields:
 
         - Future: `product`, `maturity` as YYYYMM (DD can be added but is ignored)
@@ -354,7 +354,7 @@ paths:
 
 
         ## ETD CSV format
-        
+
         See the example in [GUI](https://eurexmargins.prod.dbgservice.com/estimator) for simpler CSV format that does not support flexible instruments or use the CSV format known from Margin Calculator.
 
         ## OTC CSV format
@@ -427,7 +427,7 @@ paths:
         The receive leg has the same attributes as pay leg above, except prefix "pay" is replaced by "rcv".
 
         ## OTC sensitivities in CSV format
-        
+
         The whole portfolio is described by a table of DV01 sensitivities, submitted in CSV format known from Margin Calculator. The columns are curves and rows maturities - see the example in request model.
 
         ## OTC reports CB202, CB207
@@ -449,17 +449,19 @@ paths:
           schema:
             type: object
             example:
-              etd_portfolio:
-                - line_no: 1
-                  product_id: FEXD
-                  maturity: 202812
-                  net_ls_balance: 10
-                - line_no: 2
-                  product_id: OESX
-                  maturity: 202812
-                  call_put_flag: C
-                  exercise_price: 2400
-                  net_ls_balance: -10
+              portfolio_components:
+                - type: etd_portfolio
+                  etd_portfolio:
+                    - line_no: 1
+                      product_id: FEXD
+                      maturity: 202812
+                      net_ls_balance: 10
+                    - line_no: 2
+                      product_id: OESX
+                      maturity: 202812
+                      call_put_flag: C
+                      exercise_price: 2400
+                      net_ls_balance: -10
             properties:
               snapshot:
                 $ref: '#/definitions/snapshot'
@@ -469,106 +471,119 @@ paths:
                 type: boolean
                 description: enable cross-margining between OTC and Fixed Income
                 example: True
-              etd_portfolio:
+              portfolio_components:
                 type: array
+                description: array of portfolio components
                 items:
                   type: object
-                  properties:
-                    line_no:
-                      $ref: '#/definitions/line_no'
-                    product_id:
-                      $ref: '#/definitions/product_id'
-                    maturity:
-                      $ref: '#/definitions/maturity'
-                    call_put_flag:
-                      $ref: '#/definitions/call_put_flag'
-                    exercise_price:
-                      $ref: '#/definitions/exercise_price'
-                    version_number:
-                      $ref: '#/definitions/version_number'
-                    iid:
-                      $ref: '#/definitions/iid'
-                    instrument_type:
-                      $ref: '#/definitions/instrument_type'
-                    exercise_style:
-                      $ref: '#/definitions/exercise_style'
-                    net_ea:
-                      $ref: '#/definitions/net_ea'
-                    net_ls_balance:
-                      $ref: '#/definitions/net_ls_balance'
+                  description: one portfolio component, only type and one structure relevant for the type is filled
                   required:
-                    - line_no
-                    - net_ls_balance
-              etd_csv:
-                type: object
-                properties:
-                  csv:
-                    type: string
-                    description: ETD portfolio as one string in CSV, in Margin Calculator GUI format or Margin Estimator GUI format
-                required:
-                - csv
-              etd_cp005:
-                type: object
-                properties:
-                  member:
-                    type: string
-                    description: optional attribute to process only positions of the member, if not given the clearing member is used
-                  account:
-                    type: string
-                    description: optional attribute to process only positions on that account, if not given "PP" account is used
-                  xml:
-                    type: string
-                    description: exchange traded portfolio as Eurex report CP005
-                required:
-                  - xml
-              otc_csv:
-                type: object
-                properties:
-                  csv:
-                    type: string
-                    description: OTC portfolio as one string in CSV, fomrat known from Margin Calculator GUI
-                    example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
-                required:
-                  - csv
-              otc_sensitivities:
-                type: object
-                properties:
-                  csv:
-                    type: string
-                    description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
-                    example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-                required:
-                - csv
-              otc_cb202:
-                type: object
-                properties:
-                  member:
-                    type: string
-                    description: optional, will be matched against RC tag
-                  account:
-                    type: string
-                    description: optional, will be matched against acctTypGrp tag, if not given P account is assumed
-                    default: P
-                  legal_entity:
-                    type: string
-                    description: optional, will be matched against srcSysLEId tag
-                  xml:
-                    type: string
-                    description: EurexOTC report CB202 or report CB207 describing trades as a single string
-                required:
-                  - xml
-              otc_fpml:
-                type: object
-                properties:
-                  party:
-                    type: string
-                    description: matched against partyId tag
-                  xml:
-                    type: string
-                    description: FpML describing trades as a single string
-                required:
-                  - party
-                  - xml
+                    - type
+                  properties:
+                    type:
+                      type: string
+                      description: type of this component
+                      example: etd_portfolio
+                    etd_portfolio:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          line_no:
+                            $ref: '#/definitions/line_no'
+                          product_id:
+                            $ref: '#/definitions/product_id'
+                          maturity:
+                            $ref: '#/definitions/maturity'
+                          call_put_flag:
+                            $ref: '#/definitions/call_put_flag'
+                          exercise_price:
+                            $ref: '#/definitions/exercise_price'
+                          version_number:
+                            $ref: '#/definitions/version_number'
+                          iid:
+                            $ref: '#/definitions/iid'
+                          instrument_type:
+                            $ref: '#/definitions/instrument_type'
+                          exercise_style:
+                            $ref: '#/definitions/exercise_style'
+                          net_ea:
+                            $ref: '#/definitions/net_ea'
+                          net_ls_balance:
+                            $ref: '#/definitions/net_ls_balance'
+                        required:
+                          - line_no
+                          - net_ls_balance
+                    etd_csv:
+                      type: object
+                      properties:
+                        csv:
+                          type: string
+                          description: ETD portfolio as one string in CSV, in Margin Calculator GUI format or Margin Estimator GUI format
+                      required:
+                      - csv
+                    etd_cp005:
+                      type: object
+                      properties:
+                        member:
+                          type: string
+                          description: optional attribute to process only positions of the member, if not given the clearing member is used
+                        account:
+                          type: string
+                          description: optional attribute to process only positions on that account, if not given "PP" account is used
+                        xml:
+                          type: string
+                          description: exchange traded portfolio as Eurex report CP005
+                      required:
+                        - xml
+                    otc_csv:
+                      type: object
+                      properties:
+                        csv:
+                          type: string
+                          description: OTC portfolio as one string in CSV, fomrat known from Margin Calculator GUI
+                          example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+                      required:
+                        - csv
+                    otc_sensitivities:
+                      type: object
+                      properties:
+                        csv:
+                          type: string
+                          description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
+                          example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                      required:
+                      - csv
+                    otc_cb202:
+                      type: object
+                      properties:
+                        member:
+                          type: string
+                          description: optional, will be matched against RC tag
+                        account:
+                          type: string
+                          description: optional, will be matched against acctTypGrp tag, if not given P account is assumed
+                          default: P
+                        legal_entity:
+                          type: string
+                          description: optional, will be matched against srcSysLEId tag
+                        xml:
+                          type: string
+                          description: EurexOTC report CB202 or report CB207 describing trades as a single string
+                      required:
+                        - xml
+                    otc_fpml:
+                      type: object
+                      properties:
+                        party:
+                          type: string
+                          description: matched against partyId tag
+                        xml:
+                          type: string
+                          description: FpML describing trades as a single string
+                      required:
+                        - party
+                        - xml
       responses:
         '200':
           description: OK

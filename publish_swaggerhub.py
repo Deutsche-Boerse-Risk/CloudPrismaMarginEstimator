@@ -5,15 +5,26 @@ import os
 import requests
 import sys
 
-SWAGGER_FILE = 'swagger.yaml'
+SWAGGER_FILE = {
+        '1': 'swagger.yaml',
+        '2': 'swagger2.yaml'
+    }
 SWAGGERHUB_API = dict(
-    DEV ='https://api.swaggerhub.com/apis/dbgservice/cPME-dev',
-    SIMU='https://api.swaggerhub.com/apis/dbgservice/cPME-sandbox',
-    PROD='https://api.swaggerhub.com/apis/dbgservice/cPME'
-)
+        DEV ='https://api.swaggerhub.com/apis/dbgservice/cPME-dev',
+        SIMU='https://api.swaggerhub.com/apis/dbgservice/cPME-sandbox',
+        PROD='https://api.swaggerhub.com/apis/dbgservice/cPME'
+    )
 
-if len(sys.argv) < 2:
-    print("Error: environment expected as command line argument, one or more of %s" % SWAGGERHUB_API.keys())
+if len(sys.argv) < 3:
+    print("Usage: %s <version> <environment> [environment2] [environment3] ..." % sys.argv[0])
+    exit(2)
+
+if sys.argv[1] not in SWAGGER_FILE:
+    print("Versions: %s\n" % list(SWAGGER_FILE.keys()))
+    exit(2)
+
+if any([a not in SWAGGERHUB_API for a in sys.argv[2:]]):
+    print("Environments: %s\n" % list(SWAGGERHUB_API.keys()))
     exit(2)
 
 if 'SWAGGERHUB_KEY' not in os.environ:
@@ -21,9 +32,9 @@ if 'SWAGGERHUB_KEY' not in os.environ:
     exit(2)
 SWAGGERHUB_KEY = os.environ['SWAGGERHUB_KEY']
 
-with open(SWAGGER_FILE, 'r') as infile:
+with open(SWAGGER_FILE[sys.argv[1]], 'r') as infile:
     swagger = infile.read()
-    for env in sys.argv[1:]:
+    for env in sys.argv[2:]:
         if env not in SWAGGERHUB_API:
             print("Error: %s is not a valid environment" % env)
             continue
