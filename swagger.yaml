@@ -374,7 +374,7 @@ paths:
 
         - internalTradeID*: id of the trade to distinguish it in drilldown, must be unique
 
-        - tradeType*: IRS (or Swap), OIS, FRA, ZC (TODO: template has ZCIS and VNS)
+        - tradeType*: IRS (or Swap), OIS, FRA, ZC
 
         - currency*: ISO code of currency, e.g. EUR, CHF, USD, GBP
 
@@ -433,7 +433,7 @@ paths:
         ## OTC reports CB202, CB207
 
         See Eurex OTC member documentation for CB202 and CB207 reports.
-        Only positions from one specified account will be evaluated, see the attibutes of `otc_cb202` structure below.
+        Only positions from one specified account will be evaluated, see the attributes of `otc_cb202` structure below.
         We recommend using gzip compression in the request, see above.
 
         ## OTC FpML

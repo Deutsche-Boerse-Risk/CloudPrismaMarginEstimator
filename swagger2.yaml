@@ -45,7 +45,7 @@ info:
     For example:
 
 
-    <pre>echo '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}' \
+    <pre>echo '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
       | gzip \
       | curl -s -H "X-DBP-APIKEY: your-key" -H "Content-Type: application/json" \
         https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/estimator \
@@ -71,7 +71,7 @@ info:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
       'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/series?products=FGBM&business_date=20190307'
-    echo '{"snapshot":{"business_date":20190307}, "etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}' \
+    echo '{"snapshot":{"business_date":20190307},"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
       | curl -H 'X-DBP-APIKEY: your-key' \
         'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/estimator' \
         --data-binary @-
@@ -86,8 +86,6 @@ info:
     ## Change log
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
-
-    - 4.0.0 introduction of OTC portfolio components, cross-margining and historical snapshots
 
   termsOfService: 'https://eurexmargins.prod.dbgservice.com/terms'
 host: api.developer.deutsche-boerse.com
@@ -349,7 +347,7 @@ paths:
         <pre>
         curl --header 'X-DBP-APIKEY: your-key' \
           https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/estimator \
-          -d '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}'
+          -d '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}'
         </pre>
 
 
@@ -374,7 +372,7 @@ paths:
 
         - internalTradeID*: id of the trade to distinguish it in drilldown, must be unique
 
-        - tradeType*: IRS (or Swap), OIS, FRA, ZC (TODO: template has ZCIS and VNS)
+        - tradeType*: IRS (or Swap), OIS, FRA, ZC
 
         - currency*: ISO code of currency, e.g. EUR, CHF, USD, GBP
 
@@ -433,7 +431,7 @@ paths:
         ## OTC reports CB202, CB207
 
         See Eurex OTC member documentation for CB202 and CB207 reports.
-        Only positions from one specified account will be evaluated, see the attibutes of `otc_cb202` structure below.
+        Only positions from one specified account will be evaluated, see the attributes of `otc_cb202` structure below.
         We recommend using gzip compression in the request, see above.
 
         ## OTC FpML
