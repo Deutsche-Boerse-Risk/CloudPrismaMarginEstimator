@@ -535,53 +535,13 @@ paths:
                       required:
                         - xml
                     otc_csv:
-                      type: object
-                      properties:
-                        csv:
-                          type: string
-                          description: OTC portfolio as one string in CSV, fomrat known from Margin Calculator GUI
-                          example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
-                      required:
-                        - csv
+                      $ref: '#/definitions/otc_csv'
                     otc_sensitivities:
-                      type: object
-                      properties:
-                        csv:
-                          type: string
-                          description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
-                          example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-                      required:
-                      - csv
+                      $ref: '#/definitions/otc_sensitivities'
                     otc_cb202:
-                      type: object
-                      properties:
-                        member:
-                          type: string
-                          description: optional, will be matched against RC tag
-                        account:
-                          type: string
-                          description: optional, will be matched against acctTypGrp tag, if not given P account is assumed
-                          default: P
-                        legal_entity:
-                          type: string
-                          description: optional, will be matched against srcSysLEId tag
-                        xml:
-                          type: string
-                          description: EurexOTC report CB202 or report CB207 describing trades as a single string
-                      required:
-                        - xml
+                      $ref: '#/definitions/otc_cb202'
                     otc_fpml:
-                      type: object
-                      properties:
-                        party:
-                          type: string
-                          description: matched against partyId tag
-                        xml:
-                          type: string
-                          description: FpML describing trades as a single string
-                      required:
-                        - party
-                        - xml
+                      $ref: '#/definitions/otc_fpml'
       responses:
         '200':
           description: OK
@@ -1047,6 +1007,54 @@ definitions:
     type: number
     description: Long/short balance, negative for short
     example: -100
+  otc_csv:
+    type: object
+    properties:
+      csv:
+        type: string
+        description: OTC portfolio as one string in CSV, fomrat known from Margin Calculator GUI
+        example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+    required:
+      - csv
+  otc_cb202:
+    type: object
+    properties:
+      member:
+        type: string
+        description: optional, will be matched against RC tag
+      account:
+        type: string
+        description: optional, will be matched against acctTypGrp tag, if not given P account is assumed
+        default: P
+      legal_entity:
+        type: string
+        description: optional, will be matched against srcSysLEId tag
+      xml:
+        type: string
+        description: EurexOTC report CB202 or report CB207 describing trades as a single string
+    required:
+      - xml
+  otc_fpml:
+    type: object
+    properties:
+      party:
+        type: string
+        description: matched against partyId tag
+      xml:
+        type: string
+        description: FpML describing trades as a single string
+    required:
+      - party
+      - xml
+  otc_sensitivities:
+    type: object
+    properties:
+      csv:
+        type: string
+        description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
+        example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+    required:
+    - csv
   greek_types:
     type: array
     description: Greek types, array with the following valid values
