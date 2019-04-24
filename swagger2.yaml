@@ -89,7 +89,7 @@ info:
 
   termsOfService: 'https://eurexmargins.prod.dbgservice.com/terms'
 host: api.developer.deutsche-boerse.com
-basePath: /prod/prisma-margin-estimator/1.0.0/
+basePath: /prod/prisma-margin-estimator/2.0.0/
 schemes:
   - https
 paths:
@@ -696,6 +696,62 @@ paths:
                     premium_margin_currency:
                       type: string
                       description: Currency of premium margin - currency of the product, can be different from clearing currency
+  /otc_trade_details:
+    post:
+      summary: OTC Trade Details
+      description: >-
+        Parse a short human-readable description of OTC trade, e.g. to display on a GUI.
+        The description is not complete, i.e. it is not sufficient to evaluate the trade.
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: body
+          in: body
+          schema:
+            type: object
+            example:
+              portfolio_components:
+                - type: otc_csv
+                  csv: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+            properties:
+              snapshot:
+                $ref: '#/definitions/snapshot'
+              portfolio_components:
+                type: array
+                description: array of portfolio components
+                items:
+                  type: object
+                  description: one portfolio component, only type and one structure relevant for the type is filled
+                  required:
+                    - type
+                  properties:
+                    type:
+                      type: string
+                      description: type of this component
+                      example: etd_portfolio
+                    otc_csv:
+                      $ref: '#/definitions/otc_csv'
+                    otc_cb202:
+                      $ref: '#/definitions/otc_cb202'
+                    otc_fpml:
+                      $ref: '#/definitions/otc_fpml'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              business_date: 20180809
+              live: false
+              live_timestamp: 0
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
   /greeks:
     post:
       summary: Greek Calculation Request
