@@ -700,7 +700,7 @@ paths:
     post:
       summary: OTC Trade Details
       description: >-
-        Parse a short human-readable description of OTC trade, e.g. to display on a GUI.
+        Return a short human-readable description of OTC trade, e.g. to display on a GUI.
         The description is not complete, i.e. it is not sufficient to evaluate the trade.
       parameters:
         - $ref: '#/parameters/x_dbp_apikey'
@@ -752,6 +752,40 @@ paths:
                 $ref: '#/definitions/live'
               live_timestamp:
                 $ref: '#/definitions/live_timestamp'
+              otc_trade_details:
+                type: array
+                items:
+                  type: object
+                  description: details of one OTC trade
+                  properties:
+                    internal_trade_id:
+                      type: string
+                      description: internalTradeID or tradeId as submitted in the request
+                      example: 1
+                    type:
+                      type: string
+                      description: FRA or Swap
+                      example: Swap
+                    pay:
+                      type: string
+                      description: pay leg, either Fixed rate or index plus optional spread
+                      example: Fixed 1.05%
+                    receive:
+                      type: string
+                      description: receive leg, either Fixed rate or index plus optional spread
+                      example: EUR-EURIBOR-6M +2bp
+                    notional:
+                      type: number
+                      description: trade notional
+                      example: 100000000
+                    notional_currency:
+                      type: string
+                      description: notional currency
+                      example: EUR
+                    maturity:
+                      type: string
+                      description: total maturity since effective date, in years
+                      example: 6.2Y
   /greeks:
     post:
       summary: Greek Calculation Request
