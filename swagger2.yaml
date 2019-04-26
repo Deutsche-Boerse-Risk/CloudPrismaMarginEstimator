@@ -744,6 +744,14 @@ paths:
               business_date: 20180809
               live: false
               live_timestamp: 0
+              otc_trade_details:
+                - internal_trade_id:
+                  type: FRA
+                  pay: Fixed 0.15%
+                  receive: EUR-EURIBOR-3M
+                  notional: 100000000
+                  notional_currency: EUR
+                  maturity: 0.8Y
           schema:
             type: object
             properties:
