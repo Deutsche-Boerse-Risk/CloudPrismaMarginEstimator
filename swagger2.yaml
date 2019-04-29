@@ -745,7 +745,7 @@ paths:
               live: false
               live_timestamp: 0
               otc_trade_details:
-                - internal_trade_id:
+                - internal_trade_id: 1
                   type: FRA
                   pay: Fixed 0.15%
                   receive: EUR-EURIBOR-3M
@@ -774,15 +774,15 @@ paths:
                     type:
                       type: string
                       description: FRA or Swap
-                      example: Swap
+                      example: FRA
                     pay:
                       type: string
                       description: pay leg, either Fixed rate or index plus optional spread
-                      example: Fixed 1.05%
+                      example: Fixed 0.15%
                     receive:
                       type: string
                       description: receive leg, either Fixed rate or index plus optional spread
-                      example: EUR-EURIBOR-6M +2bp
+                      example: EUR-EURIBOR-3M +2bp
                     notional:
                       type: number
                       description: trade notional
@@ -794,7 +794,7 @@ paths:
                     maturity:
                       type: string
                       description: total maturity since effective date, in years
-                      example: 6.2Y
+                      example: 0.8Y
   /greeks:
     post:
       summary: Greek Calculation Request
