@@ -1,4 +1,49 @@
-# OTC Trades in CSV Format
+# GUI User Guide
+
+[cPME GUI](https://eurexmargins.prod.dbgservice.com/estimator) offers margin calculation for:
+
+- Eurex derivatives (ETD)
+    - uploaded in a simplified CSV format
+    - or entered directly directly on GUI
+- OTC trades accepted by Eurex OTC, except FX swaps and inflation swaps
+    - uploaded in CSV format known from Margin Calculator
+
+It is assumed that the uploaded portfolio belongs to one account and the positions can offset each other.
+When both ETD and OTC part of portfolio is entered, user can select whether cross-margining between ETD and OTC should be applied using "Cross margin" checkbox.
+
+## ETD CSV Format
+
+attribute | mandatory for Options / Futures? | example
+--- | --- | --- 
+Product ID | | ODAX
+Maturity | mandatory | 201912
+Call Put Flag | O: mandatory, F: ignored | C
+Exercise Price | O: mandatory, F: ignored | 11000
+Version Number | optional, defaults to 0 | 0
+Net LS Balance | mandatory | -100
+
+Example with one future and one option:
+
+```csv
+Product ID,Maturity,Call Put Flag,Exercise Price,Version Number,Net LS Balance
+H3OL,202012,,,0,100
+NVU,202006,P,36.000000,0,-200
+```
+
+## ETD GUI Entry
+
+Positions can also be entered manually on GUI:
+
+column | description
+--- | ---
+Product ID | dropdown with eligible products
+Maturity | dropdown with contract year/month of standard series, e.g. "201712"
+P/C | Call/Put flag, for options dropdown with "C" or "P", empty and disabled for futures
+Strk | Strike, for options dropdown filled with exercise price of standard series of selected maturity, empty and disabled for flex
+Version | dropdown with distinct version numbers for given maturity and strike, non-editable if only one version exists
+Net Position | free text field to enter the position size, negative for short position
+
+## OTC CSV Format
 
 One line contains all information for one trade, including both its legs.
 All columns must be present, although some can be empty.
@@ -7,7 +52,7 @@ For certain trade types, even some optional columns must be filled, see the desc
 If unsure about possible combinations of attribute values please check
   [EurexOTC Clear IRS Product List](https://www.eurexclearing.com/resource/blob/227404/ff4638f2a3bfedbf511868ef54c6a153/data/ec15075e_Attach.pdf).
 
-## Basic OTC trade attributes
+### Basic OTC trade attributes
 
 - internalTradeID*: id of the trade to distinguish it in drilldown, must be unique
 - tradeType*: IRS (or Swap), OIS, FRA, ZC
@@ -15,7 +60,7 @@ If unsure about possible combinations of attribute values please check
 - effectiveDate*: effective date as DD/MM/YYYY, e.g. 20/12/2018
 - terminationDate*: termination date as DD/MM/YYYY, e.g. 20/12/2028
 
-## Pay leg attributes
+### Pay leg attributes
 
 - payLegType*: fixedLeg or floatingLeg
 - payLegSpread: rate for fixedLeg in %, or spread (optional) for floatingLeg in bp
@@ -36,14 +81,26 @@ If unsure about possible combinations of attribute values please check
 - payAdjustment: ADJUSTED, UNADJUSTED, MAT_UNADJUSTED
 - payRollMethod: Standard, IMM
 
-## Receive leg attributes
+### Receive leg attributes
 
 The receive leg has the same attributes as pay leg above, except prefix "pay" is replaced by "rcv".
 
-## Example
+### Example
 
 ```csv
 internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod
 1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
 ```
+
+## Results
+
+The calculated margin is displayed by default on liquidation group level.
+
+The drilldown icon next to each liquidation group shows further details - different margin components on liquidation group split level.
+
+In the ETD position table, each position has:
+
+- Initial margin, this is approximate contribution of the position to Initial margin based on so-called component VaR; note that this is only an indication, given the nature of portfolio margining there is no such thing as exact contribution of single position to the margin
+- Premium margin
+- drilldown icon which shows distribution of the margins to liquidation group splits - this is relevant on for Fixed Income/Money Market products in case of cross-margining with OTC, other liquidation groups have only one split
 
