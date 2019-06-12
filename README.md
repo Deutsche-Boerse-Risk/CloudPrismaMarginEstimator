@@ -6,7 +6,39 @@ Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
 - **[DBG Digital Business Platform - gateway for accessing the API](https://console.developer.deutsche-boerse.com/)**
 - **[cPME GUI](https://eurexmargins.prod.dbgservice.com)**
 
+# Know Limitations
+
+- does not support cash market (equities, bonds, ...)
+- does not support FX swaps and inflation swaps
+- does not support new flexible contracts, only the ones that already exist
+
 # FAQ
+
+## Comparison to Other Margin Calculation Tools
+
+### Summary
+
+feature / tool         | cPME API      | cPME GUI | OpenGamma PME | Online Margin Calculator
+--- | --- | --- | --- | ---
+Eurex products (ETD)   | yes           | yes           | yes           | yes
+OTC interest rate trades | yes         | yes           | yes           | yes
+OTC FX trades          | no            | no            | no            | yes
+historical calculation | yes           | no            | yes           | yes
+intraday calculation   | yes           | yes           | no            | yes
+can run locally        | no            | no            | yes           | no
+replicates production values | ETD     | ETD           | ETD           | ETD and OTC
+
+### What is the differenece to cPME GUI?
+
+The GUI is using the cPME API as well, but not every API feature is provided by the GUI.
+
+### What is the advantage over OpenGamma PME?
+
+No need to install, upgrade and maintain the software. You do not have to provide Transparency Enablers every day as an input.
+
+### What is the advantage over Online Margin Calculator?
+
+cPME provides API also for Eurex ETD, whereas Margin Calculator offers API only for OTC.
 
 ## Submitting Calculation Request
 
@@ -57,3 +89,24 @@ Compare the margin on liquidation group level against CC050 report. The margin o
 
 No, simulation (a.k.a. sandbox) uses different scenarios and has different prices than production, therefore it calculates different margin for the same portfolio.
 
+## Security
+
+### Where is cPME running?
+
+cPME is deployed in Deutsche Boerse VPC (Virtual Private Cloud) within the Frankfurt region of Amazon Web Services.
+
+### How is the communication designed, is it encrypted?
+
+In essence cPME has a simple client-server architecture.
+Client is either your browser or whatever you are making direct API calls from.
+Server is the backend accepting API calls.
+All communication between the backend and clients are running over HTTS.
+
+### Are the requests or results archived?
+
+On the backend side all calculations are done in memory only. No records are kept of the information processed.
+
+### How do you ensure availability and disaster recovery?
+
+cPME is stateless and highly elastic.
+It runs in a highly-available Kubernetes cluster spread that is spread across three AWS Availability Zones.
