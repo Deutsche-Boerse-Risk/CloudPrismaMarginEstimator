@@ -1,4 +1,4 @@
-# cPME-API
+# Cloud Prisma Margin Estimator (cPME)
 
 Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded
 portfolio according to [Eurex Prisma
@@ -57,7 +57,7 @@ Transparency Enablers every day as an input.
 cPME provides an API also for Eurex Exchange Traded Derivatives,
 whereas the Online Margin Calculator offers API only for OTC.
 
-## Submitting a calculation request
+## Submitting a calculation request to API
 
 ### Can cPME calculate margin for all instruments?
 
