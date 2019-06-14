@@ -12,8 +12,8 @@ questions.
 Key links:
 
 - [cPME API definition at SwaggerHub][api-definition]
-- [DBG Digital Business Platform] - gateway for accessing the
-  API][api-digital-business-platform]
+- [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the
+  API
 - [cPME GUI][cpme-gui]
 - [GUI User Guide](docs/gui.md)
 
