@@ -30,15 +30,16 @@ Key links:
 
 ### Summary Table
 
-| feature / tool               | cPME API | cPME GUI | OpenGamme PME | Online Margin Calculator |
+| feature / tool               | cPME API | cPME GUI | OpenGamma PME | Online Margin Calculator |
 |------------------------------|----------|----------|---------------|--------------------------|
 | Eurex products (ETD)         | yes      | yes      | yes           | yes                      |
 | OTC interest rate trades     | yes      | yes      | yes           | yes                      |
 | OTC FX trades                | no       | no       | no            | yes                      |
+| equities, bonds              | no       | no       | no            | no                       |
 | historical calculation       | yes      | no       | yes           | yes                      |
 | intraday calculation         | yes      | yes      | no            | yes                      |
 | can run locally              | no       | no       | yes           | no                       |
-| replicates production values |          | ETD      | ETD           | ETD and OTC              |
+| replicates production values | ETD      | ETD      | ETD           | ETD and OTC              |
 
 ### What is the difference between the cPME GUI and API?
 
@@ -127,7 +128,7 @@ Fixed Income/Money Market positions and OTC IRS trades are both in
 
 Without cross-margining, FI/MM positions are assigned to 2-day holding
 period split `PFI01_HP2` and OTC trades are assigned to 5-day holding
-period split `PFI01_HP5`. Margins in each split is calculated
+period split `PFI01_HP5`. Margins in each split are calculated
 independently. With cross-margining, some FI/MM positions are moved
 (or partially moved) to `PFI01_HP5` split to offset the risk of OTC
 trades and lower the overall margin.
