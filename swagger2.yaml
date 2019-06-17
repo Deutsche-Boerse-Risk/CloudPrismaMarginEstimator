@@ -85,6 +85,8 @@ info:
 
     ## Change log
 
+    - x.x.x OTC trade details resource and also included in estimator response
+
     - 4.1.1 historical snapshots also for list of products, series and currencies
 
   termsOfService: 'https://eurexmargins.prod.dbgservice.com/terms'
@@ -184,7 +186,7 @@ paths:
                     product_tick_value:
                       type: number
                     liquidation_group:
-                      type: string
+                      $ref: '#/definitions/liquidation_group'
                     xm_eligibility:
                       type: boolean
                   required:
@@ -611,11 +613,9 @@ paths:
                   type: object
                   properties:
                     liquidation_group:
-                      type: string
-                      description: Liquidation group
+                      $ref: '#/definitions/liquidation_group'
                     liquidation_group_split:
-                      type: string
-                      description: Liquidation group split
+                      $ref: '#/definitions/liquidation_group_split'
                     initial_margin:
                       type: number
                       description: Initial margin on liquidation group split level, equals to market risk plus add ons
@@ -679,23 +679,47 @@ paths:
                     net_ls_balance:
                       $ref: '#/definitions/net_ls_balance'
                     liquidation_group:
-                      type: string
-                      description: Liquidation group
+                      $ref: '#/definitions/liquidation_group'
                     liquidation_group_split:
-                      type: string
-                      description: Liquidation group split
+                      $ref: '#/definitions/liquidation_group_split'
                     component_margin:
-                      type: number
-                      description: Initial margin on position level is a approximation based on compVaR. compVaR is calculated to split VaR among positions, then other add-ons are added proportionally to compVaR
+                      $ref: '#/definitions/component_margin'
                     component_margin_currency:
-                      type: string
-                      description: Currency of component margin
+                      $ref: '#/definitions/component_margin_currency'
                     premium_margin:
                       type: number
                       description: Premium margin for the position
                     premium_margin_currency:
                       type: string
                       description: Currency of premium margin - currency of the product, can be different from clearing currency
+              otc_drilldowns:
+                type: array
+                description: Margin figures and short trade desription on OTC trade level. Internal Trade Id is used as a key.
+                items:
+                  type: object
+                  properties:
+                    trade_id:
+                      $ref: '#/definitions/trade_id'
+                    liquidation_group:
+                      $ref: '#/definitions/liquidation_group'
+                    liquidation_group_split:
+                      $ref: '#/definitions/liquidation_group_split'
+                    component_margin:
+                      $ref: '#/definitions/component_margin'
+                    component_margin_currency:
+                      $ref: '#/definitions/component_margin_currency'
+                    type:
+                      $ref: '#/definitions/otc_type'
+                    pay:
+                      $ref: '#/definitions/pay'
+                    receive:
+                      $ref: '#/definitions/receive'
+                    notional:
+                      $ref: '#/definitions/notional'
+                    notional_currency:
+                      $ref: '#/definitions/notional_currency'
+                    maturity:
+                      $ref: '#/definitions/otc_maturity'
   /otc_trade_details:
     post:
       summary: OTC Trade Details
@@ -745,7 +769,7 @@ paths:
               live: false
               live_timestamp: 0
               otc_trade_details:
-                - internal_trade_id: 1
+                - trade_id: "1"
                   type: FRA
                   pay: Fixed 0.15%
                   receive: EUR-EURIBOR-3M
@@ -767,34 +791,20 @@ paths:
                   type: object
                   description: details of one OTC trade
                   properties:
-                    internal_trade_id:
-                      type: string
-                      description: internalTradeID or tradeId as submitted in the request
-                      example: 1
+                    trade_id:
+                      $ref: '#/definitions/trade_id'
                     type:
-                      type: string
-                      description: FRA or Swap
-                      example: FRA
+                      $ref: '#/definitions/otc_type'
                     pay:
-                      type: string
-                      description: pay leg, either Fixed rate or index plus optional spread
-                      example: Fixed 0.15%
+                      $ref: '#/definitions/pay'
                     receive:
-                      type: string
-                      description: receive leg, either Fixed rate or index plus optional spread
-                      example: EUR-EURIBOR-3M +2bp
+                      $ref: '#/definitions/receive'
                     notional:
-                      type: number
-                      description: trade notional
-                      example: 100000000
+                      $ref: '#/definitions/notional'
                     notional_currency:
-                      type: string
-                      description: notional currency
-                      example: EUR
+                      $ref: '#/definitions/notional_currency'
                     maturity:
-                      type: string
-                      description: total maturity since effective date, in years
-                      example: 0.8Y
+                      $ref: '#/definitions/otc_maturity'
   /greeks:
     post:
       summary: Greek Calculation Request
@@ -1154,6 +1164,46 @@ definitions:
         example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     required:
     - csv
+  liquidation_group:
+    type: string
+    description: Liquidation group
+  liquidation_group_split:
+    type: string
+    description: Liquidation group split
+  component_margin:
+    type: number
+    description: Initial margin on position level is a approximation based on compVaR. compVaR is calculated to split VaR among positions, then other add-ons are added proportionally to compVaR
+  component_margin_currency:
+    type: string
+    description: Currency of component margin
+  trade_id:
+    type: string
+    description: internalTradeID or tradeId as submitted in the request
+    example: "1"
+  otc_type:
+    type: string
+    description: FRA or Swap
+    example: FRA
+  pay:
+    type: string
+    description: pay leg, either Fixed rate or index plus optional spread
+    example: Fixed 0.15%
+  receive:
+    type: string
+    description: receive leg, either Fixed rate or index plus optional spread
+    example: EUR-EURIBOR-3M +2bp
+  notional:
+    type: number
+    description: trade notional
+    example: 100000000
+  notional_currency:
+    type: string
+    description: notional currency
+    example: EUR
+  otc_maturity:
+    type: string
+    description: total maturity since effective date, in years
+    example: 0.8Y
   greek_types:
     type: array
     description: Greek types, array with the following valid values
