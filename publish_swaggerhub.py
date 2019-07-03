@@ -43,7 +43,10 @@ with open(SWAGGER_FILE[sys.argv[1]], 'r') as infile:
                             data=swagger,
                             headers={'Content-Type': 'application/yaml', 'Authorization': SWAGGERHUB_KEY}
                            )
-        if rsp.status_code != 200:
-            print("POST %s ERROR %d: %s\nbody: %s" % (api, rsp.status_code, rsp.text, swagger[0:400]))
+        if rsp.status_code == 200:
+            print("POST %s OK" % (api))
+        elif rsp.status_code == 201:
+            print("POST %s CREATED NEW VERSION" % (api))
         else:
-            print("POST %s OK %d" % (api, rsp.status_code))
+            print("POST %s ERROR %d: %s\nbody: %s" % (api, rsp.status_code, rsp.text, swagger[0:400]))
+
