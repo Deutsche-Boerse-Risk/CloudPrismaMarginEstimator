@@ -85,7 +85,7 @@ info:
 
     ## Change log
 
-    - x.x.x OTC trade details resource and also included in estimator response
+    - 4.2.1 OTC trade details resource and also included in estimator response
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
 
