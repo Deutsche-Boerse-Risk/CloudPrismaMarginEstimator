@@ -85,6 +85,8 @@ info:
 
     ## Change log
 
+    - x.x.x list of snapshots can be requested
+
     - 4.2.1 OTC trade details resource and also included in estimator response
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
@@ -305,6 +307,79 @@ paths:
                 type: array
                 items:
                   type: string
+  /snapshots:
+    get:
+      summary: List Available Snapshots
+      description: List of end-of-day or start-of-day snapshots that can be used in other requests.
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date_from'
+        - $ref: '#/parameters/business_date_to'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              snapshots:
+                - business_date: 20180809
+                  live: false
+                  otc_available: true
+                - business_date: 20180810
+                  live: true
+                  otc_available: true
+          schema:
+            type: object
+            properties:
+              snapshots:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    business_date:
+                      $ref: '#/definitions/business_date'
+                    live:
+                      $ref: '#/definitions/live'
+                    otc_available:
+                      $ref: '#/definitions/otc_available'
+  /live_snapshots:
+    get:
+      summary: List Available Live Snapshots for Given Day
+      description: List of live (intraday) snapshots for given business_date. Contains also start-of-day snapshot.
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              live_snapshots:
+                - business_date: 20180809
+                  live: true
+                  otc_available: true
+                  live_timestamp: 0
+                - business_date: 20180809
+                  live: true
+                  otc_available: true
+                  live_timestamp: 1562162876
+          schema:
+            type: object
+            properties:
+              snapshots:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    business_date:
+                      $ref: '#/definitions/business_date'
+                    live:
+                      $ref: '#/definitions/live'
+                    otc_available:
+                      $ref: '#/definitions/otc_available'
+                    live_timestamp:
+                      $ref: '#/definitions/live_timestamp'
   /estimator:
     post:
       summary: Margin Calculation Request
@@ -1024,6 +1099,16 @@ parameters:
     in: query
     type: number
     description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means start-of-day.
+  business_date_from:
+    name: business_date_from
+    in: query
+    type: number
+    description: Start of a date range, in YYYYMMDD format
+  business_date_to:
+    name: business_date_to
+    in: query
+    type: number
+    description: End of a date range, in YYYYMMDD format
 
 definitions:
   business_date:
@@ -1038,6 +1123,10 @@ definitions:
     type: number
     description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means start-of-day.
     example: 0
+  otc_available:
+    type: boolean
+    description: Is OTC available in the snapshot? Snapshot can exist without OTC, then only ETD portfolio can be evaluated. Snapshot without ETD is not possible. Live snapshots can be marked as otc_available which means OTC portfolio will be evaluated, however the OTC market data are from start-of-day, not from the particular timestamp.
+    example: true
   snapshot:
     type: object
     description: Optional point in time as of which the result is calculated. If only business_date is specified, latest snapshot from that business date is used. The timestamp is used only when live is true.
