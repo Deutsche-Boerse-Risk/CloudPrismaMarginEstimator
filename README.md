@@ -72,7 +72,7 @@ cPME can evaluate derivatives, both exchange traded
 Other OTC instruments, such as inflation swaps and FX swaps, are not
 yet supported.
 
-### What to do when a request fails for a big portfolio?
+#### What to do when a request fails for a big portfolio?
 
 Especially XML formats of a portfolio can be quite large which can
 cause connection problems. Try compressing the portfolio, see
@@ -98,6 +98,16 @@ Historical requests can take several minutes and might be refused if
 cPME calculation cluster is busy as there is an upper limit on the
 number of concurrent global historical calculations. In case your
 request historical request is rejected try again in 15 minutes.
+
+### What is the difference between versions 1.0 and 2.0?
+
+Version 2.0 has slightly more complex [estimator request](https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/default/post_estimator)
+which allows to submit multiple portfolio components of the same type,
+e.g. two parts of OTC portfolio both in CSV format.
+
+There are no plans to decomission 1.0, but some future functionality might
+be implemented only in 2.0. One application may use both resources from
+1.0 and 2.0., you do not have to commit to one version.
 
 ## Interpreting a margin result
 
