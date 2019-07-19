@@ -85,7 +85,7 @@ info:
 
     ## Change log
 
-    - x.x.x OTC trade details in estimator response
+    - 4.2.1 OTC trade details in estimator response
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
 
@@ -691,6 +691,12 @@ paths:
                       $ref: '#/definitions/liquidation_group'
                     liquidation_group_split:
                       $ref: '#/definitions/liquidation_group_split'
+                    npv:
+                      type: number
+                      description: Net Present Value of the trade
+                    dv01:
+                      type: number
+                      description: DV01 sensitivity of the trade
                     component_margin:
                       $ref: '#/definitions/component_margin'
                     component_margin_currency:
