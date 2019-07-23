@@ -3,18 +3,31 @@
 [cPME GUI](https://eurexmargins.prod.dbgservice.com/estimator) offers margin calculation for:
 
 - Eurex derivatives (ETD)
-    - uploaded in a simplified CSV format
+    - [uploaded in a simplified CSV format](#upload-etd-portfolio)
     - or entered directly directly on GUI
 - OTC trades accepted by Eurex OTC, except FX swaps and inflation swaps
     - uploaded in CSV format known from Margin Calculator
 
 It is assumed that the uploaded portfolio belongs to one account and the positions can offset each other.
-When both ETD and OTC part of portfolio is entered, user can select whether cross-margining between ETD and OTC should be applied using "Cross margin" checkbox.
 
-## ETD CSV Format
+The following sections describe separate entry of ETD and OTC portfolio, but it is possible to enter both. In that case you can select whether cross-margining between ETD and OTC should be applied using "Cross margin" checkbox.
 
-attribute | mandatory for Options / Futures? | example
---- | --- | --- 
+## Upload ETD Portfolio
+
+### Launch cPME GUI
+
+1. Navigate to [https://eurexmargins.prod.dbgservice.com](https://eurexmargins.prod.dbgservice.com).
+1. If you entered the first time, Terms of Use are shown, read them and accept them.
+
+### Prepare ETD Portfolio
+
+1. Download an example clicking "Eurex Portfolio Example" - "Download as a CSV file".
+1. Edit the CSV file to replace the example with the positions you wish.
+
+Columns in the CSV have the following meaning:
+
+column | mandatory for Options / Futures? | example
+--- | --- | ---: 
 Product ID | | ODAX
 Maturity | mandatory | 201912
 Call Put Flag | O: mandatory, F: ignored | C
@@ -22,13 +35,22 @@ Exercise Price | O: mandatory, F: ignored | 11000
 Version Number | optional, defaults to 0 | 0
 Net LS Balance | mandatory | -100
 
-Example with one future and one option:
+Example CSV file with one future and one option:
 
 ```csv
 Product ID,Maturity,Call Put Flag,Exercise Price,Version Number,Net LS Balance
 H3OL,202012,,,0,100
 NVU,202006,P,36.000000,0,-200
 ```
+
+### Upload the Prepared ETD File
+
+1. Click "Upload Eurex Portfolio".
+1. Select your prepared portfolio.
+
+### Read the Results
+
+1. Top box displays "Initial Margin" and "Premium Margin" for each liquidation group
 
 ## ETD GUI Entry
 
