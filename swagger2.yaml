@@ -1252,6 +1252,7 @@ definitions:
       - xml
   otc_sensitivities:
     type: object
+    description: Table of DV01 sensitivities (a.k.a. deltas) of the OTC portfolio. There can be only one component of this type as input for margin calculation.
     properties:
       csv:
         type: string
