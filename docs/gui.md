@@ -62,9 +62,8 @@ Position table shows:
 
 - "Initial margin", an approximation of contribution of given position by "component VaR" method
   - note that this is only an indication, given the nature of portfolio margining there is no such thing as exact contribution of a single position to the margin
-- Premium margin
 - "Premium margin" for options (except future-style options)
-- drilldown icon to display distribution between splits (interesting only for Fixed Incom derivatives)
+- drilldown icon to display distribution between splits (interesting only for Fixed Income derivatives)
 
 ## Enter ETD Portfolio
 
