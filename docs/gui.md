@@ -3,18 +3,31 @@
 [cPME GUI](https://eurexmargins.prod.dbgservice.com/estimator) offers margin calculation for:
 
 - Eurex derivatives (ETD)
-    - uploaded in a simplified CSV format
-    - or entered directly directly on GUI
+    - [uploaded in a simplified CSV format](#upload-etd-portfolio)
+    - or [entered directly directly on GUI](#enter-etd-portfolio)
 - OTC trades accepted by Eurex OTC, except FX swaps and inflation swaps
-    - uploaded in CSV format known from Margin Calculator
+    - [uploaded in CSV format known from Margin Calculator](#upload-otc-portfolio)
 
 It is assumed that the uploaded portfolio belongs to one account and the positions can offset each other.
-When both ETD and OTC part of portfolio is entered, user can select whether cross-margining between ETD and OTC should be applied using "Cross margin" checkbox.
 
-## ETD CSV Format
+The following sections describe separate entry of ETD and OTC portfolio, but it is possible to enter both. In that case you can select whether cross-margining between ETD and OTC should be applied using "Cross margin" checkbox.
 
-attribute | mandatory for Options / Futures? | example
---- | --- | --- 
+## Upload ETD Portfolio
+
+### Launch cPME GUI
+
+1. Navigate to [https://eurexmargins.prod.dbgservice.com](https://eurexmargins.prod.dbgservice.com).
+1. If you entered the first time, Terms of Use are shown, read them and accept them.
+
+### Prepare ETD Portfolio
+
+1. Download an example clicking "Eurex Portfolio Example" - "Download as a CSV file".
+1. Edit the CSV file to replace the example with the positions you wish.
+
+Columns in the CSV have the following meaning:
+
+column | mandatory for Options / Futures? | example
+--- | --- | ---: 
 Product ID | | ODAX
 Maturity | mandatory | 201912
 Call Put Flag | O: mandatory, F: ignored | C
@@ -22,7 +35,7 @@ Exercise Price | O: mandatory, F: ignored | 11000
 Version Number | optional, defaults to 0 | 0
 Net LS Balance | mandatory | -100
 
-Example with one future and one option:
+Example CSV file with one future and one option:
 
 ```csv
 Product ID,Maturity,Call Put Flag,Exercise Price,Version Number,Net LS Balance
@@ -30,9 +43,36 @@ H3OL,202012,,,0,100
 NVU,202006,P,36.000000,0,-200
 ```
 
-## ETD GUI Entry
+### Upload the Prepared ETD File
+
+1. Click "Upload Eurex Portfolio".
+1. Select your prepared portfolio.
+
+### Read the Results
+
+Top box displays:
+
+- "Total Margin", a sum of initial margin and premium margin for all [liquidation groups](https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/#what-liquidation-groups-are-there-and-what-is-liquidation-group-split)
+- "Initial Margin" and "Premium Margin", for each liquidation group and total
+- drilldown icon (split arrow) next to liquidation group row opens further breakdown of initial margin
+  - into liquidation groups splits (only for PFI01, i.e. Fixed Income and IRS)
+  - into margin components (market risk and the add-ons)
+
+Position table shows:
+
+- "Initial margin", an approximation of contribution of given position by "component VaR" method
+  - note that this is only an indication, given the nature of portfolio margining there is no such thing as exact contribution of a single position to the margin
+- Premium margin
+- "Premium margin" for options (except future-style options)
+- drilldown icon to display distribution between splits (interesting only for Fixed Incom derivatives)
+
+## Enter ETD Portfolio
 
 Positions can also be entered manually on GUI:
+
+1. [launch cPME GUI](#launch-cpme-gui)
+2. Click "Start an empty portfolio"
+3. Enter the positions you wish:
 
 column | description
 --- | ---
@@ -43,7 +83,21 @@ Strk | Strike, for options dropdown filled with exercise price of standard serie
 Version | dropdown with distinct version numbers for given maturity and strike, non-editable if only one version exists
 Net Position | free text field to enter the position size, negative for short position
 
-## OTC CSV Format
+4. Click "+" or press Enter after each position
+5. Click "Recalculate margin"
+6. [Read the results](#read-the-results)
+
+## Upload OTC Portfolio
+
+Upload of OTC portfolio is similar to ETD portfolio upload:
+
+1. [launch cPME GUI](#launch-cpme-gui)
+2. Prepare your [OTC trades in CSV format](#otc-portfolio-csv-format)
+  - you can use [Excel template](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_trade_template.xlsm?raw=true) to generate the CSV, see [OTC template description](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_template_description.xls?raw=true)
+3. Click "Upload OTC portfolio" and select the prepared CSV file
+4. [Read the results](#read-the-results), only the top box will be shown, not individual trades
+
+## OTC Portfolio CSV Format
 
 One line contains all information for one trade, including both its legs.
 All columns must be present, although some can be empty.
@@ -91,16 +145,3 @@ The receive leg has the same attributes as pay leg above, except prefix "pay" is
 internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod
 1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
 ```
-
-## Results
-
-The calculated margin is displayed by default on liquidation group level.
-
-The drilldown icon next to each liquidation group shows further details - different margin components on liquidation group split level.
-
-In the ETD position table, each position has:
-
-- Initial margin, this is approximate contribution of the position to Initial margin based on so-called component VaR; note that this is only an indication, given the nature of portfolio margining there is no such thing as exact contribution of single position to the margin
-- Premium margin
-- drilldown icon which shows distribution of the margins to liquidation group splits - this is relevant on for Fixed Income/Money Market products in case of cross-margining with OTC, other liquidation groups have only one split
-
