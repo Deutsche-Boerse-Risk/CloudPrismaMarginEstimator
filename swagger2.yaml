@@ -6,11 +6,13 @@ info:
     Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
     according to Eurex Prisma methodology. The application is available to both members
     and non-members of Eurex Clearing. It can be accessed via web user interface,
-    see [cPME GUI](https://eurexmargins.prod.dbgservice.com) or directly through API,
+    see [cPME GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
     described here.
 
     It supports also greek and stress price calculation - these analytical tools
     are not related to the margin.
+
+    [FAQ](https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/)
 
     ## API Key
 
