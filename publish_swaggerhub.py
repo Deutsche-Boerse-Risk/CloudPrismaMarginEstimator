@@ -5,7 +5,7 @@ import os
 import requests
 import sys
 
-SWAGGER_FILE = {
+SWAGGER_FILE = {  # "-prod" suffix will be added for PROD environment, e.g. "swagger-prod.yaml"
         '1': 'swagger.yaml',
         '2': 'swagger2.yaml'
     }
@@ -32,9 +32,13 @@ if 'SWAGGERHUB_KEY' not in os.environ:
     exit(2)
 SWAGGERHUB_KEY = os.environ['SWAGGERHUB_KEY']
 
-with open(SWAGGER_FILE[sys.argv[1]], 'r') as infile:
-    swagger = infile.read()
-    for env in sys.argv[2:]:
+for env in sys.argv[2:]:
+    filename = SWAGGER_FILE[sys.argv[1]]
+    if 'PROD' in env:
+        filename = filename.replace('.yaml', '-prod.yaml')
+    print("posting %s to %s" % (filename, env))
+    with open(filename, 'r') as infile:
+        swagger = infile.read()
         if env not in SWAGGERHUB_API:
             print("Error: %s is not a valid environment" % env)
             continue
