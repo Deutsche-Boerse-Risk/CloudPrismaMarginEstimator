@@ -755,10 +755,10 @@ paths:
                       $ref: '#/definitions/liquidation_group_split'
                     npv:
                       type: number
-                      description: Net Present Value of the trade
+                      description: Net Present Value of the trade in notional currency
                     dv01:
                       type: number
-                      description: DV01 sensitivity of the trade
+                      description: DV01 sensitivity of the trade in notional currency
                     component_margin:
                       $ref: '#/definitions/component_margin'
                     component_margin_currency:
