@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Cloud Prisma Margin Estimator API
-  version: "2.0"
+  version: "1.0"
   description: >-
     Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
     according to Eurex Prisma methodology. The application is available to both members
@@ -25,7 +25,7 @@ info:
 
     <pre>
     curl --header 'X-DBP-APIKEY: your-key' \
-      https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/products
+      https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/products
     </pre>
 
 
@@ -47,10 +47,10 @@ info:
     For example:
 
 
-    <pre>echo '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
+    <pre>echo '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}' \
       | gzip \
       | curl -s -H "X-DBP-APIKEY: your-key" -H "Content-Type: application/json" \
-        https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator-2-0/2.0.0/estimator \
+        https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/estimator \
         --data-binary @- -H "Content-Encoding: gzip" -H "Accept-Encoding: gzip" \
       | gunzip
     </pre>
@@ -72,10 +72,10 @@ info:
     Example of requesting the latest snapshot of given date, in GET and POST type of request:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
-      'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator-2-0/2.0.0/series?products=FGBM&business_date=20190307'
-    echo '{"snapshot":{"business_date":20190307},"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
+      'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/series?products=FGBM&business_date=20190307'
+    echo '{"snapshot":{"business_date":20190307}, "etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}' \
       | curl -H 'X-DBP-APIKEY: your-key' \
-        'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator-2-0/2.0.0/estimator' \
+        'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator/1.0.0/estimator' \
         --data-binary @-
     </pre>
 
@@ -87,13 +87,15 @@ info:
 
     ## Change log
 
-    - 4.2.1 OTC trade details resource and also included in estimator response
+    - 4.2.1 OTC trade details in estimator response
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
 
+    - 4.0.0 introduction of OTC portfolio components, cross-margining and historical snapshots
+
   termsOfService: 'https://eurexmargins.prod.dbgservice.com/terms'
 host: api.developer.deutsche-boerse.com
-basePath: /prod/prisma-margin-estimator-2-0/2.0.0/
+basePath: /prod/prisma-margin-estimator/1.0.0/
 schemes:
   - https
 paths:
@@ -318,6 +320,8 @@ paths:
 
         - ETD is submitted as
           - `etd_portfolio` JSON array, see request model
+          - or `etd_csv` with positions in CSV format
+          - or `etd_cp005`, i.e. Eurex CP005 report
 
         - OTC is submitted as
           - `otc_csv` with trades in CSV format known from Margin Calculator or Prisma Margin Estimator, see description bellow
@@ -348,10 +352,14 @@ paths:
 
         <pre>
         curl --header 'X-DBP-APIKEY: your-key' \
-          https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator \
-          -d '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}'
+          https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/estimator \
+          -d '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}'
         </pre>
 
+
+        ## ETD CSV format
+
+        See the example in [GUI](https://eurexmargins.prod.dbgservice.com/estimator) for simpler CSV format that does not support flexible instruments or use the CSV format known from Margin Calculator.
 
         ## OTC CSV format
 
@@ -445,19 +453,17 @@ paths:
           schema:
             type: object
             example:
-              portfolio_components:
-                - type: etd_portfolio
-                  etd_portfolio:
-                    - line_no: 1
-                      product_id: FEXD
-                      maturity: 202812
-                      net_ls_balance: 10
-                    - line_no: 2
-                      product_id: OESX
-                      maturity: 202812
-                      call_put_flag: C
-                      exercise_price: 2400
-                      net_ls_balance: -10
+              etd_portfolio:
+                - line_no: 1
+                  product_id: FEXD
+                  maturity: 202812
+                  net_ls_balance: 10
+                - line_no: 2
+                  product_id: OESX
+                  maturity: 202812
+                  call_put_flag: C
+                  exercise_price: 2400
+                  net_ls_balance: -10
             properties:
               snapshot:
                 $ref: '#/definitions/snapshot'
@@ -467,57 +473,66 @@ paths:
                 type: boolean
                 description: enable cross-margining between OTC and Fixed Income
                 example: True
-              portfolio_components:
+              etd_portfolio:
                 type: array
-                description: array of portfolio components
                 items:
                   type: object
-                  description: one portfolio component, only type and one structure relevant for the type is filled
-                  required:
-                    - type
                   properties:
-                    type:
-                      type: string
-                      description: type of this component
-                      example: etd_portfolio
-                    etd_portfolio:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          line_no:
-                            $ref: '#/definitions/line_no'
-                          product_id:
-                            $ref: '#/definitions/product_id'
-                          maturity:
-                            $ref: '#/definitions/maturity'
-                          call_put_flag:
-                            $ref: '#/definitions/call_put_flag'
-                          exercise_price:
-                            $ref: '#/definitions/exercise_price'
-                          version_number:
-                            $ref: '#/definitions/version_number'
-                          iid:
-                            $ref: '#/definitions/iid'
-                          instrument_type:
-                            $ref: '#/definitions/instrument_type'
-                          exercise_style:
-                            $ref: '#/definitions/exercise_style'
-                          net_ea:
-                            $ref: '#/definitions/net_ea'
-                          net_ls_balance:
-                            $ref: '#/definitions/net_ls_balance'
-                        required:
-                          - line_no
-                          - net_ls_balance
-                    otc_csv:
-                      $ref: '#/definitions/otc_csv'
-                    otc_sensitivities:
-                      $ref: '#/definitions/otc_sensitivities'
-                    otc_cb202:
-                      $ref: '#/definitions/otc_cb202'
-                    otc_fpml:
-                      $ref: '#/definitions/otc_fpml'
+                    line_no:
+                      $ref: '#/definitions/line_no'
+                    product_id:
+                      $ref: '#/definitions/product_id'
+                    maturity:
+                      $ref: '#/definitions/maturity'
+                    call_put_flag:
+                      $ref: '#/definitions/call_put_flag'
+                    exercise_price:
+                      $ref: '#/definitions/exercise_price'
+                    version_number:
+                      $ref: '#/definitions/version_number'
+                    iid:
+                      $ref: '#/definitions/iid'
+                    instrument_type:
+                      $ref: '#/definitions/instrument_type'
+                    exercise_style:
+                      $ref: '#/definitions/exercise_style'
+                    net_ea:
+                      $ref: '#/definitions/net_ea'
+                    net_ls_balance:
+                      $ref: '#/definitions/net_ls_balance'
+                  required:
+                    - line_no
+                    - net_ls_balance
+              etd_csv:
+                type: object
+                properties:
+                  csv:
+                    type: string
+                    description: ETD portfolio as one string in CSV, in Margin Calculator GUI format or Margin Estimator GUI format
+                required:
+                - csv
+              etd_cp005:
+                type: object
+                properties:
+                  member:
+                    type: string
+                    description: optional attribute to process only positions of the member, if not given the clearing member is used
+                  account:
+                    type: string
+                    description: optional attribute to process only positions on that account, if not given "PP" account is used
+                  xml:
+                    type: string
+                    description: exchange traded portfolio as Eurex report CP005
+                required:
+                  - xml
+              otc_csv:
+                $ref: '#/definitions/otc_csv'
+              otc_sensitivities:
+                $ref: '#/definitions/otc_sensitivities'
+              otc_cb202:
+                $ref: '#/definitions/otc_cb202'
+              otc_fpml:
+                $ref: '#/definitions/otc_fpml'
       responses:
         '200':
           description: OK
@@ -688,91 +703,6 @@ paths:
                       $ref: '#/definitions/component_margin'
                     component_margin_currency:
                       $ref: '#/definitions/component_margin_currency'
-                    type:
-                      $ref: '#/definitions/otc_type'
-                    pay:
-                      $ref: '#/definitions/pay'
-                    receive:
-                      $ref: '#/definitions/receive'
-                    notional:
-                      $ref: '#/definitions/notional'
-                    notional_currency:
-                      $ref: '#/definitions/notional_currency'
-                    maturity:
-                      $ref: '#/definitions/otc_maturity'
-  /otc_trade_details:
-    post:
-      summary: OTC Trade Details
-      description: >-
-        Return a short human-readable description of OTC trade, e.g. to display on a GUI.
-        The description is not complete, i.e. it is not sufficient to evaluate the trade.
-      parameters:
-        - $ref: '#/parameters/x_dbp_apikey'
-        - name: body
-          in: body
-          schema:
-            type: object
-            example:
-              portfolio_components:
-                - type: otc_csv
-                  otc_csv:
-                    csv: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
-            properties:
-              snapshot:
-                $ref: '#/definitions/snapshot'
-              portfolio_components:
-                type: array
-                description: array of portfolio components
-                items:
-                  type: object
-                  description: one portfolio component, only type and one structure relevant for the type is filled
-                  required:
-                    - type
-                  properties:
-                    type:
-                      type: string
-                      description: type of this component
-                      example: etd_portfolio
-                    otc_csv:
-                      $ref: '#/definitions/otc_csv'
-                    otc_cb202:
-                      $ref: '#/definitions/otc_cb202'
-                    otc_fpml:
-                      $ref: '#/definitions/otc_fpml'
-      responses:
-        '200':
-          description: OK
-          headers: {}
-          examples:
-            application/json:
-              business_date: 20180809
-              live: false
-              live_timestamp: 0
-              otc_trade_details:
-                - trade_id: "1"
-                  type: FRA
-                  pay: Fixed 0.15%
-                  receive: EUR-EURIBOR-3M
-                  notional: 100000000
-                  notional_currency: EUR
-                  maturity: 0.8Y
-          schema:
-            type: object
-            properties:
-              business_date:
-                $ref: '#/definitions/business_date'
-              live:
-                $ref: '#/definitions/live'
-              live_timestamp:
-                $ref: '#/definitions/live_timestamp'
-              otc_trade_details:
-                type: array
-                items:
-                  type: object
-                  description: details of one OTC trade
-                  properties:
-                    trade_id:
-                      $ref: '#/definitions/trade_id'
                     type:
                       $ref: '#/definitions/otc_type'
                     pay:
@@ -1137,7 +1067,6 @@ definitions:
       - xml
   otc_sensitivities:
     type: object
-    description: Table of DV01 sensitivities (a.k.a. deltas) of the OTC portfolio. There can be only one component of this type as input for margin calculation.
     properties:
       csv:
         type: string
@@ -1160,10 +1089,10 @@ definitions:
   trade_id:
     type: string
     description: internalTradeID or tradeId as submitted in the request
-    example: "1"
+    example: 1
   otc_type:
     type: string
-    description: FRA, FixedFloat, Basis, OIS or Inflation
+    description: FRA or Swap
     example: FRA
   pay:
     type: string
