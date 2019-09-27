@@ -208,6 +208,10 @@ tolerant setup.
 It runs in a highly-available Kubernetes cluster spread that is spread
 across three AWS Availability Zones.
 
+### Through which countries pass the client data?
+
+On our side, only Germany.
+
 
 [api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/1.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
