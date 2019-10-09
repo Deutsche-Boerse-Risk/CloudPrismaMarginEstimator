@@ -1048,6 +1048,25 @@ paths:
                         items:
                           type: number
 
+/config/max_body_size:
+  get:
+    summary: Maximum body size
+    description: Returns maximum allowed body size of request in bytes.
+    parameters:
+      - $ref: '#/parameters/x_dbp_apikey'
+    responses:
+      '200':
+        description: OK
+        headers: {}
+        examples:
+          application/json:
+            max_body_size: 262144000
+          type: object
+          properties:
+            max_body_size:
+              type: number
+              description: maximum allowed body size of request in bytes
+
 parameters:
   x_dbp_apikey:
     name: X-DBP-APIKEY
