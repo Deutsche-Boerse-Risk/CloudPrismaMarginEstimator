@@ -357,7 +357,7 @@ paths:
           headers: {}
           examples:
             application/json:
-              live_snapshots:
+              snapshots:
                 - business_date: 20180809
                   live: true
                   otc_available: true
@@ -860,6 +860,94 @@ paths:
                       $ref: '#/definitions/notional_currency'
                     maturity:
                       $ref: '#/definitions/otc_maturity'
+  /otc_sensitivites:
+    post:
+      summary: OTC Sensitivities
+      description: >-
+        Return a table of DV01 (delta) sensitivities of OTC portfolio, per curve and maturity bucket. The sensitivity table is accepted as `otc_sensitivities` input for `estimator` request and can be used instead of the whole OTC portfolio for faster margin computation.
+      externalDocs:
+        url: https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/raw/master/templates/otc/OTC_sensitivities_template.xlsm
+        description: Example of the DV01 Sensitivities table as Excel sheet
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: body
+          in: body
+          schema:
+            type: object
+            example:
+              portfolio_components:
+                - type: otc_csv
+                  otc_csv:
+                    csv: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+            properties:
+              snapshot:
+                $ref: '#/definitions/snapshot'
+              portfolio_components:
+                type: array
+                description: array of portfolio components
+                items:
+                  type: object
+                  description: one portfolio component, only type and one structure relevant for the type is filled
+                  required:
+                    - type
+                  properties:
+                    type:
+                      type: string
+                      description: type of this component
+                      example: otc_csv
+                    otc_csv:
+                      $ref: '#/definitions/otc_csv'
+                    otc_cb202:
+                      $ref: '#/definitions/otc_cb202'
+                    otc_fpml:
+                      $ref: '#/definitions/otc_fpml'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              business_date: 20180809
+              live: false
+              live_timestamp: 0
+              curves:
+                - EUR.EONIA
+              dv01_per_maturity:
+                - maturity: ON
+                  dv01:
+                    - 123.456
+              csv: Maturity,EUR.EONIA\nON,123.456
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
+              curves:
+                type: array
+                items:
+                  type: string
+                  description: name of a interest rate curve
+                  example: EUR.EURIBOR.1M
+              dv01_per_maturity:
+                type: array
+                items:
+                  type: object
+                  description: DV01 for different curves of one maturity
+                  properties:
+                    maturity:
+                      $ref: '#/definitions/otc_maturity'
+                    dv01:
+                      type: array
+                      items:
+                        type: number
+                        example: -284.40
+              csv:
+                type: string
+                description: the DV01 table as one string in format that can be directly submitted to margin estimation
   /greeks:
     post:
       summary: Greek Calculation Request
