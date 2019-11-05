@@ -94,10 +94,9 @@ CPME calculation cluster is busy as there is an upper limit on the
 number of concurrent global historical calculations. In case your
 request historical request is rejected try again in 15 minutes.
 
-Historical requests can take several minutes to perform. An upper limit has been
-imposed on the number of concurrent historical calculations across all users, so a request
-might be refused if the CPME calculation cluster is busy. In this case you are
-advised to try again in 15 minutes.
+An upper limit has been imposed on the number of concurrent historical calculations
+across all users, so a request might be refused if the CPME calculation cluster is busy.
+In this case you are advised to try again in 15 minutes.
 
 ### What is the difference between API versions 1.0 and 2.0?
 
@@ -118,8 +117,8 @@ characters:
 - line endings in CSV are written as `\n`
 - strings inside XML are enclosed by single quotes `'`, because double quotes enclose the whole XML as one JSON attribute
 
-As an example see how XML can be submitted using the `curl` (replace "your key"
-by your API key).
+As an example see how XML can be submitted using the `curl` command
+(replace "your key" by your API key).
 Note that the single quotes inside XML are escaped because we need
 to enclose the JSON in single quotes on the command line. This is not
 required inside application or script.
@@ -216,7 +215,12 @@ CPME is stateless, has a highly elastic architecture and fault
 tolerant setup.
 
 It runs in a highly-available Kubernetes cluster spread that is spread
-across three AWS Availability Zones.
+across three AWS Availability Zones in Frankfurt region.
+
+### Which countries does client data pass?
+
+Since CPME runs entirely within the Frankfurt region of AWS,
+all processing takes part within Germany.
 
 [CPME-gui]:https://eurexmargins.prod.dbgservice.com
 [api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/CPME/1.0
