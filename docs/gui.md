@@ -13,7 +13,7 @@ It is assumed that the uploaded portfolio belongs to one account and the positio
 If an OTC member report contains more members and accounts, the GUI picks the P account of the clearing member.
 
 The following sections describe ETD and OTC portfolios separately,
-but it is possible to combined portfolio at the same time.
+but it is possible to margin combined at the same time.
 In that case you can select whether cross-margining between ETD and OTC
 should be applied using the "Cross margin" checkbox.
 
