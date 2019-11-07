@@ -56,8 +56,6 @@ is provided by the GUI.
 
 ## Submitting a calculation request to API
 
-### What inputs can I use?
-
 ### How can I perform a what-if analysis?
 
 The user may load portfolios in the API in several formats concurrently. The user can for example
@@ -100,7 +98,7 @@ In this case you are advised to try again in 15 minutes.
 
 ### What is the difference between API versions 1.0 and 2.0?
 
-Version 2.0 has slightly more complex [estimator request](https://app.swaggerhub.com/apis-docs/dbgservice/CPME/2.0#/default/post_estimator)
+Version 2.0 has slightly more complex [estimator request](https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/default/post_estimator)
 allowing the user to submit multiple portfolio components of the same type,
 e.g. two parts of OTC portfolio both in CSV format.
 
@@ -223,7 +221,7 @@ Since CPME runs entirely within the Frankfurt region of AWS,
 all processing takes part within Germany.
 
 [CPME-gui]:https://eurexmargins.prod.dbgservice.com
-[api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/CPME/1.0
+[api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/1.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf
-[risk-parameters]:https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters.
+[risk-parameters]:https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters
