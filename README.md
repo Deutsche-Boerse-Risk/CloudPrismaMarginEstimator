@@ -220,7 +220,7 @@ Since CPME runs entirely within the Frankfurt region of AWS,
 all processing takes part within Germany.
 
 [CPME-gui]:https://eurexmargins.prod.dbgservice.com
-[api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/1.0
+[api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf
 [risk-parameters]:https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters
