@@ -87,7 +87,7 @@ info:
 
     ## Change log
 
-    - x.x.x list of snapshots can be requested
+    - 4.2.2 list of snapshots can be requested, OTC sensitivities
 
     - 4.2.1 OTC trade details resource and also included in estimator response
 

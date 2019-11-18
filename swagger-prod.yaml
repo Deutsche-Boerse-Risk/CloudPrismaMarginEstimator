@@ -1092,7 +1092,7 @@ definitions:
     example: 1
   otc_type:
     type: string
-    description: FRA or Swap
+    description: FRA, FixedFloat, Basis, OIS or Inflation
     example: FRA
   pay:
     type: string

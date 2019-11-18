@@ -1135,6 +1135,28 @@ paths:
                         type: array
                         items:
                           type: number
+  /config/{param}:
+    get:
+      summary: Read configuration parameter
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: param
+          in: path
+          description: name of the parameter
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          examples:
+            application/json:
+              max_body_size: 262144000
+          schema:
+            type: object
+            properties:
+              max_body_size:
+                type: number
+                description: maximum allowed body size of request in bytes
 
 parameters:
   x_dbp_apikey:
