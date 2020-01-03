@@ -65,9 +65,11 @@ info:
     with timestamp equal or smaller than the requested time.
     If time is not given then the latest timestamp of the business date is used.
 
-    It takes about one minute to start the instance for specified snapshot.
+    It takes several minutes to start the instance for a specified snapshot,
     That instance can then serve subsequent requests for the same snapshot.
     After some inactive time the instance is shutdown.
+    It is recommended not to specify a date and time and calculate
+    current margin or margin as of last end-of-day, see below.
 
     Example of requesting the latest snapshot of given date, in GET and POST type of request:
 
@@ -81,11 +83,16 @@ info:
 
 
     If business date is not given, the latest business date is used.
+    If only live=False is specified, last end-of-day is used.
+    Calculation instance for these two requests is always up,
+    you should not experience any delay.
 
     Response contains identification of the selected snapshot,
     see attributes `business_date`, `live` and `live_timestamp`.
 
     ## Change log
+
+    - 5.2.0 request with live=false without date means last end-of-day
 
     - 4.2.2 list of snapshots can be requested, OTC sensitivities
 
@@ -1207,7 +1214,7 @@ definitions:
     example: 20181205
   live:
     type: boolean
-    description: Is the snapshot live (meaning intraday or start-of-day)? False for end-of-day.
+    description: Is the snapshot live (meaning intraday or start-of-day)? False for end-of-day. In request, False without any date means last end-of-day.
     example: false
   live_timestamp:
     type: number
@@ -1219,7 +1226,7 @@ definitions:
     example: true
   snapshot:
     type: object
-    description: Optional point in time as of which the result is calculated. If only business_date is specified, latest snapshot from that business date is used. The timestamp is used only when live is true.
+    description: Optional point in time as of which the result is calculated. If only business_date is specified, latest snapshot from that business date is used. If only live=False is specified, last EOD is used. The timestamp is used only when live is true.
     properties:
       business_date:
         $ref: '#/definitions/business_date'
@@ -1227,8 +1234,6 @@ definitions:
         $ref: '#/definitions/live'
       live_timestamp:
         $ref: '#/definitions/live_timestamp'
-    required:
-      - business_date
   clearing_currency:
     type: string
     description: currency code of the currency in which the result should be calculated
