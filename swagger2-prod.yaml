@@ -87,6 +87,8 @@ info:
 
     ## Change log
 
+    - 4.2.2 list of snapshots can be requested, OTC sensitivities
+
     - 4.2.1 OTC trade details resource and also included in estimator response
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
@@ -307,6 +309,79 @@ paths:
                 type: array
                 items:
                   type: string
+  /snapshots:
+    get:
+      summary: List Available Snapshots
+      description: List of end-of-day or start-of-day snapshots that can be used in other requests.
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date_from'
+        - $ref: '#/parameters/business_date_to'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              snapshots:
+                - business_date: 20180809
+                  live: false
+                  otc_available: true
+                - business_date: 20180810
+                  live: true
+                  otc_available: true
+          schema:
+            type: object
+            properties:
+              snapshots:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    business_date:
+                      $ref: '#/definitions/business_date'
+                    live:
+                      $ref: '#/definitions/live'
+                    otc_available:
+                      $ref: '#/definitions/otc_available'
+  /live_snapshots:
+    get:
+      summary: List Available Live Snapshots for Given Day
+      description: List of live (intraday) snapshots for given business_date. Contains also start-of-day snapshot.
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              snapshots:
+                - business_date: 20180809
+                  live: true
+                  otc_available: true
+                  live_timestamp: 0
+                - business_date: 20180809
+                  live: true
+                  otc_available: true
+                  live_timestamp: 1562162876
+          schema:
+            type: object
+            properties:
+              snapshots:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    business_date:
+                      $ref: '#/definitions/business_date'
+                    live:
+                      $ref: '#/definitions/live'
+                    otc_available:
+                      $ref: '#/definitions/otc_available'
+                    live_timestamp:
+                      $ref: '#/definitions/live_timestamp'
   /estimator:
     post:
       summary: Margin Calculation Request
@@ -680,10 +755,10 @@ paths:
                       $ref: '#/definitions/liquidation_group_split'
                     npv:
                       type: number
-                      description: Net Present Value of the trade
+                      description: Net Present Value of the trade in notional currency
                     dv01:
                       type: number
-                      description: DV01 sensitivity of the trade
+                      description: DV01 sensitivity of the trade in notional currency
                     component_margin:
                       $ref: '#/definitions/component_margin'
                     component_margin_currency:
@@ -785,6 +860,94 @@ paths:
                       $ref: '#/definitions/notional_currency'
                     maturity:
                       $ref: '#/definitions/otc_maturity'
+  /otc_sensitivites:
+    post:
+      summary: OTC Sensitivities
+      description: >-
+        Return a table of DV01 (delta) sensitivities of OTC portfolio, per curve and maturity bucket. The sensitivity table is accepted as `otc_sensitivities` input for `estimator` request and can be used instead of the whole OTC portfolio for faster margin computation.
+      externalDocs:
+        url: https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/raw/master/templates/otc/OTC_sensitivities_template.xlsm
+        description: Example of the DV01 Sensitivities table as Excel sheet
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: body
+          in: body
+          schema:
+            type: object
+            example:
+              portfolio_components:
+                - type: otc_csv
+                  otc_csv:
+                    csv: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+            properties:
+              snapshot:
+                $ref: '#/definitions/snapshot'
+              portfolio_components:
+                type: array
+                description: array of portfolio components
+                items:
+                  type: object
+                  description: one portfolio component, only type and one structure relevant for the type is filled
+                  required:
+                    - type
+                  properties:
+                    type:
+                      type: string
+                      description: type of this component
+                      example: otc_csv
+                    otc_csv:
+                      $ref: '#/definitions/otc_csv'
+                    otc_cb202:
+                      $ref: '#/definitions/otc_cb202'
+                    otc_fpml:
+                      $ref: '#/definitions/otc_fpml'
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              business_date: 20180809
+              live: false
+              live_timestamp: 0
+              curves:
+                - EUR.EONIA
+              dv01_per_maturity:
+                - maturity: ON
+                  dv01:
+                    - 123.456
+              csv: Maturity,EUR.EONIA\nON,123.456
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
+              curves:
+                type: array
+                items:
+                  type: string
+                  description: name of a interest rate curve
+                  example: EUR.EURIBOR.1M
+              dv01_per_maturity:
+                type: array
+                items:
+                  type: object
+                  description: DV01 for different curves of one maturity
+                  properties:
+                    maturity:
+                      $ref: '#/definitions/otc_maturity'
+                    dv01:
+                      type: array
+                      items:
+                        type: number
+                        example: -284.40
+              csv:
+                type: string
+                description: the DV01 table as one string in format that can be directly submitted to margin estimation
   /greeks:
     post:
       summary: Greek Calculation Request
@@ -972,6 +1135,28 @@ paths:
                         type: array
                         items:
                           type: number
+  /config/{param}:
+    get:
+      summary: Read configuration parameter
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: param
+          in: path
+          description: name of the parameter
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          examples:
+            application/json:
+              max_body_size: 262144000
+          schema:
+            type: object
+            properties:
+              max_body_size:
+                type: number
+                description: maximum allowed body size of request in bytes
 
 parameters:
   x_dbp_apikey:
@@ -1004,6 +1189,16 @@ parameters:
     in: query
     type: number
     description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means start-of-day.
+  business_date_from:
+    name: business_date_from
+    in: query
+    type: number
+    description: Start of a date range, in YYYYMMDD format
+  business_date_to:
+    name: business_date_to
+    in: query
+    type: number
+    description: End of a date range, in YYYYMMDD format
 
 definitions:
   business_date:
@@ -1018,6 +1213,10 @@ definitions:
     type: number
     description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means start-of-day.
     example: 0
+  otc_available:
+    type: boolean
+    description: Is OTC available in the snapshot? Snapshot can exist without OTC, then only ETD portfolio can be evaluated. Snapshot without ETD is not possible. Live snapshots can be marked as otc_available which means OTC portfolio will be evaluated, however the OTC market data are from start-of-day, not from the particular timestamp.
+    example: true
   snapshot:
     type: object
     description: Optional point in time as of which the result is calculated. If only business_date is specified, latest snapshot from that business date is used. The timestamp is used only when live is true.
@@ -1163,7 +1362,7 @@ definitions:
     example: "1"
   otc_type:
     type: string
-    description: FRA or Swap
+    description: FRA, FixedFloat, Basis, OIS or Inflation
     example: FRA
   pay:
     type: string
