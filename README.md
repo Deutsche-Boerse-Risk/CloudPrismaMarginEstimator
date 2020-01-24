@@ -186,6 +186,11 @@ Platform][api-digital-business-platform]) has different scenarios
 and prices compared to production, and therefore produces a
 different margin for the same portfolio.
 
+Occasionally, the sandbox can be setup with production market data
+but with different risk model parametrization, as a testing ground
+before the new setup becomes productive. This will be announced by
+the usual channels.
+
 ## Security
 
 ### Where is CPME running?

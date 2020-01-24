@@ -50,7 +50,7 @@ info:
     <pre>echo '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
       | gzip \
       | curl -s -H "X-DBP-APIKEY: your-key" -H "Content-Type: application/json" \
-        https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator-2-0/2.0.0/estimator \
+        https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator \
         --data-binary @- -H "Content-Encoding: gzip" -H "Accept-Encoding: gzip" \
       | gunzip
     </pre>
@@ -72,10 +72,10 @@ info:
     Example of requesting the latest snapshot of given date, in GET and POST type of request:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
-      'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator-2-0/2.0.0/series?products=FGBM&business_date=20190307'
+      'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/series?products=FGBM&business_date=20190307'
     echo '{"snapshot":{"business_date":20190307},"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
       | curl -H 'X-DBP-APIKEY: your-key' \
-        'https://api.developer.deutsche-boerse.com/sandbox/prisma-margin-estimator-2-0/2.0.0/estimator' \
+        'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator' \
         --data-binary @-
     </pre>
 
