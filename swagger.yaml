@@ -96,6 +96,8 @@ info:
 
     - 5.2.0 request with live=false without date means last end-of-day
 
+    - 4.2.1 OTC trade details in estimator response
+
     - 4.1.1 historical snapshots also for list of products, series and currencies
 
     - 4.0.0 introduction of OTC portfolio components, cross-margining and historical snapshots

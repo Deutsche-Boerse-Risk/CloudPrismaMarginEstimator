@@ -87,6 +87,10 @@ info:
 
     ## Change log
 
+    - 5.4.0 fixed bug in etd_cp005 parser
+
+    - 5.2.0 request with live=false without date means last end-of-day
+
     - 4.2.1 OTC trade details in estimator response
 
     - 4.1.1 historical snapshots also for list of products, series and currencies
