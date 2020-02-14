@@ -152,6 +152,18 @@ internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpre
 1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
 ```
 
+## Historical calculation
+
+By default the margin is calculated as of the latest snapshot, i.e. using the most recent market data.
+To calculate margin as of a historical snapshot, e.g. to compare against end-of-day reports,
+select the historical calculation in GUI:
+
+1. check "Historical calculation"
+2. use "Select an available date" to pick the desired date
+3. in case an intraday margin (and not end-of-day margin) is required, check "Live"
+4. if "Live" is checked, use "Select timestamp" to pick the desired time
+
+
 [https://eurexmargins.prod.dbgservice.com]:https://eurexmargins.prod.dbgservice.com
 [liquidation groups]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/#what-liquidation-groups-are-there-and-what-is-liquidation-group-split
 [Excel template]:https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_trade_template.xlsm?raw=true

@@ -43,7 +43,7 @@ Key links:
 | - CSV files                     | yes             | yes             | yes                       |
 | - OTC sensitivities (CSV)       | yes             | no              | yes                       |
 | - OTC FpML                      | yes             | yes             | no                        |
-| Historical calculation          | yes             | no              | yes                       |
+| Historical calculation          | yes             | yes             | yes                       |
 | Intraday calculation            | yes             | yes             | yes                       |
 | Local installation possible     | no              | no              | no                        |
 | Margin accuracy - ETD           | production-like | production-like | production-like           |
@@ -83,9 +83,12 @@ client's own making) cannot be processed by CPME.
 
 ### Is it possible to calculate margin as-of an historical date?
 
-Yes, in the API, see "Business date and time" section in [API
-definition][api-definition]. Calculations may performed on historical dates 
-from 18 March 2019 onwards.
+Yes:
+
+- in the API, see "Business date and time" section in [API definition][api-definition]
+- on GUI, use "Historical calculation" checkbox
+
+Calculations may performed on historical dates from 18 March 2019 onwards.
 
 Historical requests can take several minutes to perform. A request might be refused if the
 CPME calculation cluster is busy as there is an upper limit on the
