@@ -446,7 +446,7 @@ paths:
         ## OTC reports CB202, CB207
 
         See Eurex OTC member documentation for CB202 and CB207 reports.
-        Only positions from one specified account will be evaluated, see the attributes of `otc_cb202` structure below.
+        Only positions from one specified account or risk netting unit (ARNU) will be evaluated, see the attributes of `otc_cb202` structure below.
         We recommend using gzip compression in the request, see above.
 
         ## OTC FpML
@@ -1050,7 +1050,7 @@ definitions:
         description: optional, will be matched against RC tag
       account:
         type: string
-        description: optional, will be matched against acctTypGrp tag, if not given P account is assumed
+        description: optional, will be matched against acctTypGrp tag or riskNettingUnit tag, if not given P account is assumed
         default: P
       legal_entity:
         type: string
