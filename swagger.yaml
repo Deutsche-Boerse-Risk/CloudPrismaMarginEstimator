@@ -387,7 +387,7 @@ paths:
 
         - internalTradeID*: id of the trade to distinguish it in drilldown, must be unique
 
-        - tradeType*: IRS (or Swap), OIS, FRA, ZC
+        - tradeType*: IRS (or Swap), OIS, FRA, ZCIS
 
         - currency*: ISO code of currency, e.g. EUR, CHF, USD, GBP
 
@@ -408,31 +408,31 @@ paths:
 
         - payNotional*: notional
 
-        - payPaymentPeriod*: 1M, 3M, 6M, 12M, 1T (for zero-coupon)
+        - payPaymentPeriod*: 1M, 3M, 6M, 12M, 1Y, 1T (for zero-coupon)
 
         - payPeriodStartVNS: fill only for VNS
 
         - payCompounding: fill only for compounding swap, Flat or Straight
 
-        - payCompoundingIndexPeriod: period for compounding swap, 1M, 3M, 6M, 12M
+        - payCompoundingIndexPeriod: period for compounding swap, 1M, 3M, 6M, 12M, 1Y
 
         - payStub: fill only if the leg has a stub, LongFinal, LongInitial, ShortInitial, ShortFinal
 
         - payFirstRate: first pre-defined rate
 
-        - payFirstInterpolationTenor: stub interpolation tenor for floatingLeg, 1W, 1M, 3M, 6M
+        - payFirstInterpolationTenor: stub interpolation tenor for floatingLeg, 1W, 1M, 3M, 6M, ...
 
-        - paySecondInterpolationTenor: stub interpolation tenor for floatingLeg, 1W, 1M, 3M, 6M
+        - paySecondInterpolationTenor: stub interpolation tenor for floatingLeg, 1W, 1M, 3M, 6M, ...
 
-        - payDayCountMethod*: 30/360, 30E/360, 30E/360.ISDA, ACT/360, ACT/365.FIXED, ACT/ACT.ISDA, ACT/365.ISDA, ACT/ACT.ICMA, ACT/ACT.ISMA, 1/1
+        - payDayCountMethod*: 30/360, 30E/360, 30E/360.ISDA, ACT/360, ACT/365.FIXED, ACT/ACT.ISDA, ACT/365.ISDA, ACT/ACT.ICMA, ACT/ACT.ISMA, 1/1, ...
 
-        - payBusinessDayConvention: MODFOLLOWING, FOLLOWING, PRECEDING
+        - payBusinessDayConvention: MODFOLLOWING, FOLLOWING, PRECEDING, ...
 
-        - payPaymentCalendar: EUTA, CHZU, GBLO, USNY, DEFR, ITMI, FRPA, ESMA, BEBR, JPTO, DKCO, NOOS, SEST, PLWA
+        - payPaymentCalendar: EUTA, CHZU, GBLO, USNY, DEFR, ITMI, FRPA, ESMA, BEBR, JPTO, DKCO, NOOS, SEST, PLWA, ... calendars can be combined with "+"
 
-        - payAdjustment: ADJUSTED, UNADJUSTED, MAT_UNADJUSTED
+        - payAdjustment: ADJUSTED, UNADJUSTED, MAT_UNADJUSTED, ...
 
-        - payRollMethod: Standard, IMM
+        - payRollMethod: Standard, IMM, EOM, ...
 
 
         ### Receive leg attributes
