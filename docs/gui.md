@@ -5,7 +5,7 @@
 - Eurex listed derivatives (ETD)
     - [uploaded in a simplified CSV format](#upload-etd-portfolio)
     - or [entered directly in the GUI](#enter-etd-portfolio)
-- OTC IRS trades accepted by Eurex OTC except FX swaps and inflation swaps uploaded
+- OTC IRS trades accepted by Eurex OTC except FX swaps uploaded
     - [in CSV format known from Margin Calculator](#upload-otc-portfolio)
     - in the format of Eurex Clearing member full inventory reports (CB202/CB207)
 
@@ -110,12 +110,12 @@ One line contains all information for one trade, including both its legs.
 All columns must be present, although some can be empty.
 Mandatory columns are marked by asterisk \*.
 For certain trade types, even some optional columns must be filled, see the description.
-If unsure about possible combinations of attribute values please check [EurexOTC Clear IRS Product List].
+If you are unsure about possible combinations of attribute values please refer to the [EurexOTC Clear IRS Product List] or the [OTC template description] (also available as link in the CPME GUI).
 
 ### Basic OTC trade attributes
 
 - internalTradeID*: id of the trade to distinguish it in drilldown, must be unique
-- tradeType*: IRS (or Swap), OIS, FRA, ZC
+- tradeType*: IRS, Basis swap, OIS, FRA, VNS, ZCIS
 - currency*: ISO code of currency, e.g. EUR, CHF, USD, GBP
 - effectiveDate*: effective date as DD/MM/YYYY, e.g. 20/12/2018
 - terminationDate*: termination date as DD/MM/YYYY, e.g. 20/12/2028

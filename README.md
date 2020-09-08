@@ -19,7 +19,7 @@ Key links:
 # Known Limitations
 
 - Does not support cash market (equities, bonds, ...)
-- Does not support FX swaps and inflation swaps
+- Does not support FX swaps
 - Does not support new flexible contracts, only existing ones
 
 # Frequently Asked Questions
@@ -35,7 +35,7 @@ Key links:
 | - ETD                           | yes             | yes             | yes                       |
 | - OTC IRS                       | yes             | yes             | yes                       |
 | - OTC FX                        | no              | no              | yes                       |
-| - OTC inflation                 | no              | no              | yes                       |
+| - OTC inflation                 | yes             | yes             | yes                       |
 | - Cross-margining (ETD/OTC IRS) | yes             | yes             | yes                       |
 | - Equities, bonds               | no              | no              | no                        |
 | Input formats covered:          |                 |                 |                           |
