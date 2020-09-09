@@ -92,6 +92,8 @@ info:
 
     ## Change log
 
+    - 5.7.0 support for inflation swaps
+
     - 5.2.0 request with live=false without date means last end-of-day
 
     - 4.2.2 list of snapshots can be requested, OTC sensitivities
@@ -444,15 +446,16 @@ paths:
         All columns must be present, although some can be empty.
         Mandatory columns are marked by asterisk *.
         For certain trade types, even some optional columns must be filled, see the description.
-        If unsure about possible combinations of attribute values please check
-          [EurexOTC Clear IRS Product List](https://www.eurexclearing.com/resource/blob/227404/ff4638f2a3bfedbf511868ef54c6a153/data/ec15075e_Attach.pdf).
+        If unsure about possible combinations of attribute values please refer to
+          [EurexOTC Clear IRS Product List](https://www.eurexclearing.com/resource/blob/227404/ff4638f2a3bfedbf511868ef54c6a153/data/ec15075e_Attach.pdf)
+          or the [OTC template description](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/raw/master/templates/otc/OTC_template_description.xls).
 
 
         ### Basic OTC trade attributes
 
         - internalTradeID*: id of the trade to distinguish it in drilldown, must be unique
 
-        - tradeType*: IRS (or Swap), OIS, FRA, ZCIS
+        - tradeType*: IRS, Basis swap, OIS, FRA, VNS, ZCIS
 
         - currency*: ISO code of currency, e.g. EUR, CHF, USD, GBP
 
@@ -623,10 +626,15 @@ paths:
                   time_to_expiry_adjustment: 0
                   premium_margin: 0
                   market_risk_per_rms:
-                    - rms_name: SIMPLE STRESS VAR 3
+                    - rms_name: FILTERED_HISTORICAL_VAR_2
                       simulation_type: Historical
                       rms_market_risk: 4991.692879
                       weighting_factor: 0.51
+                      rms_components:
+                        - subsample_id: 1
+                          risk_measure_value: 4481.692879
+                          correlation_break_adjustment: 500.0
+                          compression_adjustment: 10.0
               drilldowns:
                 - line_no: 1
                   product_id: OGBL
@@ -708,6 +716,23 @@ paths:
                           weighting_factor:
                             type: number
                             description: RMS weighting factor to be applied before aggregation to LGS level
+                          rms_components:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                subsample_id:
+                                  type: number
+                                  description: id of the subsample (from 1 to risk horizon), or 1 if the RMS is not using subsampling
+                                risk_measure_value:
+                                  type: number
+                                  description: the main risk measure value for this RMS, e.g. value-at-risk for Historical or Stress simulation_type
+                                correlation_break_adjustment:
+                                  type: number
+                                  description: Correlation Break Adjustment for this RMS
+                                compression_adjustment:
+                                  type: number
+                                  description: Compression Adjustment for this RMS
               drilldowns:
                 type: array
                 description: Margin figures on position level. Full business key is used, it is not possible to map to input line_no one to one because positions may be aggregated or split
