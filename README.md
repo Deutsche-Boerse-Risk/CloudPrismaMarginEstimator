@@ -86,9 +86,9 @@ client's own making) cannot be processed by CPME.
 Yes:
 
 - in the API, see "Business date and time" section in [API definition][api-definition]
+  - dates from 18 March 2019 available, or from 11 December 2018 for ETD-only requests
 - on GUI, use "Historical calculation" checkbox
-
-Calculations may performed on historical dates from 18 March 2019 onwards.
+  - one year history available
 
 Historical requests can take several minutes to perform. A request might be refused if the
 CPME calculation cluster is busy as there is an upper limit on the
