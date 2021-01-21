@@ -92,6 +92,8 @@ info:
 
     ## Change log
 
+    - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
+
     - 5.7.0 support for inflation swaps
 
     - 5.4.0 fixed bug in etd_cp005 parser
@@ -411,7 +413,7 @@ paths:
 
         - payNotional*: notional
 
-        - payPaymentPeriod*: 1M, 3M, 6M, 12M, 1Y, 1T (for zero-coupon)
+        - payPaymentPeriod*: 1M, 3M, 6M, 12M, 1Y, 1T (for zero-coupon); inflation swaps always use 1T no matter what period is given
 
         - payPeriodStartVNS: fill only for VNS
 
@@ -431,7 +433,7 @@ paths:
 
         - payBusinessDayConvention: MODFOLLOWING, FOLLOWING, PRECEDING, ...
 
-        - payPaymentCalendar: EUTA, CHZU, GBLO, USNY, DEFR, ITMI, FRPA, ESMA, BEBR, JPTO, DKCO, NOOS, SEST, PLWA, ... calendars can be combined with "+"
+        - payPaymentCalendar: EUTA, CHZU, GBLO, USNY, DEFR, ITMI, FRPA, ESMA, BEBR, JPTO, DKCO, NOOS, SEST, PLWA, ... calendars can be combined with "+"; unknown calendar is ignored
 
         - payAdjustment: ADJUSTED, UNADJUSTED, MAT_UNADJUSTED, ...
 
