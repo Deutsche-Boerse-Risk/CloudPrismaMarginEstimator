@@ -418,13 +418,13 @@ paths:
 
         The full key for series depends on instrument type, these are the mandatory fields:
 
-        - Future: `product`, `maturity` as YYYYMM (DD can be added but is ignored)
+        - Future: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `version_number` (defaults to 0)
 
-        - Option: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `call_put_flag`, `exercise_price`
+        - Option: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `call_put_flag`, `exercise_price`, `version_number` (defaults to 0)
 
-        - Flex Future: `instrument_type`: "Flex Future", `product`, `maturity` as YYYYMMDD
+        - Flex Future: `instrument_type`: "Flex Future", `product`, `maturity` as YYYYMMDD, `version_number` (defaults to 0)
 
-        - Flex Option: `instrument_type`: "Flex Option", `product`, `maturity` as YYYYMMDD, `call_put_flag`, `exercise_price`, `exercise_style`
+        - Flex Option: `instrument_type`: "Flex Option", `product`, `maturity` as YYYYMMDD, `call_put_flag`, `exercise_price`, `exercise_style`, `version_number` (defaults to 0)
 
 
         Only already existing Flex Future or Flex Option can be submitted, not a new one (e.g. different strike or expiry day).
