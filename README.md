@@ -178,7 +178,7 @@ these to the five-day split if doing so lowers the total margin.
 Compare the margin on liquidation group level against the `CC050`
 report. The margin on account level (`CC060`) cannot be obtained from
 CPME as the account may contain cash market instruments that are
-currently supported by CPME.
+currently not supported by CPME.
 
 ### Is the margin from the simulation environment similar to production?
 
