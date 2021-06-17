@@ -3,13 +3,15 @@ info:
   title: Cloud Prisma Margin Estimator API
   version: "2.0"
   description: >-
-    Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
-    according to Eurex Prisma methodology. The application is available to both members
+    Cloud Prisma Margin Estimator (CPME) calculates margin for an uploaded portfolio
+    according to Eurex PRISMA methodology. The application is available to both members
     and non-members of Eurex Clearing. It can be accessed via web user interface,
-    see [cPME GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
+    see [CPME GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
     described here.
 
-    It supports also greek and stress price calculation - these analytical tools
+    The key request is `/estimator`, it is the only request you need to calculate
+    the margin. Other requests provide lists or details of instruments, available dates etc.
+    CPME supports also greek and stress price calculation - these analytical tools
     are not related to the margin.
 
     [FAQ](https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/)
@@ -110,6 +112,8 @@ basePath: /prod/prisma-margin-estimator-2-0/2.0.0/
 schemes:
   - https
 paths:
+
+
   /products:
     get:
       summary: List All Products
@@ -179,7 +183,7 @@ paths:
                     underlying_isin:
                       type: string
                     currency:
-                      type: string
+                      $ref: '#/definitions/currency'
                     product_type:
                       type: string
                     extended_product_type:
@@ -207,6 +211,8 @@ paths:
                   required:
                     - product
                     - instrument_type
+
+
   /series:
     get:
       summary: List Series of a Product
@@ -393,6 +399,8 @@ paths:
                       $ref: '#/definitions/otc_available'
                     live_timestamp:
                       $ref: '#/definitions/live_timestamp'
+
+
   /estimator:
     post:
       summary: Margin Calculation Request
@@ -809,6 +817,8 @@ paths:
                       $ref: '#/definitions/notional_currency'
                     maturity:
                       $ref: '#/definitions/otc_maturity'
+
+
   /otc_trade_details:
     post:
       summary: OTC Trade Details
@@ -894,6 +904,8 @@ paths:
                       $ref: '#/definitions/notional_currency'
                     maturity:
                       $ref: '#/definitions/otc_maturity'
+
+
   /otc_sensitivities:
     post:
       summary: OTC Sensitivities
@@ -982,6 +994,8 @@ paths:
               csv:
                 type: string
                 description: the DV01 table as one string in format that can be directly submitted to margin estimation
+
+
   /greeks:
     post:
       summary: Greek Calculation Request
@@ -1072,6 +1086,8 @@ paths:
                       type: array
                       items:
                         type: number
+
+
   /stressmatrix:
     post:
       summary: Stress Matrix Request
@@ -1169,6 +1185,35 @@ paths:
                         type: array
                         items:
                           type: number
+
+  /convert/etd/cp005:
+    post:
+      summary: Convert Eurex ETD CP005 position report to JSON ETD representation for CPME
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              member:
+                type: string
+                description: optional attribute to process only positions of the member, if not given the clearing member is used
+              account:
+                type: string
+                description: optional attribute to process only positions on that account, if not given "PP" account is used
+              xml:
+                type: string
+                description: exchange traded portfolio as Eurex report CP005
+            required:
+              - xml
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          schema:
+            $ref: '#/definitions/etd_portfolio'
+
   /config/{param}:
     get:
       summary: Read configuration parameter
@@ -1191,6 +1236,7 @@ paths:
               max_body_size:
                 type: number
                 description: maximum allowed body size of request in bytes
+
 
 parameters:
   x_dbp_apikey:
@@ -1296,6 +1342,10 @@ definitions:
     type: number
     description: Technical instrument ID. Needed for analytical requests - greeks, stress prices. If provided in request, all other key attributes are ignored
     example: 27471356
+  currency:
+    type: string
+    description: currency code
+    example: EUR
   line_no:
     type: number
     description: Line number, used when reporting errors
@@ -1336,6 +1386,7 @@ definitions:
         example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
     required:
       - csv
+
   otc_cb202:
     type: object
     properties:
@@ -1354,6 +1405,7 @@ definitions:
         description: EurexOTC report CB202 or report CB207 describing trades as a single string
     required:
       - xml
+
   otc_fpml:
     type: object
     properties:
@@ -1366,6 +1418,7 @@ definitions:
     required:
       - party
       - xml
+
   otc_sensitivities:
     type: object
     description: Table of DV01 sensitivities (a.k.a. deltas) of the OTC portfolio. There can be only one component of this type as input for margin calculation.
