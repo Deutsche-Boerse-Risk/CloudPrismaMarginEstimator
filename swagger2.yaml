@@ -576,35 +576,7 @@ paths:
                       description: type of this component
                       example: etd_portfolio
                     etd_portfolio:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          line_no:
-                            $ref: '#/definitions/line_no'
-                          product_id:
-                            $ref: '#/definitions/product_id'
-                          maturity:
-                            $ref: '#/definitions/maturity'
-                          call_put_flag:
-                            $ref: '#/definitions/call_put_flag'
-                          exercise_price:
-                            $ref: '#/definitions/exercise_price'
-                          version_number:
-                            $ref: '#/definitions/version_number'
-                          iid:
-                            $ref: '#/definitions/iid'
-                          instrument_type:
-                            $ref: '#/definitions/instrument_type'
-                          exercise_style:
-                            $ref: '#/definitions/exercise_style'
-                          net_ea:
-                            $ref: '#/definitions/net_ea'
-                          net_ls_balance:
-                            $ref: '#/definitions/net_ls_balance'
-                        required:
-                          - line_no
-                          - net_ls_balance
+                      $ref: '#/definitions/etd_portfolio'
                     otc_csv:
                       $ref: '#/definitions/otc_csv'
                     otc_sensitivities:
@@ -1377,6 +1349,38 @@ definitions:
     type: number
     description: Long/short balance, negative for short
     example: -100
+
+  etd_portfolio:
+    type: array
+    items:
+      type: object
+      properties:
+        line_no:
+          $ref: '#/definitions/line_no'
+        product_id:
+          $ref: '#/definitions/product_id'
+        maturity:
+          $ref: '#/definitions/maturity'
+        call_put_flag:
+          $ref: '#/definitions/call_put_flag'
+        exercise_price:
+          $ref: '#/definitions/exercise_price'
+        version_number:
+          $ref: '#/definitions/version_number'
+        iid:
+          $ref: '#/definitions/iid'
+        instrument_type:
+          $ref: '#/definitions/instrument_type'
+        exercise_style:
+          $ref: '#/definitions/exercise_style'
+        net_ea:
+          $ref: '#/definitions/net_ea'
+        net_ls_balance:
+          $ref: '#/definitions/net_ls_balance'
+      required:
+        - line_no
+        - net_ls_balance
+
   otc_csv:
     type: object
     properties:
