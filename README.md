@@ -132,6 +132,8 @@ curl https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.
 
 You can also submit queries to the API with a programming language, e.g. Python. The
 [API documentation][api-definition] contains an example in Python to get you started.
+Python method `json.dumps()` takes care of writing valid JSON even when the attributes
+contain double quotes or line breaks.
 
 ## Interpreting a margin result
 
