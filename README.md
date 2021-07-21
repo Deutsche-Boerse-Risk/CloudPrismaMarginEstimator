@@ -47,7 +47,7 @@ Key links:
 | Intraday calculation            | yes             | yes             | yes                       |
 | Local installation possible     | no              | no              | no                        |
 | Margin accuracy - ETD           | production-like | production-like | production-like           |
-| Margin accuracy - OTC IRS       | high            | high            | production-like           |
+| Margin accuracy - OTC IRS       | approximate     | approximate     | production-like           |
 
 ### What is the difference between the CPME GUI and the API?
 
