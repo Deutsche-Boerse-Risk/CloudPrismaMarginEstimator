@@ -1,6 +1,6 @@
 # Cloud Prisma Margin Estimator (CPME)
 
-Cloud Prisma Margin Estimator (cPME) calculates portfolio margin according to the [Eurex Prisma
+Cloud Prisma Margin Estimator (CPME) calculates portfolio margin according to the [Eurex Prisma
 methodology][prisma-methodology]. The application is available to both
 members and non-members of Eurex Clearing, a part of the Deutsche Boerse Group. It
 can be used via a [browser based GUI][CPME-gui] or an API.
@@ -13,8 +13,7 @@ Key links:
 - [CPME GUI][CPME-gui]
 - [GUI User Guide](docs/gui.md)
 - [CPME API definition at SwaggerHub][api-definition]
-- [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the
-  API
+- [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the API
 
 # Known Limitations
 
@@ -69,8 +68,7 @@ Alternatively the user can prepare baseline and what-if portfolios in a single f
 
 Especially portfolios in XML formats can be quite large which may
 cause connection problems. Try compressing the portfolio before submitting, see
-"Compressing request and response" in the [API
-definition][api-definition]
+"Compressing request and response" in the [API definition][api-definition].
 
 ### Can I margin flexible instruments?
 
@@ -105,8 +103,7 @@ Version 2.0 has slightly more complex [estimator request](https://app.swaggerhub
 allowing the user to submit multiple portfolio components of the same type,
 e.g. two parts of OTC portfolio both in CSV format.
 
-There are no plans to decommission 1.0, but some future functionality might
-be implemented only in 2.0. You do not have to commit to one version - an application may use resources from
+There are no plans to decommission 1.0, but new features are implemented only in 2.0. You do not have to commit to one version - an application may use resources from
 both 1.0 and 2.0.
 
 ### How to submit CSV or XML files?
