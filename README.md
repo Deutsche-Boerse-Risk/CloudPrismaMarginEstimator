@@ -53,6 +53,14 @@ Key links:
 The GUI is a browser front-end to the API, but not every API feature
 is provided by the GUI.
 
+### When is CPME available?
+
+There is no time restriction set, in general CPME (both GUI and API) is available 24 hours a day, however there can be short (several minutes) intervals when instance for new snapshot is starting and request return error, in that case users have to repeat the request. Unfortunatelly sometimes we can have also unexpected downtimes – CPME does not have the same level of monitoring and support as our main Risk systems.
+
+### When is end-of-day or start-of-day snapshot available?
+
+End-of-day snapshot becomes available usually before 1am, start-of-day for OTC is received in the morning, around 6am. These are usual times, actual time varies each day, CPME is dependent on production Risk systems (PRISMA, Calypso) and any delay in their snapshot processing means delay also in CPME.
+
 ## Submitting a calculation request to API
 
 ### How can I perform a what-if analysis?
