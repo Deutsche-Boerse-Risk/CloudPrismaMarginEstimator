@@ -94,6 +94,8 @@ info:
 
     ## Change log
 
+    - 6.2.0 ETD CP005 and ETD CSV added to API v2
+
     - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
 
     - 5.7.0 support for inflation swaps
@@ -412,6 +414,8 @@ paths:
 
         - ETD is submitted as
           - `etd_portfolio` JSON array, see request model
+          - or `etd_csv` with positions in CSV format
+          - or `etd_cp005`, i.e. using Eurex CP005 XML report
 
         - OTC is submitted as
           - `otc_csv` with trades in CSV format known from Margin Calculator or Prisma Margin Estimator, see description bellow
@@ -575,8 +579,13 @@ paths:
                       type: string
                       description: type of this component
                       example: etd_portfolio
+                      enum: ['etd_portfolio','etd_csv','etd_cp005','otc_csv','otc_sensitivities','otc_cb202','otc_fpml','cash_json','repo_json']
                     etd_portfolio:
                       $ref: '#/definitions/etd_portfolio'
+                    etd_csv:
+                      $ref: '#/definitions/etd_csv'
+                    etd_cp005:
+                      $ref: '#/definitions/etd_cp005'
                     otc_csv:
                       $ref: '#/definitions/otc_csv'
                     otc_sensitivities:
@@ -1380,6 +1389,30 @@ definitions:
       required:
         - line_no
         - net_ls_balance
+
+  etd_csv:
+    type: object
+    properties:
+      csv:
+        type: string
+        description: ETD portfolio as one string in CSV, in Margin Calculator GUI format or Margin Estimator GUI format
+    required:
+    - csv
+
+  etd_cp005:
+    type: object
+    properties:
+      member:
+        type: string
+        description: optional attribute to process only positions of the member, if not given the clearing member is used
+      account:
+        type: string
+        description: optional attribute to process only positions on that account, if not given "PP" account is used
+      xml:
+        type: string
+        description: exchange traded portfolio as Eurex report CP005
+    required:
+      - xml
 
   otc_csv:
     type: object

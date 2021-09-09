@@ -36,6 +36,7 @@ Key links:
 | - OTC FX                        | no              | no              | yes                       |
 | - OTC inflation                 | yes             | yes             | yes                       |
 | - Cross-margining (ETD/OTC IRS) | yes             | yes             | yes                       |
+| - Single ISIN Repo              | planned         | planned         | no                        |
 | - Equities, bonds               | no              | no              | no                        |
 | Input formats covered:          |                 |                 |                           |
 | - Member reports                | yes             | yes             | yes                       |
@@ -55,7 +56,7 @@ is provided by the GUI.
 
 ### When is CPME available?
 
-There is no time restriction set, in general CPME (both GUI and API) is available 24 hours a day, however there can be short (several minutes) intervals when instance for new snapshot is starting and request return error, in that case users have to repeat the request. Unfortunatelly sometimes we can have also unexpected downtimes – CPME does not have the same level of monitoring and support as our main Risk systems.
+There is no time restriction set, in general CPME (both GUI and API) is available 24 hours a day, however there can be short (several minutes) intervals when instance for new snapshot is starting and request return error, in that case users have to repeat the request. Unfortunately sometimes we can have also unexpected downtimes – CPME does not have the same level of monitoring and support as our main Risk systems.
 
 ### When is end-of-day or start-of-day snapshot available?
 
@@ -87,7 +88,7 @@ CPME can calculate margins on flexible contracts provided they already exist
 on the Eurex market. Hypothetical flexible contracts (eg: of
 client's own making) cannot be processed by CPME.
 
-### Is it possible to calculate margin as-of an historical date?
+### Is it possible to calculate margin as-of a historical date?
 
 Yes:
 
@@ -107,11 +108,13 @@ In this case you are advised to try again in 15 minutes.
 
 ### What is the difference between API versions 1.0 and 2.0?
 
-Version 2.0 has slightly more complex [estimator request]
+Version 2.0 is the recommended version, it is superset of version 1.0.
+It has slightly more complex [estimator request]
 allowing the user to submit multiple portfolio components of the same type,
 e.g. two parts of OTC portfolio both in CSV format.
 
-There are no plans to decommission 1.0, but new features are implemented only in 2.0. You do not have to commit to one version - an application may use resources from
+New features are implemented only in version 2.0.
+You do not have to commit to one version - an application may use resources from
 both 1.0 and 2.0.
 
 ### How to submit CSV or XML files?
