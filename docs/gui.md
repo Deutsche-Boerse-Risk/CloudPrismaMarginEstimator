@@ -205,7 +205,29 @@ CHF          20,000.00             20,000.00        3,000.00        23,000.0
 
 Value "AM before grouping" is for your information only, to see the effect of margin offsets in case several trades fall into the same margin group.
 
-Results on Margin Class and trade (or even trade leg) level can be found by clicking "Show details" icon at the end of the Repo trade row.
+Results on Margin Class and trade (or even trade leg) level can be found by clicking "Show details" icon at the end of the Repo trade row, e.g.:
+
+```
+Margin Class                         S0055 (Margin Group ABCD)
+Additional Margin                     12,345,678.00 CHF
+Additional Margin before grouping     12,789,678.50 CHF
+Current Liquidating Margin             1,123,456.35 CHF
+Margin Parameter                               3.56 %
+
+--------------------------------------------------------------
+
+ISIN                                 CH0224397171
+
+Settlement Date                      2021-03-16 (Front Leg)
+Net Cash Position                    513,566,585.00 CHF
+Net Security Position               -513,525,147.00 CHF
+Current Liquidating Margin                41,439.00 CHF
+
+Settlement Date                      2021-04-13 (Term Leg)
+Net Cash Position                   -513,342,253.00 CHF
+Net Security Position                513,535,108.00 CHF
+Current Liquidating Margin               237,385.00 CHF
+```
 
 
 ## Enter Repo portfolio
