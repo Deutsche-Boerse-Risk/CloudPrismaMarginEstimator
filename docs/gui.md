@@ -5,6 +5,8 @@
 - Eurex listed derivatives (ETD)
     - [uploaded in a simplified CSV format](#upload-etd-portfolio)
     - or [entered directly in the GUI](#enter-etd-portfolio)
+    - or upload Eurex Clearing ETD position report CP005
+    - or upload portfolio export from C7 GUI
 - OTC IRS trades accepted by Eurex OTC except FX swaps uploaded
     - [in CSV format known from Margin Calculator](#upload-otc-portfolio)
     - in the format of Eurex Clearing member full inventory reports (CB202/CB207)
@@ -80,11 +82,11 @@ Positions can also be entered manually in the GUI:
 
 column | description
 --- | ---
-Product ID | dropdown with eligible products
-Maturity | dropdown with contract year/month of standard series, e.g. "201712"
-P/C | Call/Put flag, for options dropdown with "C" or "P", empty and disabled for futures
-Strk | Strike, for options dropdown filled with exercise price of standard series of selected maturity, empty and disabled for flex
-Version | dropdown with distinct version numbers for given maturity and strike, non-editable if only one version exists
+Product ID   | dropdown with eligible products
+Maturity     | dropdown with contract year/month of standard series, e.g. "201712"
+C/P          | Call/Put flag, for options dropdown with "C" or "P", empty and disabled for futures
+Strike       | Strike, for options dropdown filled with exercise price of standard series of selected maturity, empty and disabled for flex
+Version      | dropdown with distinct version numbers for given maturity and strike, non-editable if only one version exists
 Net Position | free text field to enter the position size, negative for short position
 
 4. Click "+" or press Enter after each position
