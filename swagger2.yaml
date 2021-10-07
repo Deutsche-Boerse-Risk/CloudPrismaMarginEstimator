@@ -94,7 +94,7 @@ info:
 
     ## Change log
 
-    - 6.2.0 ETD CP005 and ETD CSV added to API v2
+    - 6.2.0 Repo introduction; ETD CP005 and ETD CSV added to API v2
 
     - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
 
@@ -292,6 +292,92 @@ paths:
                     - expiry_maturity
                     - version_number
                     - iid
+
+
+  /securities:
+    get:
+      summary: Get attributes of securities
+      description: Get attributes of securities (equities, bonds, subscription rights) for given ISIN, or all active securities known to the Risk system if ISIN is not specified
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date'
+        - $ref: '#/parameters/live'
+        - $ref: '#/parameters/live_timestamp'
+        - name: isin
+          in: query
+          type: string
+          description: Security ISIN
+          required: false
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              business_date: 20180809
+              live: false
+              live_timestamp: 0
+              securities:
+                - sec_id: DB1
+                  sec_isin: DE0005810055
+                  sec_type: SAKT
+                  sec_name: DEUTSCHE BOERSE AG
+                  iid: 1769
+                  currency: EUR
+                  security_mnemonic: DB1
+                  standard_settlement_period: 2
+                  price_unit: ABSOLUTE
+                  security_subtype: EQUITY
+                  margin_class_code: DB10
+                - sec_id:
+                  sec_isin: CH0224397171
+                  sec_type: BCNF
+                  sec_name: EIDGENOSSENSCHAFT 15-30
+                  iid: 13528248
+                  currency: CHF
+                  security_mnemonic:
+                  standard_settlement_period: 3
+                  price_unit: PERCENTAGE
+                  security_subtype: BOND
+                  margin_class_code: S0055
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
+              securities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sec_id:
+                      $ref: '#/definitions/sec_id'
+                    sec_isin:
+                      $ref: '#/definitions/sec_isin'
+                    sec_type:
+                      $ref: '#/definitions/sec_type'
+                    sec_name:
+                      $ref: '#/definitions/sec_name'
+                    iid:
+                      $ref: '#/definitions/iid'
+                    currency:
+                      $ref: '#/definitions/currency'
+                    security_mnemonic:
+                      $ref: '#/definitions/security_mnemonic'
+                    standard_settlement_period:
+                      $ref: '#/definitions/standard_settlement_period'
+                    price_unit:
+                      $ref: '#/definitions/price_unit'
+                    security_subtype:
+                      $ref: '#/definitions/security_subtype'
+                    margin_class_code:
+                      $ref: '#/definitions/margin_class_code'
+
+
   /clearing_currencies:
     get:
       summary: List All Clearing Currencies
@@ -346,9 +432,11 @@ paths:
                 - business_date: 20180809
                   live: false
                   otc_available: true
+                  cash_available: false
                 - business_date: 20180810
                   live: true
                   otc_available: true
+                  cash_available: false
           schema:
             type: object
             properties:
@@ -363,6 +451,10 @@ paths:
                       $ref: '#/definitions/live'
                     otc_available:
                       $ref: '#/definitions/otc_available'
+                    cash_available:
+                      $ref: '#/definitions/cash_available'
+
+
   /live_snapshots:
     get:
       summary: List Available Live Snapshots for Given Day
@@ -380,10 +472,12 @@ paths:
                 - business_date: 20180809
                   live: true
                   otc_available: true
+                  cash_available: false
                   live_timestamp: 0
                 - business_date: 20180809
                   live: true
                   otc_available: true
+                  cash_available: false
                   live_timestamp: 1562162876
           schema:
             type: object
@@ -399,6 +493,8 @@ paths:
                       $ref: '#/definitions/live'
                     otc_available:
                       $ref: '#/definitions/otc_available'
+                    cash_available:
+                      $ref: '#/definitions/cash_available'
                     live_timestamp:
                       $ref: '#/definitions/live_timestamp'
 
@@ -410,7 +506,7 @@ paths:
         # Margin Calculation
 
         Portfolio is sent in the request and margin is returned as a response.
-        The request can contain exchange traded derivatives (ETD) portfolio or OTC portfolio or both:
+        The request can contain exchange traded derivatives (ETD) portfolio, OTC portfolio or Cash Market portfolio (equities and bonds) or any combination of these assets:
 
         - ETD is submitted as
           - `etd_portfolio` JSON array, see request model
@@ -423,6 +519,9 @@ paths:
           - or `otc_fpml`
           - or `otc_cb202`, i.e. EurexOTC CB202 or CB207 report
 
+        - Cash Market is submitted as
+          - `repo_json` JSON array of `repo_json_position` objects, see the model
+          - other Cash Market instruments are currently not supported
 
         ## ETD portfolio as JSON array
 
@@ -537,6 +636,10 @@ paths:
         The `party` attribute is mandatory, see below.
         We recommend using gzip compression in the request, see above.
 
+        ## Repo JSON
+
+        `portfolio_components/repo_json` defines special Repo (single-ISIN Repo) positions. For attribute details see the model below.
+
       parameters:
         - $ref: '#/parameters/x_dbp_apikey'
         - name: body
@@ -566,6 +669,8 @@ paths:
                 type: boolean
                 description: enable cross-margining between OTC and Fixed Income
                 example: True
+              simulated_settlement_date:
+                $ref: '#/definitions/simulated_settlement_date'
               portfolio_components:
                 type: array
                 description: array of portfolio components
@@ -594,6 +699,8 @@ paths:
                       $ref: '#/definitions/otc_cb202'
                     otc_fpml:
                       $ref: '#/definitions/otc_fpml'
+                    repo_json:
+                      $ref: '#/definitions/repo_json'
       responses:
         '200':
           description: OK
@@ -626,6 +733,46 @@ paths:
                           risk_measure_value: 4481.692879
                           correlation_break_adjustment: 500.0
                           compression_adjustment: 10.0
+              rbm_margin:
+                margin_classes:
+                  - margin_class_code: DB10
+                    margin_group_code:
+                    margin_parameter: 5.5
+                    margin_parameter_flag: P
+                    cash_interest_rate: -0.5660
+                    additional_margin: 1026812
+                    additional_margin_before_grouping: 1026812
+                    current_liquidating_margin: 851977
+                    margin_class_currency: EUR
+                    positions:
+                      - line_no: 1
+                        sec_isin: DE0005810055
+                        sec_name: DEUTSCHE BOERSE AG
+                        settlement_date: 20210312
+                        net_security_position: 64100
+                        net_cash_position: -10310484
+                        amount_clv_secu: 62100
+                        amount_clv_cash: -10310484
+                        current_liquidating_margin: 851977
+                  - margin_class_code: C004I
+                    margin_group_code:
+                    margin_parameter: 2.35
+                    margin_parameter_flag: P
+                    cash_interest_rate: 0.02
+                    additional_margin: 6
+                    additional_margin_before_grouping: 6
+                    current_liquidating_margin: -9592
+                    margin_class_currency: USD
+                    positions:
+                      - line_no: 2
+                        sec_isin: US240718A929
+                        sec_name:
+                        settlement_date: 20210312
+                        net_security_position: -1066
+                        net_cash_position: 10661
+                        amount_clv_secu: 10680
+                        amount_clv_cash: 10661
+                        current_liquidating_margin: -9592
               drilldowns:
                 - line_no: 1
                   product_id: OGBL
@@ -724,6 +871,8 @@ paths:
                                 compression_adjustment:
                                   type: number
                                   description: Compression Adjustment for this RMS
+              rbm_margin:
+                $ref: '#/definitions/rbm_margin'
               drilldowns:
                 type: array
                 description: Margin figures on position level. Full business key is used, it is not possible to map to input line_no one to one because positions may be aggregated or split
@@ -1278,6 +1427,9 @@ definitions:
     type: boolean
     description: Is OTC available in the snapshot? Snapshot can exist without OTC, then only ETD portfolio can be evaluated. Snapshot without ETD is not possible. Live snapshots can be marked as otc_available which means OTC portfolio will be evaluated, however the OTC market data are from start-of-day, not from the particular timestamp.
     example: true
+  cash_available:
+    type: boolean
+    description: Is Cash Market available in the snapshot? Cash Market was introduced later to CPME and is not available for earlier snapshots. Live snapshots can be marked as cash_available which means Repo portfolio will be evaluated, however the Cash Market market data are from start-of-day, not from the particular timestamp.
   snapshot:
     type: object
     description: Optional point in time as of which the result is calculated. If only business_date is specified, latest snapshot from that business date is used. If only live=False is specified, last EOD is used. The timestamp is used only when live is true.
@@ -1327,6 +1479,44 @@ definitions:
     type: string
     description: currency code
     example: EUR
+  sec_id:
+    type: string
+    description: security ticker, upto 4 characters, can be empty
+    example: DB1
+  sec_isin:
+    type: string
+    description: security ISIN, unique identifier, mandatory, upto 16 characters
+    example: DE0005810055
+  sec_type:
+    type: string
+    description: security type, internal categorization
+    example: SAKT
+  sec_name:
+    type: string
+    description: security name, can be empty
+    example: DEUTSCHE BOERSE AG
+  security_mnemonic:
+    type: string
+    description: security mnemonic, can be empty
+    example: DB1
+  standard_settlement_period:
+    type: string
+    description: standard settlement period in days
+    example: 2
+  price_unit:
+    type: string
+    enum: [ABSOLUTE,PERCENTAGE]
+    description: price unit, typically absolute for stocks and percentage for bonds
+    example: ABSOLUTE
+  security_subtype:
+    type: string
+    enum: [BOND,EQUITY,SUBSCRIPTION_RIGHT]
+    description: security subtype
+    example: EQUITY
+  margin_class_code:
+    type: string
+    description: margin class code, up to 5 characters
+    example: DB10
   line_no:
     type: number
     description: Line number, used when reporting errors
@@ -1424,6 +1614,75 @@ definitions:
     required:
       - csv
 
+  portfolio_margin:
+    type: array
+    description: Margin on LGS level, higher levels can be summed on UI. Also initial margin can be calculated as a sum of all components except premium margin
+    items:
+      type: object
+      properties:
+        liquidation_group:
+          $ref: '#/definitions/liquidation_group'
+        liquidation_group_split:
+          $ref: '#/definitions/liquidation_group_split'
+        initial_margin:
+          type: number
+          description: Initial margin on liquidation group split level, equals to market risk plus add ons
+        market_risk:
+          type: number
+          description: Market risk from ReportCP046
+        liquidity_addon:
+          type: number
+          description: Liqu risk from ReportCP046
+        long_option_credit:
+          type: number
+          description: Long option credit from ReportCP046
+        time_to_expiry_adjustment:
+          type: number
+          description: Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introducedwith Prisma R8.0
+        premium_margin:
+          type: number
+          description: Premium margin from ReportCP046
+        market_risk_per_rms:
+          type: array
+          items:
+            type: object
+            properties:
+              rms_name:
+                type: string
+                description: Risk Measure Set name
+              simulation_type:
+                type: string
+                enum: [Historical, Stress, Event]
+                description: Risk Measure Set type
+              rms_market_risk:
+                type: number
+                description: RMS market risk before weighting
+              weighting_factor:
+                type: number
+                description: RMS weighting factor to be applied before aggregation to LGS level
+              rms_components:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    subsample_id:
+                      type: number
+                      description: id of the subsample (from 1 to risk horizon), or 1 if the RMS is not using subsampling
+                    risk_measure_value:
+                      type: number
+                      description: the main risk measure value for this RMS, e.g. value-at-risk for Historical or Stress simulation_type
+                    correlation_break_adjustment:
+                      type: number
+                      description: Correlation Break Adjustment for this RMS
+                    compression_adjustment:
+                      type: number
+                      description: Compression Adjustment for this RMS
+
+  otc_csv_string:
+    type: string
+    description: OTC portfolio as one string in CSV, format known from Margin Calculator GUI
+    example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+
   otc_cb202:
     type: object
     properties:
@@ -1466,6 +1725,159 @@ definitions:
         example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     required:
     - csv
+
+  repo_json:
+    type: array
+    items:
+      $ref: '#/definitions/repo_json_position'
+
+  repo_json_position:
+    type: object
+    description: >-
+      Special Repo, also called single-ISIN Repo position (as opposed to GC-Pooling Repo).
+    properties:
+      line_no:
+        $ref: '#/definitions/line_no'
+      sec_isin:
+        $ref: '#/definitions/sec_isin'
+      trade_date:
+        type: string
+        description: Trade date as YYYY-MM-DD or YYYYMMDD, mandatory
+        example: 20210315
+      settlement_date_frontleg:
+        type: string
+        description: Settlement date for the front leg as YYYY-MM-DD or YYYYMMDD, mandatory
+        example: 20210316
+      settlement_date_termleg:
+        type: string
+        description: Settlement date for the term leg as YYYY-MM-DD or YYYYMMDD, mandatory
+        example: 20210413
+      buy_sell_indicator:
+        type: string
+        enum: ['BUY','SELL']
+        description: mandatory, SELL = Sell securities, Cash taker; BUY = Buy securities, Cash Provider
+        example: BUY
+      currency:
+        type: string
+        description: Currency code for the Repo currency, optional, if filled it is validated that it is equal to currency of the ISIN
+        example: EUR
+      nominal:
+        type: number
+        description: Nominal value, mandatory
+        example: 500000000
+      fixed_repo_rate:
+        type: number
+        description: Fixed repo rate, in percent, mandatory
+        example: 2.250
+      trade_id:
+        type: string
+        description: user defined trade Id, optional
+        example: ABC123
+      clean_price_shift:
+        type: number
+        description: absolute shift of the risk system clean price, optional
+        example: -1.00
+    required:
+      - line_no
+      - sec_isin
+      - trade_date
+      - settlement_date_frontleg
+      - settlement_date_termleg
+      - buy_sell_indicator
+      - nominal
+      - fixed_repo_rate
+
+  simulated_settlement_date:
+    type: number
+    description: date as YYYYMMDD, optional and relevant only for Repos. If provided it must be greater than the snapshot date and CPME will calculate margin as if the number of calendar days between snapshot date and simulated settlement date has passed. If any Repo legs have settlement date before simulated settlement date, they will be considered as settled. Market data are taken from the snapshot date (the simulated settlement date can be in future).
+
+  additional_margin:
+    type: number
+    description: Forward looking margin component for cash market, including margin grouping effect
+  additional_margin_before_grouping:
+    type: number
+    description: Forward looking margin component for cash market, as if there was no margin grouping
+  current_liquidating_margin:
+    type: number
+    description: Current liquidating margin for cash market, covering current loss
+  settlement_date:
+    type: number
+    description: Settlement date as YYYYMMDD, mandatory
+    example: 20210312
+  rbm_margin:
+    type: object
+    description: >-
+      RBM margin for cash market:
+
+      - for each margin class: AM and CLM in margin class currency, corresponding to CI050 report
+        - for each ISIN/settlement date combination from the margin class: current liquidating margin, net cash position and net security position, corresponding to CC711 report (if there are multiple records for ISIN/settlement date in CC711, the values are summed)
+
+    properties:
+      margin_classes:
+        type: array
+        items:
+          type: object
+          description: Margin on margin class level
+          properties:
+            margin_class_code:
+              $ref: '#/definitions/margin_class_code'
+            margin_group_code:
+              type: string
+              description: Margin group that the margin class is assigned to. Can be empty, that means no grouping
+            margin_parameter:
+              type: number
+              description: Margin parameter
+              example: 3.5
+            margin_parameter_flag:
+              type: string
+              enum: [A,P]
+              description: Margin parameter flag - absolute (A) or percentage (P)
+              example: P
+            cash_interest_rate:
+              type: number
+              description: Cash interest rate (see report CC711)
+              example: -0.5660
+            additional_margin:
+              $ref: '#/definitions/additional_margin'
+            additional_margin_before_grouping:
+              $ref: '#/definitions/additional_margin_before_grouping'
+            current_liquidating_margin:
+              $ref: '#/definitions/current_liquidating_margin'
+            margin_class_currency:
+              type: string
+              description: Code of the margin class currency - margin is calculated in that currency
+              example: USD
+            positions:
+              type: array
+              items:
+                type: object
+                description: Positions of the margin class
+                properties:
+                  line_no:
+                    $ref: '#/definitions/line_no'
+                  sec_isin:
+                    $ref: '#/definitions/sec_isin'
+                  sec_name:
+                    $ref: '#/definitions/sec_name'
+                  settlement_date:
+                    $ref: '#/definitions/settlement_date'
+                  net_security_position:
+                    type: number
+                    description: Net cash position (see report CC711)
+                  net_cash_position:
+                    type: number
+                    description: Net cash position (see report CC711)
+                  amount_clv_secu:
+                    type: number
+                    description: CrtLiqValSecu i.e. Current Liquidating Value Secu (see report CC711)
+                  amount_clv_cash:
+                    type: number
+                    description: CrtLiqValCash i.e. Current Liquidating Value Cash (see report CC711)
+                  current_liquidating_margin:
+                    $ref: '#/definitions/current_liquidating_margin'
+                  trade_id:
+                    $ref: '#/definitions/trade_id'
+
   liquidation_group:
     type: string
     description: Liquidation group
