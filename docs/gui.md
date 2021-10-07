@@ -170,7 +170,7 @@ Upload of Repo portfolio is similar to ETD portfolio upload:
   - either by exporting the portfolio from F7
   - or download an example from the CPME main page by first clicking "Repo portfolio example" followed by "Download as a CSV file" and replace example trades by your trades
 3. Click "Upload REPO portfolio" and select the prepared CSV file
-4. [Read RBM results](#read-rbm-results)
+4. [Read RBM results](#read-rbm-results) or download them using "Download" / "Repo margin" / "As XLSX file" buttons.
 
 
 ### Repo portfolio CSV format
@@ -238,7 +238,7 @@ Repo trades can be also entered directly in the GUI:
 2. Click "Start an empty portfolio"
 3. Switch to "Repo portfolio" tab
 4. Enter the positions you wish, using the same attributes as described in [Repo portfolio CSV format](#repo-portfolio-csv-format)
-5. [Read RBM results](#read-rbm-results)
+5. [Read RBM results](#read-rbm-results) or download them using "Download" / "Repo margin" / "As XLSX file" buttons.
 
 
 ## Historical calculation
