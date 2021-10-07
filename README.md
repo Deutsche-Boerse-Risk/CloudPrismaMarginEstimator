@@ -246,7 +246,11 @@ all processing takes part within Germany.
 
 ## Repo
 
-Calculation of margin for single-ISIN (special) Repo is a future functionality to be introduced late in 2021.
+Calculation of margin for single-ISIN (special) Repo was introduced October 2021, both for GUI and API
+
+### How to submit Repo portfolio in GUI?
+
+Please see [GUI User Guide](docs/gui.md), sections "Upload Repo portfolio" and "Enter Repo portfolio".
 
 ### How to submit Repo portfolio to API?
 
