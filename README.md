@@ -36,7 +36,7 @@ Key links:
 | - OTC FX                        | no              | no              | yes                       |
 | - OTC inflation                 | yes             | yes             | yes                       |
 | - Cross-margining (ETD/OTC IRS) | yes             | yes             | yes                       |
-| - Single ISIN Repo              | planned         | planned         | no                        |
+| - [Single ISIN Repo](#repo)     | yes             | yes             | no                        |
 | - Equities, bonds               | no              | no              | no                        |
 | Input formats covered:          |                 |                 |                           |
 | - Member reports                | yes             | yes             | yes                       |
