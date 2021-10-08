@@ -253,7 +253,7 @@ Calculation of margin for single-ISIN (special) Repo was introduced October 2021
 
 ### How to submit Repo portfolio in GUI?
 
-Please see [GUI User Guide], sections "Upload Repo portfolio" and "Enter Repo portfolio".
+Please see [GUI User Guide], sections [Upload Repo portfolio] and [Enter Repo portfolio].
 
 ### How to submit Repo portfolio to API?
 
@@ -274,3 +274,5 @@ The response to [estimator request] contains [rbm_margin](https://app.swaggerhub
 [risk-parameters]:https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters
 [estimator request]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/default/post_estimator
 [GUI User Guide]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html
+[Upload Repo portfolio]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html#upload-repo-portfolio
+[Enter Repo portfolio]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html#enter-repo-portfolio
