@@ -11,7 +11,7 @@ questions.
 Key links:
 
 - [CPME GUI][CPME-gui]
-- [GUI User Guide](docs/gui.md)
+- [GUI User Guide]
 - [CPME API definition at SwaggerHub][api-definition]
 - [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the API
 
@@ -253,16 +253,16 @@ Calculation of margin for single-ISIN (special) Repo was introduced October 2021
 
 ### How to submit Repo portfolio in GUI?
 
-Please see [GUI User Guide](docs/gui.md), sections "Upload Repo portfolio" and "Enter Repo portfolio".
+Please see [GUI User Guide], sections "Upload Repo portfolio" and "Enter Repo portfolio".
 
 ### How to submit Repo portfolio to API?
 
-The Repo portfolio is part of [estimator request] as [repo_json](https://app.swaggerhub.com/apis-docs/dbgservice/cPME-dev/2.0#/repo_json) structure.
+The Repo portfolio is part of [estimator request] as [repo_json](https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/repo_json) structure.
 The attributes correspond to columns in F7 portfolio export. Open-ended repo trades and floating rate repo trades are excluded from margin calculation.
 
 ### How to read Repo margin from API?
 
-The response to [estimator request] contains [rbm_margin](https://app.swaggerhub.com/apis-docs/dbgservice/cPME-dev/2.0#/rbm_margin) structure. That contains:
+The response to [estimator request] contains [rbm_margin](https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/rbm_margin) structure. That contains:
 
 - for each margin class: additional margin and current liquidating margin in margin class currency, corresponding to CC750 report
 - for each ISIN/settlement date combination from the margin class: current liquidating margin, net cash position and net security position, corresponding to CC711 report
@@ -273,3 +273,4 @@ The response to [estimator request] contains [rbm_margin](https://app.swaggerhub
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf
 [risk-parameters]:https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters
 [estimator request]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/default/post_estimator
+[GUI User Guide]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html
