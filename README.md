@@ -39,11 +39,11 @@ Key links:
 | - [Single ISIN Repo](#repo)     | yes             | yes             | no                        |
 | - Equities, bonds               | no              | no              | no                        |
 | Input formats covered:          |                 |                 |                           |
-| - Member reports                | yes             | yes             | yes                       |
+| - Member reports                | CB202, CP005    | CB202, CP005    | CB202                     |
 | - CSV files                     | yes             | yes             | yes                       |
-| - OTC sensitivities (CSV)       | yes             | no              | yes                       |
+| - OTC sensitivities (CSV)       | yes             | yes             | yes                       |
 | - OTC FpML                      | yes             | yes             | no                        |
-| Historical calculation          | yes             | yes             | yes                       |
+| [Historical calculation](#is-it-possible-to-calculate-margin-as-of-a-historical-date) | yes             | yes             | yes                       |
 | Intraday calculation            | yes             | yes             | yes                       |
 | Local installation possible     | no              | no              | no                        |
 | Margin accuracy - ETD           | production-like | production-like | production-like           |
@@ -123,7 +123,7 @@ It has slightly more complex [estimator request]
 allowing the user to submit multiple portfolio components of the same type,
 e.g. two parts of OTC portfolio both in CSV format.
 
-New features are implemented only in version 2.0.
+New features are implemented only in version 2.0, such as [Single-ISIN Repo](#repo).
 You do not have to commit to one version - an application may use resources from
 both 1.0 and 2.0.
 
@@ -204,12 +204,11 @@ currently not supported by CPME.
 
 No.
 
-The simulation environment (a.k.a. [sandbox on the Digital Business
-Platform][api-digital-business-platform]) has different scenarios
+The [simulation environment](#CPME-gui-simu) has different scenarios
 and prices compared to production, and therefore produces a
 different margin for the same portfolio.
 
-Occasionally, the sandbox can be setup with production market data
+Occasionally, we setup a [what-if sandbox](#CPME-gui-whatif) with production market data
 but with different risk model parametrization, as a testing ground
 before the new setup becomes productive. This will be announced by
 the usual channels.
@@ -268,6 +267,8 @@ The response to [estimator request] contains [rbm_margin](https://app.swaggerhub
 - for each ISIN/settlement date combination from the margin class: current liquidating margin, net cash position and net security position, corresponding to CC711 report
 
 [CPME-gui]:https://eurexmargins.prod.dbgservice.com
+[CPME-gui-simu]:https://cpme.risk.simu.dbgservice.com
+[CPME-gui-whatif]:https://whatif.eurexmargins.prod.dbgservice.com
 [api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf

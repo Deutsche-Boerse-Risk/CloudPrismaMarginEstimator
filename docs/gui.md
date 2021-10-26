@@ -3,13 +3,14 @@
 [CPME GUI](https://eurexmargins.prod.dbgservice.com/estimator) offers margin calculation for:
 
 - Eurex listed derivatives (ETD)
-    - [uploaded in a simplified CSV format](#upload-etd-portfolio)
-    - or [entered directly in the GUI](#enter-etd-portfolio)
-    - or upload Eurex Clearing ETD position report CP005
-    - or upload portfolio export from C7 GUI
+    - [upload in a simplified CSV format](#prepare-etd-portfolio)
+    - or [enter directly in the GUI](#enter-etd-portfolio)
+    - or [upload](#upload-the-prepared-etd-file) Eurex Clearing ETD position report CP005
+    - or [upload](#upload-the-prepared-etd-file) portfolio export from C7 GUI
 - OTC IRS trades accepted by Eurex OTC except FX swaps uploaded
     - [in CSV format known from Margin Calculator](#upload-otc-portfolio)
     - in the format of Eurex Clearing member full inventory reports (CB202/CB207)
+    - as [DV01 sensitivity table](#upload-otc-sensitivities)
 - Repo single-ISIN trades except floating rate and open-ended repos
     - [uploaded in F7 portfolio export CSV format](#upload-repo-portfolio)
     - or [entered directly in the GUI](#enter-repo-portfolio)
@@ -34,6 +35,9 @@ for Repo vs Portfolio Margining for ETD and OTC.
 1. If you have not visited the site before, Terms of Use are shown. These must be accepted before the tool can be used.
 
 ### Prepare ETD Portfolio
+
+If you have CP005 position report or C7 portfolio export, you can directly [upload it](#upload-the-prepared-etd-file).
+Otherwise prepare ETD portfolio file in CSV format as follows:
 
 1. Download an example from the CPME main page by first clicking "Eurex portfolio example" followed by "Download as a CSV file".
 1. Edit the CSV file to replace the example with the positions you wish.
@@ -61,6 +65,7 @@ NVU,202006,P,36.000000,0,-200
 
 1. Click "Upload Eurex Portfolio".
 1. Select your prepared portfolio.
+    - for CP005 upload, CPME displays dialog to select an account from those available in your report
 
 ### Read the Results
 
@@ -72,12 +77,18 @@ Top box displays:
   - liquidation groups splits (only for PFI01, i.e. Fixed Income and IRS)
   - margin components (market risk and the add-ons)
 
-Position table shows:
+ETD Position table shows (if ETD portfolio was uploaded):
 
 - "Initial margin", an approximation of contribution of given position by "component VaR" method
-  - note that this is only an indication, given the nature of portfolio margining there is no such thing as the exact contribution of a single position to the margin
+    - note that this is only an indication, given the nature of portfolio margining there is no such thing as the exact contribution of a single position to the margin
 - "Premium margin" for options (except future-style options)
 - Drilldown icon to display distribution between liquidation group splits (interesting only for Fixed Income derivatives)
+
+OTC Trade table shows (if OTC portfolio was uploaded):
+
+- "PV" as present value
+- "DV01" as the DV01 sensitivity
+- "CompVaR", an approximation of contribution of given trade to Initial Margin by "component VaR" method (only an indication, see disclaimer above)
 
 ## Enter ETD Portfolio
 
@@ -105,13 +116,20 @@ Net Position | free text field to enter the position size, negative for short po
 Upload of OTC portfolio is similar to ETD portfolio upload:
 
 1. [launch CPME GUI](#launch-cpme-gui)
-2. Prepare your [OTC trades in CSV format](#otc-portfolio-csv-format)
-  - you can use [Excel template] to generate the CSV:
-    - save the template and open it in Excel
-    - use "Insert trade" to enter the trades using the Excel form, see [OTC template description]
-    - use "Export portfolio" which saves the portfolio in CSV format in the same folder as the template
+2. Get your "Eurex Clearing member full inventory reports (CB202/CB207)", or prepare your [OTC trades in CSV format](#otc-portfolio-csv-format)
+    - you can use [Excel template] to generate the CSV:
+        - save the template and open it in Excel
+        - use "Insert trade" to enter the trades using the Excel form, see [OTC template description]
+        - use "Export portfolio" which saves the portfolio in CSV format in the same folder as the template
 3. Click "Upload OTC portfolio" and select the prepared CSV file
-4. [Read the results](#read-the-results), only the top box will be shown, not individual trades
+4. [Read the results](#read-the-results)
+
+## Upload OTC Sensitivities
+
+1. [launch CPME GUI](#launch-cpme-gui)
+2. Prepare DV01 sensitivity table as CSV file using [OTC sensitivities template]
+3. Click "Upload OTC Sensitivities" and select the prepared CSV file
+4. [Read the results](#read-the-results)
 
 ## OTC Portfolio CSV Format
 
@@ -258,3 +276,4 @@ select the historical calculation in GUI:
 [Excel template]:https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_trade_template.xlsm?raw=true
 [OTC template description]:https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_template_description.xls?raw=true
 [EurexOTC Clear IRS Product List]:https://www.eurexclearing.com/resource/blob/227404/ff4638f2a3bfedbf511868ef54c6a153/data/ec15075e_Attach.pdf
+[OTC sensitivities template]:https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/raw/master/templates/otc/OTC_sensitivities_template.xlsm
