@@ -94,7 +94,9 @@ info:
 
     ## Change log
 
-    - 6.2.0 Repo introduction; ETD CP005 and ETD CSV added to API v2
+    - 6.3.1 Indicative margin resource
+
+    - 6.2.0 Cash Market Repo, ETD CP005 and ETD CSV added to API v2
 
     - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
 
@@ -109,6 +111,7 @@ info:
     - 4.1.1 historical snapshots also for list of products, series and currencies
 
   termsOfService: 'https://eurexmargins.prod.dbgservice.com/terms'
+
 host: api.developer.deutsche-boerse.com
 basePath: /prod/prisma-margin-estimator-2-0/2.0.0/
 schemes:
@@ -800,77 +803,9 @@ paths:
               clearing_currency:
                 $ref: '#/definitions/clearing_currency'
               errors:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    line_no:
-                      type: string
-                    error_msg:
-                      type: string
+                $ref: '#/definitions/errors'
               portfolio_margin:
-                type: array
-                description: Margin on LGS level, higher levels can be summed on UI. Also initial margin can be calculated as a sum of all components except premium margin
-                items:
-                  type: object
-                  properties:
-                    liquidation_group:
-                      $ref: '#/definitions/liquidation_group'
-                    liquidation_group_split:
-                      $ref: '#/definitions/liquidation_group_split'
-                    initial_margin:
-                      type: number
-                      description: Initial margin on liquidation group split level, equals to market risk plus add ons
-                    market_risk:
-                      type: number
-                      description: Market risk from ReportCP046
-                    liquidity_addon:
-                      type: number
-                      description: Liqu risk from ReportCP046
-                    long_option_credit:
-                      type: number
-                      description: Long option credit from ReportCP046
-                    time_to_expiry_adjustment:
-                      type: number
-                      description: Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introducedwith Prisma R8.0
-                    premium_margin:
-                      type: number
-                      description: Premium margin from ReportCP046
-                    market_risk_per_rms:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          rms_name:
-                            type: string
-                            description: Risk Measure Set name
-                          simulation_type:
-                            type: string
-                            enum: [Historical, Stress, Event]
-                            description: Risk Measure Set type
-                          rms_market_risk:
-                            type: number
-                            description: RMS market risk before weighting
-                          weighting_factor:
-                            type: number
-                            description: RMS weighting factor to be applied before aggregation to LGS level
-                          rms_components:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                subsample_id:
-                                  type: number
-                                  description: id of the subsample (from 1 to risk horizon), or 1 if the RMS is not using subsampling
-                                risk_measure_value:
-                                  type: number
-                                  description: the main risk measure value for this RMS, e.g. value-at-risk for Historical or Stress simulation_type
-                                correlation_break_adjustment:
-                                  type: number
-                                  description: Correlation Break Adjustment for this RMS
-                                compression_adjustment:
-                                  type: number
-                                  description: Compression Adjustment for this RMS
+                $ref: '#/definitions/portfolio_margin'
               rbm_margin:
                 $ref: '#/definitions/rbm_margin'
               drilldowns:
@@ -1015,26 +950,7 @@ paths:
               live_timestamp:
                 $ref: '#/definitions/live_timestamp'
               otc_trade_details:
-                type: array
-                items:
-                  type: object
-                  description: details of one OTC trade
-                  properties:
-                    trade_id:
-                      $ref: '#/definitions/trade_id'
-                    type:
-                      $ref: '#/definitions/otc_type'
-                    pay:
-                      $ref: '#/definitions/pay'
-                    receive:
-                      $ref: '#/definitions/receive'
-                    notional:
-                      $ref: '#/definitions/notional'
-                    notional_currency:
-                      $ref: '#/definitions/notional_currency'
-                    maturity:
-                      $ref: '#/definitions/otc_maturity'
-
+                $ref: '#/definitions/otc_trade_details'
 
   /otc_sensitivities:
     post:
@@ -1344,6 +1260,88 @@ paths:
           schema:
             $ref: '#/definitions/etd_portfolio'
 
+  /indicative_margin:
+    get:
+      summary: Indicative margin for front month future contracts
+      description: >-
+        Get indicative margin for one future contract (front month contract of given future product) in EUR.
+        By default all Eurex futures are included, unless ECC clearing house is selected or a specific product
+        or products is requested.
+
+        The resulting long_initial_margin_cash and short_initial_margin_cash is equivalent to the margin calculated
+        by individual /estimator requests for portfolio of one long or short contract, respectively.
+
+        The relative long_initial_margin and short_initial_margin is the cash margin divided
+        by (current underlying price converted to EUR * trade unit value).
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - name: clearing_house
+          in: query
+          description: Either EUXCDEFF (i.e. Eurex, the default choice) or EEXCDE8L (i.e. European Commodity Clearing, linked to EEX = European Energy Exchange).
+          required: false
+          type: string
+          enum: ['EUXCDEFF','EEXCDE8L']
+          default: EUXCDEFF
+        - name: products
+          in: query
+          description: Product ID of the future, there can be multiple instances of the parameter to request margin for several future products. If not provided the result will contain margin for all future products.
+          required: false
+          type: string
+        - name: format
+          in: query
+          description: Required result format, JSON (default), XLS or XLSX spreadsheet.
+          required: false
+          type: string
+          enum: ['JSON','XLS','XLSX']
+          default: JSON
+      responses:
+        200:
+          description: OK
+          examples:
+            application/json:
+              business_date: 20210622
+              live: false
+              live_timestamp: 0
+              list_margins:
+                - liquidation_group: PEQ01
+                  product_id: DB1H
+                  prod_name: FUT ON DT. BOERSE AG
+                  margin_currency: EUR
+                  long_initial_margin: 0.100004254
+                  long_initial_margin_cash: 1479.062914
+                  short_initial_margin: 0.11544631
+                  short_initial_margin_cash: 1707.450925
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
+              list_margins:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    liquidation_group:
+                      $ref: '#/definitions/liquidation_group'
+                    product_id:
+                      $ref: '#/definitions/product_id'
+                    prod_name:
+                      type: string
+                    margin_currency:
+                      $ref: '#/definitions/currency'
+                    long_initial_margin:
+                      type: number
+                    long_initial_margin_cash:
+                      type: number
+                    short_initial_margin:
+                      type: number
+                    short_initial_margin_cash:
+                      type: number
+
   /config/{param}:
     get:
       summary: Read configuration parameter
@@ -1608,9 +1606,7 @@ definitions:
     type: object
     properties:
       csv:
-        type: string
-        description: OTC portfolio as one string in CSV, format known from Margin Calculator GUI
-        example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+        $ref: '#/definitions/otc_csv_string'
     required:
       - csv
 
@@ -1725,6 +1721,27 @@ definitions:
         example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
     required:
     - csv
+
+  otc_trade_details:
+    type: array
+    items:
+      type: object
+      description: details of one OTC trade
+      properties:
+        trade_id:
+          $ref: '#/definitions/trade_id'
+        type:
+          $ref: '#/definitions/otc_type'
+        pay:
+          $ref: '#/definitions/pay'
+        receive:
+          $ref: '#/definitions/receive'
+        notional:
+          $ref: '#/definitions/notional'
+        notional_currency:
+          $ref: '#/definitions/notional_currency'
+        maturity:
+          $ref: '#/definitions/otc_maturity'
 
   repo_json:
     type: array
@@ -1948,3 +1965,12 @@ definitions:
     enum: [RELATIVE, ABSOLUTE]
     description: Volatility shift type, either relative, vola 20% shifted by 0.1 relative = 22%, or absolute, vola 20% shifted by 0.1 absolute = 20.1%
     example: ABSOLUTE
+  errors:
+    type: array
+    items:
+      type: object
+      properties:
+        line_no:
+          type: string
+        error_msg:
+          type: string
