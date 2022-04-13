@@ -94,7 +94,7 @@ info:
 
     ## Change log
 
-    - X.X.X ETD maturity specified preferably by contact_date
+    - 6.5.0 ETD maturity specified preferably by contract_date
 
     - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
 
@@ -116,6 +116,8 @@ basePath: /prod/prisma-margin-estimator/1.0.0/
 schemes:
   - https
 paths:
+
+
   /products:
     get:
       summary: List All Products
@@ -213,6 +215,8 @@ paths:
                   required:
                     - product
                     - instrument_type
+
+
   /series:
     get:
       summary: List Series of a Product
@@ -296,6 +300,92 @@ paths:
                     - expiry_maturity
                     - version_number
                     - iid
+
+
+  /securities:
+    get:
+      summary: Get attributes of securities
+      description: Get attributes of securities (equities, bonds, subscription rights) for given ISIN, or all active securities known to the Risk system if ISIN is not specified
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date'
+        - $ref: '#/parameters/live'
+        - $ref: '#/parameters/live_timestamp'
+        - name: isin
+          in: query
+          type: string
+          description: Security ISIN
+          required: false
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              business_date: 20180809
+              live: false
+              live_timestamp: 0
+              securities:
+                - sec_id: DB1
+                  sec_isin: DE0005810055
+                  sec_type: SAKT
+                  sec_name: DEUTSCHE BOERSE AG
+                  iid: 1769
+                  currency: EUR
+                  security_mnemonic: DB1
+                  standard_settlement_period: 2
+                  price_unit: ABSOLUTE
+                  security_subtype: EQUITY
+                  margin_class_code: DB10
+                - sec_id:
+                  sec_isin: CH0224397171
+                  sec_type: BCNF
+                  sec_name: EIDGENOSSENSCHAFT 15-30
+                  iid: 13528248
+                  currency: CHF
+                  security_mnemonic:
+                  standard_settlement_period: 3
+                  price_unit: PERCENTAGE
+                  security_subtype: BOND
+                  margin_class_code: S0055
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
+              securities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sec_id:
+                      $ref: '#/definitions/sec_id'
+                    sec_isin:
+                      $ref: '#/definitions/sec_isin'
+                    sec_type:
+                      $ref: '#/definitions/sec_type'
+                    sec_name:
+                      $ref: '#/definitions/sec_name'
+                    iid:
+                      $ref: '#/definitions/iid'
+                    currency:
+                      $ref: '#/definitions/currency'
+                    security_mnemonic:
+                      $ref: '#/definitions/security_mnemonic'
+                    standard_settlement_period:
+                      $ref: '#/definitions/standard_settlement_period'
+                    price_unit:
+                      $ref: '#/definitions/price_unit'
+                    security_subtype:
+                      $ref: '#/definitions/security_subtype'
+                    margin_class_code:
+                      $ref: '#/definitions/margin_class_code'
+
+
   /clearing_currencies:
     get:
       summary: List All Clearing Currencies
@@ -961,7 +1051,7 @@ definitions:
   contract_frequency:
     type: string
     enum: [MONTHLY,WEEKLY,DAILY,FLEX,END_OF_MONTH]
-    description:
+    description: Contract frequency
     example: MONTHLY
   contract_maturity:
     type: number
@@ -993,6 +1083,44 @@ definitions:
     type: string
     description: currency code
     example: EUR
+  sec_id:
+    type: string
+    description: security ticker, upto 4 characters, can be empty
+    example: DB1
+  sec_isin:
+    type: string
+    description: security ISIN, unique identifier, mandatory, upto 16 characters
+    example: DE0005810055
+  sec_type:
+    type: string
+    description: security type, internal categorization
+    example: SAKT
+  sec_name:
+    type: string
+    description: security name, can be empty
+    example: DEUTSCHE BOERSE AG
+  security_mnemonic:
+    type: string
+    description: security mnemonic, can be empty
+    example: DB1
+  standard_settlement_period:
+    type: string
+    description: standard settlement period in days
+    example: 2
+  price_unit:
+    type: string
+    enum: [ABSOLUTE,PERCENTAGE]
+    description: price unit, typically absolute for stocks and percentage for bonds
+    example: ABSOLUTE
+  security_subtype:
+    type: string
+    enum: [BOND,EQUITY,SUBSCRIPTION_RIGHT]
+    description: security subtype
+    example: EQUITY
+  margin_class_code:
+    type: string
+    description: margin class code, up to 5 characters
+    example: DB10
   line_no:
     type: number
     description: Line number, used when reporting errors
@@ -1240,3 +1368,12 @@ definitions:
     enum: [RELATIVE, ABSOLUTE]
     description: Volatility shift type, either relative, vola 20% shifted by 0.1 relative = 22%, or absolute, vola 20% shifted by 0.1 absolute = 20.1%
     example: ABSOLUTE
+  errors:
+    type: array
+    items:
+      type: object
+      properties:
+        line_no:
+          type: string
+        error_msg:
+          type: string

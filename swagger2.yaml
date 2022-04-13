@@ -94,7 +94,7 @@ info:
 
     ## Change log
 
-    - X.X.X ETD maturity specified preferably by contact_date
+    - 6.5.0 ETD maturity specified preferably by contract_date
 
     - 6.3.1 Indicative margin resource
 
@@ -1016,12 +1016,12 @@ paths:
               live: false
               live_timestamp: 0
               curves:
-                - EUR.EONIA
+                - EUR.ESTR
               dv01_per_maturity:
                 - maturity: ON
                   dv01:
                     - 123.456
-              csv: Maturity,EUR.EONIA\nON,123.456
+              csv: Maturity,EUR.ESTR\nON,123.456
           schema:
             type: object
             properties:
@@ -1286,6 +1286,10 @@ paths:
 
         The relative long_initial_margin and short_initial_margin is the cash margin divided
         by (current underlying price converted to EUR * trade unit value).
+
+        Optionally business date can be specified to get historical indicative margins, by default CPME returns the most recent values.
+        In contrast to estimator request, which uses end-of-day for historical calculation (unless time is specified),
+        indicative margin is always for start-of-day (published in the morning to indicate margin during the day).
       parameters:
         - $ref: '#/parameters/x_dbp_apikey'
         - name: clearing_house
@@ -1307,6 +1311,7 @@ paths:
           type: string
           enum: ['JSON','XLS','XLSX']
           default: JSON
+        - $ref: '#/parameters/business_date'
       responses:
         200:
           description: OK
@@ -1469,7 +1474,7 @@ definitions:
   contract_frequency:
     type: string
     enum: [MONTHLY,WEEKLY,DAILY,FLEX,END_OF_MONTH]
-    description:
+    description: Contract frequency
     example: MONTHLY
   contract_maturity:
     type: number
@@ -1744,7 +1749,7 @@ definitions:
       csv:
         type: string
         description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
-        example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        example: Maturity,CHF.SARON.ON,DKK.CIBOR.6M,EUR.ESTR.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.SONIA.ON,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.SOFR.ON,USD.LIBOR.1M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,100,,,,,,,,,,,,,,,
     required:
     - csv
 
