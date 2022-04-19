@@ -590,35 +590,7 @@ paths:
                 description: enable cross-margining between OTC and Fixed Income
                 example: True
               etd_portfolio:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    line_no:
-                      $ref: '#/definitions/line_no'
-                    product_id:
-                      $ref: '#/definitions/product_id'
-                    maturity:
-                      $ref: '#/definitions/maturity'
-                    call_put_flag:
-                      $ref: '#/definitions/call_put_flag'
-                    exercise_price:
-                      $ref: '#/definitions/exercise_price'
-                    version_number:
-                      $ref: '#/definitions/version_number'
-                    iid:
-                      $ref: '#/definitions/iid'
-                    instrument_type:
-                      $ref: '#/definitions/instrument_type'
-                    exercise_style:
-                      $ref: '#/definitions/exercise_style'
-                    net_ea:
-                      $ref: '#/definitions/net_ea'
-                    net_ls_balance:
-                      $ref: '#/definitions/net_ls_balance'
-                  required:
-                    - line_no
-                    - net_ls_balance
+                $ref: '#/definitions/etd_portfolio'
               etd_csv:
                 type: object
                 properties:
@@ -1229,11 +1201,14 @@ definitions:
     type: object
     properties:
       csv:
-        type: string
-        description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
-        example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        $ref: '#/definitions/otc_csv_string'
     required:
     - csv
+  otc_csv_string:
+    type: string
+    description: OTC portfolio as one string in CSV, format known from Margin Calculator GUI
+    example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+
   portfolio_margin:
     type: array
     description: Margin on LGS level, higher levels can be summed on UI. Also initial margin can be calculated as a sum of all components except premium margin
