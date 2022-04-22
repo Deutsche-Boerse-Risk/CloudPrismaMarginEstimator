@@ -5,7 +5,7 @@ methodology][prisma-methodology]. The application is available to both
 members and non-members of Eurex Clearing, a part of the Deutsche Boerse Group. It
 can be used via a [browser based GUI][CPME-gui] or an API.
 
-This repo contains documentation, examples and frequently asked
+This GitHub repository contains documentation, examples and frequently asked
 questions.
 
 Key links:
@@ -17,7 +17,7 @@ Key links:
 
 # Known Limitations
 
-- Does not support cash market (equities, bonds, ...)
+- Does not support cash market (equities, bonds, ...) except for single-ISIN repo trades
 - Does not support FX swaps
 - Does not support new flexible contracts, only existing ones
 
@@ -48,6 +48,7 @@ Key links:
 | Local installation possible     | no              | no              | no                        |
 | Margin accuracy - ETD           | production-like | production-like | production-like           |
 | Margin accuracy - OTC IRS       | approximate     | approximate     | production-like           |
+| Margin accuracy - Repo          | approximate     | approximate     | n/a                       |
 
 ### What is the difference between the CPME GUI and the API?
 
@@ -56,7 +57,7 @@ is provided by the GUI.
 
 ### When is CPME available?
 
-There is no time restriction set, in general CPME (both GUI and API) is available 24 hours a day, however there can be short (several minutes) intervals when instance for new snapshot is starting and request return error, in that case users have to repeat the request. Unfortunately sometimes we can have also unexpected downtimes – CPME does not have the same level of monitoring and support as our main Risk systems.
+There is no time restriction set, in general CPME (both GUI and API) is available 24 hours a day, however there can be short (several minutes) intervals when instance for new snapshot is starting and requests return error, in that case users have to repeat the request. Unfortunately sometimes we can have also unexpected downtimes – CPME does not have the same level of monitoring and support as our main Risk systems.
 
 ### When is end-of-day or start-of-day snapshot available?
 

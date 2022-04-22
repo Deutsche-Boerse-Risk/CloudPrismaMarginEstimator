@@ -11,6 +11,7 @@
     - [in CSV format known from Margin Calculator](#upload-otc-portfolio)
     - in the format of Eurex Clearing member full inventory reports (CB202/CB207)
     - as [DV01 sensitivity table](#upload-otc-sensitivities)
+    - or [entered as OTC shorthand](#enter-otc-shorthand)
 - Repo single-ISIN trades except floating rate and open-ended repos
     - [uploaded in F7 portfolio export CSV format](#upload-repo-portfolio)
     - or [entered directly in the GUI](#enter-repo-portfolio)
@@ -26,6 +27,8 @@ should be applied using the "Cross margin" checkbox.
 Repo portfolio can be submitted only separately, because the margin
 is calculated by a different methodology: Risk Based Margining (RBM)
 for Repo vs Portfolio Margining for ETD and OTC.
+
+# ETD
 
 ## Upload ETD Portfolio
 
@@ -111,6 +114,8 @@ Net Position | free text field to enter the position size, negative for short po
 5. Click "Recalculate margin"
 6. [Read the results](#read-the-results)
 
+# OTC
+
 ## Upload OTC Portfolio
 
 Upload of OTC portfolio is similar to ETD portfolio upload:
@@ -178,6 +183,32 @@ The receive leg has the same attributes as pay leg above, except prefix "pay" is
 internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod
 1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
 ```
+
+## Enter OTC shorthand
+
+Instead of uploading the OTC trades or sensitivities, it is possible to enter interest rate swaps
+in a simplified way called "OTC shorthand". Only the key attributes are required:
+currency, notional, maturity, pay/rec and fixed rate - e.g. `EUR 100m 25y pay 1%`.
+CPME uses default values for the remaining attributes, it is not possible to enter them.
+
+To specify trade by OTC shorthand:
+
+1. [launch CPME GUI](#launch-cpme-gui)
+2. Click "Start an empty portfolio"
+3. Switch to "OTC portfolio" tab
+4. Click "Enter OTC trades"
+5. Write one trade per line into the trade window, using "currency notional maturity pay/rec rate" format, e.g.:
+
+```
+USD 1b 3y rec 1.5%
+EUR 500m 10y pay 1%
+```
+
+6. Click "Submit" (this will replace your previous OTC portfolio, there is currently no option to add trades to the existing portfolio)
+7. [Read the results](#read-the-results)
+
+
+# Repo
 
 ## Upload Repo portfolio
 
@@ -247,7 +278,6 @@ Net Security Position                513,535,108.00 CHF
 Current Liquidating Margin               237,385.00 CHF
 ```
 
-
 ## Enter Repo portfolio
 
 Repo trades can be also entered directly in the GUI:
@@ -261,7 +291,7 @@ Repo trades can be also entered directly in the GUI:
 
 ## Historical calculation
 
-By default the margin is calculated as of the latest snapshot, i.e. using the most recent market data.
+By default, the margin is calculated as of the latest snapshot, i.e. using the most recent market data.
 To calculate margin as of a historical snapshot, e.g. to compare against end-of-day reports,
 select the historical calculation in GUI:
 
