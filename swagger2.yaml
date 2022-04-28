@@ -1287,7 +1287,7 @@ paths:
               otc_shorthand_lines:
                 type: string
                 description: Text description of OTC trade(s), separated by newline
-                example: USD200m 10Y pay 1.5%
+                example: USD 200m 10Y pay 1.5%
             required:
               - otc_shorthand_lines
       responses:

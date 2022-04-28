@@ -18,7 +18,6 @@ Key links:
 # Known Limitations
 
 - Does not support cash market (equities, bonds, ...) except for single-ISIN repo trades
-- Does not support FX swaps
 - Does not support new flexible contracts, only existing ones
 
 # Frequently Asked Questions
@@ -33,7 +32,6 @@ Key links:
 | Asset classes covered:          |                 |                 |                           |
 | - ETD                           | yes             | yes             | yes                       |
 | - OTC IRS                       | yes             | yes             | yes                       |
-| - OTC FX                        | no              | no              | yes                       |
 | - OTC inflation                 | yes             | yes             | yes                       |
 | - Cross-margining (ETD/OTC IRS) | yes             | yes             | yes                       |
 | - [Single ISIN Repo](#repo)     | yes             | yes             | no                        |
@@ -43,6 +41,7 @@ Key links:
 | - CSV files                     | yes             | yes             | yes                       |
 | - OTC sensitivities (CSV)       | yes             | yes             | yes                       |
 | - OTC FpML                      | yes             | yes             | no                        |
+| - OTC shorthand                 | yes             | yes             | no                        |
 | [Historical calculation](#is-it-possible-to-calculate-margin-as-of-a-historical-date) | yes             | yes             | yes                       |
 | Intraday calculation            | yes             | yes             | yes                       |
 | Local installation possible     | no              | no              | no                        |
