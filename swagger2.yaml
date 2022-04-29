@@ -1276,7 +1276,7 @@ paths:
   /convert/otc/shorthand:
     post:
       summary: Convert a short text description of the trade to OTC CSV
-      description: Text description of a trade similar to Clarus Quick Trade format is converted to OTC CSV representation that can be used for margin calculation. Response contains also trade details. The expected trade format is contains currency, notional, maturity, side and rate. E.g. "USD200m 10Y pay 1.5%".
+      description: Text description of a trade similar to Clarus Quick Trade format is converted to OTC CSV representation that can be used for margin calculation. Response contains also trade details. The expected trade format is contains currency, notional, maturity, side and rate. E.g. "USD 200m 10Y pay 1.5%".
       parameters:
         - $ref: '#/parameters/x_dbp_apikey'
         - name: body
