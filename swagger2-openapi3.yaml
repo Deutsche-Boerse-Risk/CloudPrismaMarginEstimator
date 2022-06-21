@@ -1761,6 +1761,11 @@ components:
       type: string
       description: margin class code, up to 5 characters
       example: DB10
+    margin_group_code:
+        type: string
+        description: >-
+          Margin group that the margin class is assigned to. Can be
+          empty, that means no grouping
     line_no:
       type: number
       description: Line number, used when reporting errors
@@ -2147,10 +2152,7 @@ components:
               margin_class_code:
                 $ref: '#/components/schemas/margin_class_code'
               margin_group_code:
-                type: string
-                description: >-
-                  Margin group that the margin class is assigned to. Can be
-                  empty, that means no grouping
+                $ref: '#/components/schemas/margin_group_code'
               margin_parameter:
                 type: number
                 description: Margin parameter
