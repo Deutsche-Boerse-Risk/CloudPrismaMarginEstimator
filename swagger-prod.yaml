@@ -3,13 +3,15 @@ info:
   title: Cloud Prisma Margin Estimator API
   version: "1.0"
   description: >-
-    Cloud Prisma Margin Estimator (cPME) calculates margin for an uploaded portfolio
-    according to Eurex Prisma methodology. The application is available to both members
+    Cloud Prisma Margin Estimator (CPME) calculates margin for an uploaded portfolio
+    according to Eurex PRISMA methodology. The application is available to both members
     and non-members of Eurex Clearing. It can be accessed via web user interface,
-    see [cPME GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
+    see [CPME GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
     described here.
 
-    It supports also greek and stress price calculation - these analytical tools
+    The key request is `/estimator`, it is the only request you need to calculate
+    the margin. Other requests provide lists or details of instruments, available dates etc.
+    CPME supports also greek and stress price calculation - these analytical tools
     are not related to the margin.
 
     [FAQ](https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/)
@@ -47,7 +49,7 @@ info:
     For example:
 
 
-    <pre>echo '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}' \
+    <pre>echo '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}' \
       | gzip \
       | curl -s -H "X-DBP-APIKEY: your-key" -H "Content-Type: application/json" \
         https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/estimator \
@@ -75,7 +77,7 @@ info:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
       'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/series?products=FGBM&business_date=20190307'
-    echo '{"snapshot":{"business_date":20190307}, "etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}' \
+    echo '{"snapshot":{"business_date":20190307}, "etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}' \
       | curl -H 'X-DBP-APIKEY: your-key' \
         'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/estimator' \
         --data-binary @-
@@ -91,6 +93,8 @@ info:
     see attributes `business_date`, `live` and `live_timestamp`.
 
     ## Change log
+
+    - 6.5.0 ETD maturity specified preferably by contract_date
 
     - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
 
@@ -112,6 +116,8 @@ basePath: /prod/prisma-margin-estimator/1.0.0/
 schemes:
   - https
 paths:
+
+
   /products:
     get:
       summary: List All Products
@@ -181,7 +187,7 @@ paths:
                     underlying_isin:
                       type: string
                     currency:
-                      type: string
+                      $ref: '#/definitions/currency'
                     product_type:
                       type: string
                     extended_product_type:
@@ -209,6 +215,8 @@ paths:
                   required:
                     - product
                     - instrument_type
+
+
   /series:
     get:
       summary: List Series of a Product
@@ -238,6 +246,7 @@ paths:
               live_timestamp: 0
               list_series:
                 - product_id: OGBL
+                  contract_date: 20190621
                   contract_maturity: 201906
                   expiry_maturity: 201906
                   call_put_flag: C
@@ -260,6 +269,8 @@ paths:
                   properties:
                     product_id:
                       $ref: '#/definitions/product_id'
+                    contract_date:
+                      $ref: '#/definitions/contract_date'
                     contract_maturity:
                       $ref: '#/definitions/contract_maturity'
                     expiry_maturity:
@@ -280,12 +291,101 @@ paths:
                       type: number
                     exercise_style_flag:
                       $ref: '#/definitions/exercise_style_flag'
+                    contract_frequency:
+                      $ref: '#/definitions/contract_frequency'
                   required:
                     - product_id
+                    - contract_date
                     - contract_maturity
                     - expiry_maturity
                     - version_number
                     - iid
+
+
+  /securities:
+    get:
+      summary: Get attributes of securities
+      description: Get attributes of securities (equities, bonds, subscription rights) for given ISIN, or all active securities known to the Risk system if ISIN is not specified
+      parameters:
+        - $ref: '#/parameters/x_dbp_apikey'
+        - $ref: '#/parameters/business_date'
+        - $ref: '#/parameters/live'
+        - $ref: '#/parameters/live_timestamp'
+        - name: isin
+          in: query
+          type: string
+          description: Security ISIN
+          required: false
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          examples:
+            application/json:
+              business_date: 20180809
+              live: false
+              live_timestamp: 0
+              securities:
+                - sec_id: DB1
+                  sec_isin: DE0005810055
+                  sec_type: SAKT
+                  sec_name: DEUTSCHE BOERSE AG
+                  iid: 1769
+                  currency: EUR
+                  security_mnemonic: DB1
+                  standard_settlement_period: 2
+                  price_unit: ABSOLUTE
+                  security_subtype: EQUITY
+                  margin_class_code: DB10
+                - sec_id:
+                  sec_isin: CH0224397171
+                  sec_type: BCNF
+                  sec_name: EIDGENOSSENSCHAFT 15-30
+                  iid: 13528248
+                  currency: CHF
+                  security_mnemonic:
+                  standard_settlement_period: 3
+                  price_unit: PERCENTAGE
+                  security_subtype: BOND
+                  margin_class_code: S0055
+          schema:
+            type: object
+            properties:
+              business_date:
+                $ref: '#/definitions/business_date'
+              live:
+                $ref: '#/definitions/live'
+              live_timestamp:
+                $ref: '#/definitions/live_timestamp'
+              securities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sec_id:
+                      $ref: '#/definitions/sec_id'
+                    sec_isin:
+                      $ref: '#/definitions/sec_isin'
+                    sec_type:
+                      $ref: '#/definitions/sec_type'
+                    sec_name:
+                      $ref: '#/definitions/sec_name'
+                    iid:
+                      $ref: '#/definitions/iid'
+                    currency:
+                      $ref: '#/definitions/currency'
+                    security_mnemonic:
+                      $ref: '#/definitions/security_mnemonic'
+                    standard_settlement_period:
+                      $ref: '#/definitions/standard_settlement_period'
+                    price_unit:
+                      $ref: '#/definitions/price_unit'
+                    security_subtype:
+                      $ref: '#/definitions/security_subtype'
+                    margin_class_code:
+                      $ref: '#/definitions/margin_class_code'
+
+
   /clearing_currencies:
     get:
       summary: List All Clearing Currencies
@@ -334,7 +434,7 @@ paths:
         - ETD is submitted as
           - `etd_portfolio` JSON array, see request model
           - or `etd_csv` with positions in CSV format
-          - or `etd_cp005`, i.e. Eurex CP005 report
+          - or `etd_cp005`, i.e. using Eurex CP005 XML report
 
         - OTC is submitted as
           - `otc_csv` with trades in CSV format known from Margin Calculator or Prisma Margin Estimator, see description bellow
@@ -349,16 +449,18 @@ paths:
 
         The full key for series depends on instrument type, these are the mandatory fields:
 
-        - Future: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `version_number` (defaults to 0)
+        - Future: `product`, `contract_date` as YYYYMMDD, `version_number` (defaults to 0)
 
-        - Option: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `call_put_flag`, `exercise_price`, `version_number` (defaults to 0)
+        - Option: `product`, `contract_date` as YYYYMMDD, `call_put_flag`, `exercise_price`, `version_number` (defaults to 0)
 
-        - Flex Future: `instrument_type`: "Flex Future", `product`, `maturity` as YYYYMMDD, `version_number` (defaults to 0)
+        - Flex Future: `instrument_type`: "Flex Future", `product`, `contract_date` as YYYYMMDD, `version_number` (defaults to 0)
 
-        - Flex Option: `instrument_type`: "Flex Option", `product`, `maturity` as YYYYMMDD, `call_put_flag`, `exercise_price`, `exercise_style`, `version_number` (defaults to 0)
+        - Flex Option: `instrument_type`: "Flex Option", `product`, `contract_date` as YYYYMMDD, `call_put_flag`, `exercise_price`, `exercise_style`, `version_number` (defaults to 0)
 
 
         Only already existing Flex Future or Flex Option can be submitted, not a new one (e.g. different strike or expiry day).
+
+        For backward compatibility `maturity` as YYYYMM (DD added for flex) can be used instead of `contract_date`, however it is not recommended as uniqueness is not guaranteed.
 
         Example of minimal request with one future contract:
 
@@ -366,7 +468,7 @@ paths:
         <pre>
         curl --header 'X-DBP-APIKEY: your-key' \
           https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator/1.0.0/estimator \
-          -d '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}'
+          -d '{"etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}'
         </pre>
 
 
@@ -470,13 +572,13 @@ paths:
               etd_portfolio:
                 - line_no: 1
                   product_id: FEXD
-                  maturity: 202812
+                  contract_date: 20301220
                   net_ls_balance: 10
                 - line_no: 2
-                  product_id: OESX
-                  maturity: 202812
+                  product_id: OESD
+                  contract_date: 20311222
                   call_put_flag: C
-                  exercise_price: 2400
+                  exercise_price: 90
                   net_ls_balance: -10
             properties:
               snapshot:
@@ -488,35 +590,7 @@ paths:
                 description: enable cross-margining between OTC and Fixed Income
                 example: True
               etd_portfolio:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    line_no:
-                      $ref: '#/definitions/line_no'
-                    product_id:
-                      $ref: '#/definitions/product_id'
-                    maturity:
-                      $ref: '#/definitions/maturity'
-                    call_put_flag:
-                      $ref: '#/definitions/call_put_flag'
-                    exercise_price:
-                      $ref: '#/definitions/exercise_price'
-                    version_number:
-                      $ref: '#/definitions/version_number'
-                    iid:
-                      $ref: '#/definitions/iid'
-                    instrument_type:
-                      $ref: '#/definitions/instrument_type'
-                    exercise_style:
-                      $ref: '#/definitions/exercise_style'
-                    net_ea:
-                      $ref: '#/definitions/net_ea'
-                    net_ls_balance:
-                      $ref: '#/definitions/net_ls_balance'
-                  required:
-                    - line_no
-                    - net_ls_balance
+                $ref: '#/definitions/etd_portfolio'
               etd_csv:
                 type: object
                 properties:
@@ -581,12 +655,13 @@ paths:
                           compression_adjustment: 10.0
               drilldowns:
                 - line_no: 1
-                  product_id: OGBL
+                  product_id: OEXD
                   call_put_flag: C
-                  exercise_price: 160
+                  exercise_price: 90
                   version_number: '0'
                   iid: 18249016
-                  maturity: 201806
+                  contract_date: 20311222
+                  maturity: 203112
                   net_ls_balance: 10
                   liquidation_group: PFI01
                   liquidation_group_split: PFI01_HP2_T0-99999
@@ -606,77 +681,9 @@ paths:
               clearing_currency:
                 $ref: '#/definitions/clearing_currency'
               errors:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    line_no:
-                      type: string
-                    error_msg:
-                      type: string
+                $ref: '#/definitions/errors'
               portfolio_margin:
-                type: array
-                description: Margin on LGS level, higher levels can be summed on UI. Also initial margin can be calculated as a sum of all components except premium margin
-                items:
-                  type: object
-                  properties:
-                    liquidation_group:
-                      $ref: '#/definitions/liquidation_group'
-                    liquidation_group_split:
-                      $ref: '#/definitions/liquidation_group_split'
-                    initial_margin:
-                      type: number
-                      description: Initial margin on liquidation group split level, equals to market risk plus add ons
-                    market_risk:
-                      type: number
-                      description: Market risk from ReportCP046
-                    liquidity_addon:
-                      type: number
-                      description: Liqu risk from ReportCP046
-                    long_option_credit:
-                      type: number
-                      description: Long option credit from ReportCP046
-                    time_to_expiry_adjustment:
-                      type: number
-                      description: Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introducedwith Prisma R8.0
-                    premium_margin:
-                      type: number
-                      description: Premium margin from ReportCP046
-                    market_risk_per_rms:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          rms_name:
-                            type: string
-                            description: Risk Measure Set name
-                          simulation_type:
-                            type: string
-                            enum: [Historical, Stress, Event]
-                            description: Risk Measure Set type
-                          rms_market_risk:
-                            type: number
-                            description: RMS market risk before weighting
-                          weighting_factor:
-                            type: number
-                            description: RMS weighting factor to be applied before aggregation to LGS level
-                          rms_components:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                subsample_id:
-                                  type: number
-                                  description: id of the subsample (from 1 to risk horizon), or 1 if the RMS is not using subsampling
-                                risk_measure_value:
-                                  type: number
-                                  description: the main risk measure value for this RMS, e.g. value-at-risk for Historical or Stress simulation_type
-                                correlation_break_adjustment:
-                                  type: number
-                                  description: Correlation Break Adjustment for this RMS
-                                compression_adjustment:
-                                  type: number
-                                  description: Compression Adjustment for this RMS
+                $ref: '#/definitions/portfolio_margin'
               drilldowns:
                 type: array
                 description: Margin figures on position level. Full business key is used, it is not possible to map to input line_no one to one because positions may be aggregated or split
@@ -687,6 +694,8 @@ paths:
                       $ref: '#/definitions/line_no'
                     product_id:
                       $ref: '#/definitions/product_id'
+                    contract_date:
+                      $ref: '#/definitions/contract_date'
                     maturity:
                       $ref: '#/definitions/maturity'
                     call_put_flag:
@@ -841,6 +850,8 @@ paths:
                       type: array
                       items:
                         type: number
+
+
   /stressmatrix:
     post:
       summary: Stress Matrix Request
@@ -1003,6 +1014,17 @@ definitions:
     type: string
     description: Unique identifier of a product
     example: OESX
+  contract_date:
+    type: number
+    description: Contract date of the instrument in YYYYMMDD format.
+      Introduced with Next Generation ETD contracts initiative as part of the series primary key.
+      Maturity (meaning contract_maturity) can still be used alternatives to contract_date, however only contract_date guarantees uniqueness.
+    example: 20281215
+  contract_frequency:
+    type: string
+    enum: [MONTHLY,WEEKLY,DAILY,FLEX,END_OF_MONTH]
+    description: Contract frequency
+    example: MONTHLY
   contract_maturity:
     type: number
     description: Maturity of the instrument in YYYYMM format. Corresponds to contract year/month as shown on Eurex webpage
@@ -1029,6 +1051,48 @@ definitions:
     type: number
     description: Technical instrument ID. Needed for analytical requests - greeks, stress prices. If provided in request, all other key attributes are ignored
     example: 27471356
+  currency:
+    type: string
+    description: currency code
+    example: EUR
+  sec_id:
+    type: string
+    description: security ticker, upto 4 characters, can be empty
+    example: DB1
+  sec_isin:
+    type: string
+    description: security ISIN, unique identifier, mandatory, upto 16 characters
+    example: DE0005810055
+  sec_type:
+    type: string
+    description: security type, internal categorization
+    example: SAKT
+  sec_name:
+    type: string
+    description: security name, can be empty
+    example: DEUTSCHE BOERSE AG
+  security_mnemonic:
+    type: string
+    description: security mnemonic, can be empty
+    example: DB1
+  standard_settlement_period:
+    type: string
+    description: standard settlement period in days
+    example: 2
+  price_unit:
+    type: string
+    enum: [ABSOLUTE,PERCENTAGE]
+    description: price unit, typically absolute for stocks and percentage for bonds
+    example: ABSOLUTE
+  security_subtype:
+    type: string
+    enum: [BOND,EQUITY,SUBSCRIPTION_RIGHT]
+    description: security subtype
+    example: EQUITY
+  margin_class_code:
+    type: string
+    description: margin class code, up to 5 characters
+    example: DB10
   line_no:
     type: number
     description: Line number, used when reporting errors
@@ -1060,6 +1124,40 @@ definitions:
     type: number
     description: Long/short balance, negative for short
     example: -100
+
+  etd_portfolio:
+    type: array
+    items:
+      type: object
+      properties:
+        line_no:
+          $ref: '#/definitions/line_no'
+        product_id:
+          $ref: '#/definitions/product_id'
+        contract_date:
+          $ref: '#/definitions/contract_date'
+        maturity:
+          $ref: '#/definitions/maturity'
+        call_put_flag:
+          $ref: '#/definitions/call_put_flag'
+        exercise_price:
+          $ref: '#/definitions/exercise_price'
+        version_number:
+          $ref: '#/definitions/version_number'
+        iid:
+          $ref: '#/definitions/iid'
+        instrument_type:
+          $ref: '#/definitions/instrument_type'
+        exercise_style:
+          $ref: '#/definitions/exercise_style'
+        net_ea:
+          $ref: '#/definitions/net_ea'
+        net_ls_balance:
+          $ref: '#/definitions/net_ls_balance'
+      required:
+        - line_no
+        - net_ls_balance
+
   otc_csv:
     type: object
     properties:
@@ -1103,11 +1201,78 @@ definitions:
     type: object
     properties:
       csv:
-        type: string
-        description: aggregated sensitivities in CSV format known from Margin Calculator GUI, as a single string. Example shows the full header row with curves and one row for 1M maturity. Supported maturities are 1M to 11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
-        example: Maturity,CHF.LIBOR.1M,CHF.LIBOR.2M,CHF.LIBOR.3M,CHF.LIBOR.6M,CHF.SARON.ON,DKK.CIBOR.6M,EUR.EONIA.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.LIBOR.1M,GBP.LIBOR.1Y,GBP.LIBOR.2M,GBP.LIBOR.3M,GBP.LIBOR.6M,GBP.SONIA.ON,JPY.LIBOR.1M,JPY.LIBOR.2M,JPY.LIBOR.3M,JPY.LIBOR.6M,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.FEDFUNDS.ON,USD.LIBOR.1M,USD.LIBOR.2M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        $ref: '#/definitions/otc_csv_string'
     required:
     - csv
+  otc_csv_string:
+    type: string
+    description: OTC portfolio as one string in CSV, format known from Margin Calculator GUI
+    example: internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,FRA,EUR,20/12/2018,20/08/2019,fixedLeg,0.15,,,100000000,3M,,,,,,,,ACT/360,,,,,floatingLeg,,,,100000000,3M,,,,,,,,ACT/360,,,,
+
+  portfolio_margin:
+    type: array
+    description: Margin on LGS level, higher levels can be summed on UI. Also initial margin can be calculated as a sum of all components except premium margin
+    items:
+      type: object
+      properties:
+        liquidation_group:
+          $ref: '#/definitions/liquidation_group'
+        liquidation_group_split:
+          $ref: '#/definitions/liquidation_group_split'
+        initial_margin:
+          type: number
+          description: Initial margin on liquidation group split level, equals to market risk plus add ons
+        market_risk:
+          type: number
+          description: Market risk from ReportCP046
+        liquidity_addon:
+          type: number
+          description: Liqu risk from ReportCP046
+        long_option_credit:
+          type: number
+          description: Long option credit from ReportCP046
+        time_to_expiry_adjustment:
+          type: number
+          description: Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introducedwith Prisma R8.0
+        premium_margin:
+          type: number
+          description: Premium margin from ReportCP046
+        market_risk_per_rms:
+          type: array
+          items:
+            type: object
+            properties:
+              rms_name:
+                type: string
+                description: Risk Measure Set name
+              simulation_type:
+                type: string
+                enum: [Historical, Stress, Event]
+                description: Risk Measure Set type
+              rms_market_risk:
+                type: number
+                description: RMS market risk before weighting
+              weighting_factor:
+                type: number
+                description: RMS weighting factor to be applied before aggregation to LGS level
+              rms_components:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    subsample_id:
+                      type: number
+                      description: id of the subsample (from 1 to risk horizon), or 1 if the RMS is not using subsampling
+                    risk_measure_value:
+                      type: number
+                      description: the main risk measure value for this RMS, e.g. value-at-risk for Historical or Stress simulation_type
+                    correlation_break_adjustment:
+                      type: number
+                      description: Correlation Break Adjustment for this RMS
+                    compression_adjustment:
+                      type: number
+                      description: Compression Adjustment for this RMS
+
   liquidation_group:
     type: string
     description: Liquidation group
@@ -1178,3 +1343,12 @@ definitions:
     enum: [RELATIVE, ABSOLUTE]
     description: Volatility shift type, either relative, vola 20% shifted by 0.1 relative = 22%, or absolute, vola 20% shifted by 0.1 absolute = 20.1%
     example: ABSOLUTE
+  errors:
+    type: array
+    items:
+      type: object
+      properties:
+        line_no:
+          type: string
+        error_msg:
+          type: string

@@ -49,7 +49,7 @@ info:
     For example:
 
 
-    <pre>echo '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
+    <pre>echo '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}]}' \
       | gzip \
       | curl -s -H "X-DBP-APIKEY: your-key" -H "Content-Type: application/json" \
         https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator \
@@ -77,7 +77,7 @@ info:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
       'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/series?products=FGBM&business_date=20190307'
-    echo '{"snapshot":{"business_date":20190307},"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}' \
+    echo '{"snapshot":{"business_date":20190307},"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}]}' \
       | curl -H 'X-DBP-APIKEY: your-key' \
         'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator' \
         --data-binary @-
@@ -93,6 +93,8 @@ info:
     see attributes `business_date`, `live` and `live_timestamp`.
 
     ## Change log
+
+    - 6.5.0 ETD maturity specified preferably by contract_date
 
     - 6.3.1 Indicative margin resource
 
@@ -247,6 +249,7 @@ paths:
               live_timestamp: 0
               list_series:
                 - product_id: OGBL
+                  contract_date: 20190621
                   contract_maturity: 201906
                   expiry_maturity: 201906
                   call_put_flag: C
@@ -269,6 +272,8 @@ paths:
                   properties:
                     product_id:
                       $ref: '#/definitions/product_id'
+                    contract_date:
+                      $ref: '#/definitions/contract_date'
                     contract_maturity:
                       $ref: '#/definitions/contract_maturity'
                     expiry_maturity:
@@ -289,8 +294,11 @@ paths:
                       type: number
                     exercise_style_flag:
                       $ref: '#/definitions/exercise_style_flag'
+                    contract_frequency:
+                      $ref: '#/definitions/contract_frequency'
                   required:
                     - product_id
+                    - contract_date
                     - contract_maturity
                     - expiry_maturity
                     - version_number
@@ -532,16 +540,18 @@ paths:
 
         The full key for series depends on instrument type, these are the mandatory fields:
 
-        - Future: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `version_number` (defaults to 0)
+        - Future: `product`, `contract_date` as YYYYMMDD, `version_number` (defaults to 0)
 
-        - Option: `product`, `maturity` as YYYYMM (DD can be added but is ignored), `call_put_flag`, `exercise_price`, `version_number` (defaults to 0)
+        - Option: `product`, `contract_date` as YYYYMMDD, `call_put_flag`, `exercise_price`, `version_number` (defaults to 0)
 
-        - Flex Future: `instrument_type`: "Flex Future", `product`, `maturity` as YYYYMMDD, `version_number` (defaults to 0)
+        - Flex Future: `instrument_type`: "Flex Future", `product`, `contract_date` as YYYYMMDD, `version_number` (defaults to 0)
 
-        - Flex Option: `instrument_type`: "Flex Option", `product`, `maturity` as YYYYMMDD, `call_put_flag`, `exercise_price`, `exercise_style`, `version_number` (defaults to 0)
+        - Flex Option: `instrument_type`: "Flex Option", `product`, `contract_date` as YYYYMMDD, `call_put_flag`, `exercise_price`, `exercise_style`, `version_number` (defaults to 0)
 
 
         Only already existing Flex Future or Flex Option can be submitted, not a new one (e.g. different strike or expiry day).
+
+        For backward compatibility `maturity` as YYYYMM (DD added for flex) can be used instead of `contract_date`, however it is not recommended as uniqueness is not guaranteed.
 
         Example of minimal request with one future contract:
 
@@ -549,7 +559,7 @@ paths:
         <pre>
         curl --header 'X-DBP-APIKEY: your-key' \
           https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator \
-          -d '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","maturity":202812,"net_ls_balance":1}]}]}'
+          -d '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}]}'
         </pre>
 
 
@@ -655,13 +665,13 @@ paths:
                   etd_portfolio:
                     - line_no: 1
                       product_id: FEXD
-                      maturity: 202812
+                      contract_date: 20301220
                       net_ls_balance: 10
                     - line_no: 2
-                      product_id: OESX
-                      maturity: 202812
+                      product_id: OESD
+                      contract_date: 20311222
                       call_put_flag: C
-                      exercise_price: 2400
+                      exercise_price: 90
                       net_ls_balance: -10
             properties:
               snapshot:
@@ -778,12 +788,13 @@ paths:
                         current_liquidating_margin: -9592
               drilldowns:
                 - line_no: 1
-                  product_id: OGBL
+                  product_id: OEXD
                   call_put_flag: C
-                  exercise_price: 160
+                  exercise_price: 90
                   version_number: '0'
                   iid: 18249016
-                  maturity: 201806
+                  contract_date: 20311222
+                  maturity: 203112
                   net_ls_balance: 10
                   liquidation_group: PFI01
                   liquidation_group_split: PFI01_HP2_T0-99999
@@ -818,6 +829,8 @@ paths:
                       $ref: '#/definitions/line_no'
                     product_id:
                       $ref: '#/definitions/product_id'
+                    contract_date:
+                      $ref: '#/definitions/contract_date'
                     maturity:
                       $ref: '#/definitions/maturity'
                     call_put_flag:
@@ -1483,6 +1496,17 @@ definitions:
     type: string
     description: Unique identifier of a product
     example: OESX
+  contract_date:
+    type: number
+    description: Contract date of the instrument in YYYYMMDD format.
+      Introduced with Next Generation ETD contracts initiative as part of the series primary key.
+      Maturity (meaning contract_maturity) can still be used alternatives to contract_date, however only contract_date guarantees uniqueness.
+    example: 20281215
+  contract_frequency:
+    type: string
+    enum: [MONTHLY,WEEKLY,DAILY,FLEX,END_OF_MONTH]
+    description: Contract frequency
+    example: MONTHLY
   contract_maturity:
     type: number
     description: Maturity of the instrument in YYYYMM format. Corresponds to contract year/month as shown on Eurex webpage
@@ -1592,6 +1616,8 @@ definitions:
           $ref: '#/definitions/line_no'
         product_id:
           $ref: '#/definitions/product_id'
+        contract_date:
+          $ref: '#/definitions/contract_date'
         maturity:
           $ref: '#/definitions/maturity'
         call_put_flag:
