@@ -40,7 +40,7 @@ for Repo vs Portfolio Margining for ETD and OTC.
 ### Prepare ETD Portfolio
 
 If you have CP005 position report or C7 portfolio export, you can directly [upload it](#upload-the-prepared-etd-file).
-Otherwise prepare ETD portfolio file in CSV format as follows:
+Otherwise, prepare ETD portfolio file in CSV format as follows:
 
 1. Download an example from the CPME main page by first clicking "Eurex portfolio example" followed by "Download as a CSV file".
 1. Edit the CSV file to replace the example with the positions you wish.
@@ -49,20 +49,25 @@ The columns in the CSV file are as follows:
 
 column | mandatory for Options / Futures? | example
 --- | --- | ---: 
-Product ID | mandatory | ODAX
-Maturity | mandatory | 201912
+Product ID | mandatory | OEXD
+Contract Date | mandatory | 20311219
 Call Put Flag | O: mandatory, F: ignored | C
-Exercise Price | O: mandatory, F: ignored | 11000
+Exercise Price | O: mandatory, F: ignored | 100.00
 Version Number | optional, defaults to 0 | 0
 Net LS Balance | mandatory | -100
 
 Example CSV file with one future and one option:
 
 ```csv
-Product ID,Maturity,Call Put Flag,Exercise Price,Version Number,Net LS Balance
-H3OL,202012,,,0,100
-NVU,202006,P,36.000000,0,-200
+Product ID,Contract Date,Call Put Flag,Exercise Price,Version Number,Net LS Balance
+FEXD,20311219,,,0,100
+OEXD,20311219,C,100.00,0,-100
 ```
+
+All the additional columns can be left empty, they are used only for special cases:
+
+- positions which expired today and were not closed before the expiry, then the net position size is entered under Net EA Balance
+- positions on flexible contracts, then Instrument Type ("Flex Future" or "Flex Option") and Exercise Style Flag (for options, "EUROPEAN" or "AMERICAN") is filled
 
 ### Upload the Prepared ETD File
 
@@ -101,14 +106,15 @@ Positions can also be entered manually in the GUI:
 2. Click "Start an empty portfolio"
 3. Enter the positions you wish:
 
-column | description
---- | ---
-Product ID   | dropdown with eligible products
-Maturity     | dropdown with contract year/month of standard series, e.g. "201712"
-C/P          | Call/Put flag, for options dropdown with "C" or "P", empty and disabled for futures
-Strike       | Strike, for options dropdown filled with exercise price of standard series of selected maturity, empty and disabled for flex
-Version      | dropdown with distinct version numbers for given maturity and strike, non-editable if only one version exists
-Net Position | free text field to enter the position size, negative for short position
+column             | description
+---                | ---
+Product ID         | dropdown with eligible products, e.g. "OEXD"
+Contract Frequency | filters expiries that are displayed in Contract Date column, most products have only MONTHLY frequency
+Contract Date      | dropdown with contract year/month of standard series
+C/P                | Call/Put flag, for options dropdown with "C" or "P", empty and disabled for futures
+Strike             | Strike, for options dropdown filled with exercise price of standard series of selected maturity, empty and disabled for flex
+Version            | dropdown with distinct version numbers for given maturity and strike, non-editable if only one version exists
+Net Position       | free text field to enter the position size, negative for short position
 
 4. Click "+" or press Enter after each position
 5. Click "Recalculate margin"
