@@ -597,6 +597,7 @@ paths:
                   csv:
                     type: string
                     description: ETD portfolio as one string in CSV, in Margin Calculator GUI format or Margin Estimator GUI format
+                    example: Product ID,Contract Date,Version Number,Call Put Flag,Exercise Price,Net LS Balance\nFEXD,20311219,0,,,100\nOESX,20311219,0,C,5000,-100
                 required:
                 - csv
               etd_cp005:
@@ -743,7 +744,10 @@ paths:
                       description: Net Present Value of the trade in notional currency
                     dv01:
                       type: number
-                      description: DV01 sensitivity of the trade in notional currency
+                      description: DV01 (interest rate) sensitivity of the trade in notional currency
+                    ie01:
+                      type: number
+                      description: IE01 (inflation rate) sensitivity of the trade in notional currency - optional
                     component_margin:
                       $ref: '#/definitions/component_margin'
                     component_margin_currency:

@@ -27,7 +27,7 @@ info:
 
 
     <pre> curl --header 'X-DBP-APIKEY: your-key' \
-      https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/products
+      https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/products
     </pre>
 
 
@@ -59,7 +59,7 @@ info:
     \
       | gzip \
       | curl -s -H "X-DBP-APIKEY: your-key" -H "Content-Type: application/json" \
-        https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator \
+        https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/estimator \
         --data-binary @- -H "Content-Encoding: gzip" -H "Accept-Encoding: gzip" \
       | gunzip
     </pre>
@@ -85,12 +85,12 @@ info:
     type of request:
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
-      'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/series?products=FGBM&business_date=20190307'
+      'https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/series?products=FGBM&business_date=20190307'
     echo
     '{"snapshot":{"business_date":20190307},"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}]}'
     \
       | curl -H 'X-DBP-APIKEY: your-key' \
-        'https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator' \
+        'https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/estimator' \
         --data-binary @-
     </pre>
 
@@ -127,8 +127,6 @@ info:
 servers:
   - url: https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0
     description: production API with static IP
-  - url: https://cpme.risk.dev.fra.aws.dbgcloud.io/api/v2.0
-    description: internal development server (not reachable from outside)
 paths:
   /products:
     get:
@@ -586,7 +584,7 @@ paths:
 
 
         <pre> curl --header 'X-DBP-APIKEY: your-key' \
-          https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/estimator \
+          https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/estimator \
           -d '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}]}'
         </pre>
 
@@ -699,6 +697,13 @@ paths:
 
         `portfolio_components/repo_json` defines special Repo (single-ISIN Repo)
         positions. For attribute details see the model below.
+
+        # What-If analysis
+
+        Estimator request allows to perform what-if analysis for ETD and OTC, i.e. it answers the question what would be the portfolio margin when a set of positions or trades is added to a base portfolio. The added trades are submitted a separate portfolio component(s) marked by non-zero whatif_id. Multiple scenarios (different sets of trades to add) can be tested with one request, the scenarios are distinguished by whatif_id.
+
+        Results for the base portfolio are returned in portfolio_margin as for standard request. Portfolio margins for the scenarios are returned in array whatif_portfolio_margin. They are total margins for the base portfolio plus the added trades. To learn the margin increase or decrease caused by the added trades, subtract margin of the base portfolio from the what-if portfolio margin. Drilldowns are returned only for the base portfolio.
+
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
       requestBody:
@@ -773,6 +778,8 @@ paths:
                         $ref: '#/components/schemas/otc_fpml'
                       repo_json:
                         $ref: '#/components/schemas/repo_json'
+                      whatif_id:
+                        $ref: '#/components/schemas/whatif_id'
       responses:
         '200':
           description: OK
@@ -878,6 +885,8 @@ paths:
                     $ref: '#/components/schemas/portfolio_margin'
                   rbm_margin:
                     $ref: '#/components/schemas/rbm_margin'
+                  what_if_portfolio_margin:
+                    $ref: '#/components/schemas/whatif_portfolio_margin'
                   drilldowns:
                     type: array
                     description: >-
@@ -944,7 +953,10 @@ paths:
                           description: Net Present Value of the trade in notional currency
                         dv01:
                           type: number
-                          description: DV01 sensitivity of the trade in notional currency
+                          description: DV01 (interest rate) sensitivity of the trade in notional currency
+                        ie01:
+                          type: number
+                          description: IE01 (inflation rate) sensitivity of the trade in notional currency - optional
                         component_margin:
                           $ref: '#/components/schemas/component_margin'
                         component_margin_currency:
@@ -1606,7 +1618,10 @@ components:
       schema:
         type: number
       description: End of a date range, in YYYYMMDD format
+
+
   schemas:
+
     business_date:
       type: number
       description: Business date as of which the result is calculated, in YYYYMMDD format
@@ -1739,7 +1754,7 @@ components:
       description: security mnemonic, can be empty
       example: DB1
     standard_settlement_period:
-      type: string
+      type: number
       description: standard settlement period in days
       example: 2
     price_unit:
@@ -1853,6 +1868,7 @@ components:
           description: >-
             ETD portfolio as one string in CSV, in Margin Calculator GUI format
             or Margin Estimator GUI format
+          example: Product ID,Contract Date,Version Number,Call Put Flag,Exercise Price,Net LS Balance\nFEXD,20311219,0,,,100\nOESX,20311219,0,C,5000,-100
       required:
         - csv
     etd_cp005:
@@ -1911,7 +1927,7 @@ components:
             type: number
             description: >-
               Time to Expiry Adjustment a.k.a. TEA from ReportCP046,
-              introducedwith Prisma R8.0
+              introduced with Prisma R8.0
           premium_margin:
             type: number
             description: Premium margin from ReportCP046
@@ -1959,6 +1975,24 @@ components:
                       compression_adjustment:
                         type: number
                         description: Compression Adjustment for this RMS
+
+    whatif_id:
+      type: number
+      description: id of the what-if scenario - marks the portfolio components that should be part of the scenario (on top on the base portfolio components, which are not labeled by whatif_id or have whatif_id=0) and marks the resulting portfolio margin for the scenario
+      example: 1
+      default: 0
+
+    whatif_portfolio_margin:
+      type: array
+      description: array of portfolio margins for what-if scenarios. Sent only if any portfolio component was marked with non-zero whatif_id in the estimator request
+      items:
+        type: object
+        properties:
+          whatif_id:
+            $ref: '#/components/schemas/whatif_id'
+          portfolio_margin:
+            $ref: '#/components/schemas/portfolio_margin'
+
     otc_csv_string:
       type: string
       description: >-
