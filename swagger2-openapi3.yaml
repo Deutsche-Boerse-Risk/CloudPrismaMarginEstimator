@@ -15,6 +15,13 @@ info:
     instruments, available dates etc. CPME supports also greek and stress price
     calculation - these analytical tools are not related to the margin.
 
+    Part of the API is also Cloud Default Fund Estimator (CPDE) which
+    *estimates* Default Fund contribution for an uploaded portfolio according
+    to Eurex methodology. Its key resource is `/default_fund`, similar `/estimator`
+    up to the following differences: historical calculation is not possible
+    for Default Fund; OTC portfolio support is planned only in future.
+
+
     [FAQ](https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/)
 
     ## API Key
@@ -761,6 +768,7 @@ paths:
                           - otc_cb202
                           - otc_fpml
                           - cash_json
+                          - cash_csv
                           - repo_json
                       etd_portfolio:
                         $ref: '#/components/schemas/etd_portfolio'
@@ -776,6 +784,10 @@ paths:
                         $ref: '#/components/schemas/otc_cb202'
                       otc_fpml:
                         $ref: '#/components/schemas/otc_fpml'
+                      cash_json:
+                        $ref: '#/components/schemas/cash_json'
+                      cash_csv:
+                        $ref: '#/components/schemas/cash_csv'
                       repo_json:
                         $ref: '#/components/schemas/repo_json'
                       whatif_id:
@@ -888,52 +900,7 @@ paths:
                   what_if_portfolio_margin:
                     $ref: '#/components/schemas/whatif_portfolio_margin'
                   drilldowns:
-                    type: array
-                    description: >-
-                      Margin figures on position level. Full business key is
-                      used, it is not possible to map to input line_no one to
-                      one because positions may be aggregated or split
-                    items:
-                      type: object
-                      properties:
-                        line_no:
-                          $ref: '#/components/schemas/line_no'
-                        product_id:
-                          $ref: '#/components/schemas/product_id'
-                        contract_date:
-                          $ref: '#/components/schemas/contract_date'
-                        maturity:
-                          $ref: '#/components/schemas/maturity'
-                        call_put_flag:
-                          $ref: '#/components/schemas/call_put_flag'
-                        exercise_price:
-                          $ref: '#/components/schemas/exercise_price'
-                        version_number:
-                          $ref: '#/components/schemas/version_number'
-                        iid:
-                          $ref: '#/components/schemas/iid'
-                        instrument_type:
-                          $ref: '#/components/schemas/instrument_type'
-                        exercise_style:
-                          $ref: '#/components/schemas/exercise_style'
-                        net_ls_balance:
-                          $ref: '#/components/schemas/net_ls_balance'
-                        liquidation_group:
-                          $ref: '#/components/schemas/liquidation_group'
-                        liquidation_group_split:
-                          $ref: '#/components/schemas/liquidation_group_split'
-                        component_margin:
-                          $ref: '#/components/schemas/component_margin'
-                        component_margin_currency:
-                          $ref: '#/components/schemas/component_margin_currency'
-                        premium_margin:
-                          type: number
-                          description: Premium margin for the position
-                        premium_margin_currency:
-                          type: string
-                          description: >-
-                            Currency of premium margin - currency of the
-                            product, can be different from clearing currency
+                    $ref: '#/components/schemas/etd_positions'
                   otc_drilldowns:
                     type: array
                     description: >-
@@ -1391,6 +1358,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/etd_portfolio'
+
   /convert/otc/shorthand:
     post:
       summary: Convert a short text description of the trade to OTC CSV
@@ -1428,6 +1396,31 @@ paths:
                     $ref: '#/components/schemas/otc_csv_string'
                   otc_trade_details:
                     $ref: '#/components/schemas/otc_trade_details'
+
+  /convert/cash/csv:
+    post:
+      summary: >-
+        Convert cash market portfolio in CSV format to JSON representation
+      parameters:
+        - $ref: '#/components/parameters/x_dbp_apikey'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                csv:
+                  $ref: '#/components/schemas/cash_csv'
+              required:
+                - csv
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cash_json'
+
   /indicative_margin:
     get:
       summary: Indicative margin for front month future contracts
@@ -1558,7 +1551,261 @@ paths:
                   max_body_size:
                     type: number
                     description: maximum allowed body size of request in bytes
+
+  /default_fund:
+    post:
+      summary: Approximate Calculation of Default Fund contribution
+      description: >-
+        Portfolio is sent in the request and Default Fund contribution is returned as a response.
+        The request can contain exchange traded derivatives (ETD) portfolio, or Cash Market portfolio (equities, bonds, repos) or any combination of these assets:
+
+        - ETD is submitted as
+          - `etd_portfolio` JSON array, see request model
+          - or `etd_csv` with positions in CSV format
+          - or `etd_cp005`, i.e. using Eurex CP005 XML report
+
+        - Cash Market is submitted as
+          - `repo_json` JSON array of `repo_json_position` objects, see the model
+          - `cash_json` JSON array of `cash_json_position` objects, see the model
+          - or `cash_csv` with cash market positions in CSV format
+
+        See the `/estimator` request for description of the input structures
+
+        Example of minimal request with one future contract:
+
+
+        <pre> curl --header 'X-DBP-APIKEY: your-key' \
+          https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/default_fund \
+          -d '{"portfolio_components":[{"type":"etd_portfolio","etd_portfolio":[{"line_no":1,"product_id":"FEXD","contract_date":20301220,"net_ls_balance":1}]}]}'
+        </pre>
+
+      parameters:
+        - $ref: '#/components/parameters/x_dbp_apikey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              portfolio_components:
+                - type: etd_portfolio
+                  etd_portfolio:
+                    - line_no: 1
+                      product_id: FEXD
+                      contract_date: 20301220
+                      net_ls_balance: 10
+                    - line_no: 2
+                      product_id: OEXD
+                      contract_date: 20311222
+                      call_put_flag: C
+                      exercise_price: 90
+                      net_ls_balance: -10
+            schema:
+              type: object
+              properties:
+                clearing_currency:
+                  $ref: '#/components/schemas/clearing_currency'
+                is_cross_margined:
+                  type: boolean
+                  description: enable cross-margining between OTC and Fixed Income
+                  example: true
+                include_drilldowns:
+                  type: boolean
+                  description: include results on position level in the response
+                  example: false
+                  default: false
+                portfolio_components:
+                  type: array
+                  description: array of portfolio components
+                  items:
+                    type: object
+                    description: >-
+                      one portfolio component, only type and one structure
+                      relevant for the type is filled
+                    required:
+                      - type
+                    properties:
+                      type:
+                        type: string
+                        description: type of this component
+                        example: etd_portfolio
+                        enum:
+                          - etd_portfolio
+                          - etd_csv
+                          - etd_cp005
+                          - cash_json
+                          - repo_json
+                      etd_portfolio:
+                        $ref: '#/components/schemas/etd_portfolio'
+                      etd_csv:
+                        $ref: '#/components/schemas/etd_csv'
+                      etd_cp005:
+                        $ref: '#/components/schemas/etd_cp005'
+                      repo_json:
+                        $ref: '#/components/schemas/repo_json'
+                      cash_json:
+                        $ref: '#/components/schemas/cash_json'
+                      cash_csv:
+                        $ref: '#/components/schemas/cash_csv'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                business_date: 20220905
+                live: false
+                live_timestamp: 0
+                clearing_currency: EUR
+                errors:
+                  - line_no: 2
+                    error_msg: 'Line 1 instrument iid not recognized: 736947'
+                portfolio_margin:
+                  - liquidation_group: PEQ01
+                    liquidation_group_split: PFI01_HP2_T0-99999
+                    initial_margin: 3161.708587
+                    market_risk: 3155.266149
+                    liquidity_addon: 6.442439
+                    long_option_credit: 0
+                    time_to_expiry_adjustment: 0
+                    premium_margin: 0
+                    market_risk_per_rms:
+                      - rms_name: FILTERED_HISTORICAL_VAR_2
+                        simulation_type: Historical
+                        rms_market_risk: 4991.692879
+                        weighting_factor: 0.51
+                        rms_components:
+                          - subsample_id: 1
+                            risk_measure_value: 4481.692879
+                            correlation_break_adjustment: 500
+                            compression_adjustment: 10
+                rbm_margin:
+                  margin_classes:
+                    - margin_class_code: DB10
+                      margin_group_code: null
+                      margin_parameter: 5.5
+                      margin_parameter_flag: P
+                      cash_interest_rate: -0.566
+                      additional_margin: 1026812
+                      additional_margin_before_grouping: 1026812
+                      current_liquidating_margin: 851977
+                      margin_class_currency: EUR
+                      positions:
+                        - line_no: 1
+                          sec_isin: DE0005810055
+                          sec_name: DEUTSCHE BOERSE AG
+                          settlement_date: 20210312
+                          net_security_position: 64100
+                          net_cash_position: -10310484
+                          amount_clv_secu: 62100
+                          amount_clv_cash: -10310484
+                          current_liquidating_margin: 851977
+                default_fund_contribution:
+                  worst_global_scenario: Lehman crash 15.09.2008
+                  currency: EUR
+                  stress_loss_over_margin: -101808201.00
+                  default_fund_requirement: 16634756
+                  slom_drilldown:
+                    - global_scenario: Lehman crash 15.09.2008
+                      stress_value: -107168880.00
+                      total_margin_requirement: 5362113.00
+                      stress_loss_over_margin: -101808201.00
+                      slom_per_lg_mg:
+                        - liquidation_group: PEQ01
+                          margin_group_code:
+                          stress_value_market_risk: 53.00
+                          stress_value_liquidity_risk: -121.00
+                          total_margin_requirement: 167539.00
+                          stress_loss_over_margin: 167471.00
+                          slom_per_lgs_mc:
+                          - liquidation_group_split: "PEQ01_HP3"
+                            margin_class_code:
+                            stress_value_market_risk: 53.00
+                            stress_value_liquidity_risk: -121.00
+                            total_margin_requirement: 167539.00
+                            stress_loss_over_margin: 167471.00
+                            worst_system_scnid: 1475
+                        - liquidation_group:
+                          margin_group_code: "!DB10"
+                          stress_value_market_risk: -107168880.00
+                          stress_value_liquidity_risk: -1310.00
+                          total_margin_requirement: 5194185.00
+                          stress_loss_over_margin: -101976005.00
+                          slom_per_lgs_mc:
+                          - liquidation_group_split:
+                            margin_class_code: DB10
+                            stress_value_market_risk: -107168880.00
+                            stress_value_liquidity_risk: -1310.00
+                            total_margin_requirement: 5194185.00
+                            stress_loss_over_margin: -101976005.00
+                            worst_system_scnid: 449
+                etd_positions:
+                  - line_no: 1
+                    product_id: OEXD
+                    call_put_flag: C
+                    exercise_price: 90
+                    version_number: '0'
+                    iid: 18249016
+                    contract_date: 20311222
+                    maturity: 203112
+                    net_ls_balance: 10
+                    liquidation_group: PEQ01
+                    liquidation_group_split: PEQ01_HP3
+                    component_margin: 2382.083819
+                    component_margin_currency: EUR
+                    premium_margin: 0
+                    premium_margin_currency: EUR
+                    stress_value_per_global_scenario:
+                      - 53.0
+              schema:
+                type: object
+                properties:
+                  business_date:
+                    $ref: '#/components/schemas/business_date'
+                  live:
+                    $ref: '#/components/schemas/live'
+                  live_timestamp:
+                    $ref: '#/components/schemas/live_timestamp'
+                  clearing_currency:
+                    $ref: '#/components/schemas/clearing_currency'
+                  errors:
+                    $ref: '#/components/schemas/errors'
+                  portfolio_margin:
+                    $ref: '#/components/schemas/portfolio_margin'
+                  rbm_margin:
+                    $ref: '#/components/schemas/rbm_margin'
+                  default_fund_contribution:
+                    $ref: '#/components/schemas/default_fund_contribution'
+                  etd_positions:
+                    $ref: '#/components/schemas/etd_positions'
+
+  /global_scenarios:
+    get:
+      summary: List global scenarios used by Default Fund Estimator
+      description: The order of scenarions corresponds to `stress_value_per_global_scenario` array in `default_fund` response.
+      parameters:
+        - $ref: '#/components/parameters/x_dbp_apikey'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                business_date: 20220912
+                global_scenario:
+                  - Lehman crash 15.09.2008
+              schema:
+                type: object
+                properties:
+                  business_date:
+                    $ref: '#/components/schemas/business_date'
+                  global_scenarios:
+                    type: array
+                    items:
+                      type: string
+
+
 components:
+
   parameters:
     x_dbp_apikey:
       name: X-DBP-APIKEY
@@ -2168,6 +2415,67 @@ components:
       type: number
       description: Settlement date as YYYYMMDD, mandatory
       example: 20210312
+
+    cash_json:
+      type: array
+      items:
+        $ref: '#/components/schemas/cash_json_position'
+
+    cash_json_position:
+      type: object
+      description: >-
+        Cash Market position - bond, equity, subscription right (security positions, SP)
+        or even pure cash position (CP). Some columns are relevant only for one type of record
+
+        - Security Quantity, Gross Amounts, Source and CCP Trade Number for SP
+        - Cash Position Type for CP
+
+        For the security positions, users have option to enter
+
+        - either Payable Cash Amount
+        - or Traded Price (which is then used by CPME to calculate the Payable Cash Amount)
+
+      properties:
+        line_no:
+          $ref: '#/components/schemas/line_no'
+        sec_isin:
+          $ref: '#/components/schemas/sec_isin'
+        settlement_date:
+          $ref: '#/components/schemas/settlement_date'
+        settlement_currency:
+          type: string
+          description: Settlement currency code, optional, used for GC pooling positions only, defaults to currency from Security
+          example: EUR
+        payable_cash_amount:
+          type: number
+          description: Payable cash amount, mandatory for leg_type S or C, otherwise empty
+          example: 1000
+        traded_price:
+          type: number
+          description: Traded price as alternative to payable_cash_amount, mandatory for empty leg_type, otherwise empty
+          example: 100
+        security_quantity:
+          type: number
+          description: Number of units bought (positive) or sold (negative), if leg_type is S or empty then mandatory, otherwise empty
+          example: -10
+        ccp_trade_mumber:
+          type: number
+          description: CCP trade number, Used as a flag, empty=net position, non-empty=gross trade, optional
+          default: 0
+        leg_type:
+          type: string
+          enum: [ 'C','S','' ]
+          description: Indicates whether the line is cash position or security position. C for cash, S for security with Payable Cash Amount, empty security with Traded Price. Unless you are familiar with DBG Risk representation of cash market positions, use empty leg type.
+
+    cash_csv:
+      type: string
+      description: >-
+        Cash market portfolio in a CSV format, first row is header and following rows are positions,
+        also called "settlements" as from risk point of view cash market position is relevant only during settlement.
+        The rows are separated by `\n` in the string, line breaks are not allowed inside JSON values.
+        The columns correspond to the attributes of `cash_json_position` object.
+      example: Security ISIN,Settlement Date,Settlement Currency,Payable Cash Amount,Traded Price,Security Quantity,CCP Trade Number,Leg Type\nDE0005810055,20220630,,,100.23,100,,
+
     rbm_margin:
       type: object
       description: >-
@@ -2358,3 +2666,157 @@ components:
             type: string
           error_msg:
             type: string
+
+    global_scenario:
+      type: string
+      description: name of the stress scenario
+      example: Lehman crash 15.09.2008
+    stress_loss_over_margin:
+      type: number
+      description: stress loss over margin in given scenario (negative means loss)
+      example: -101808201.00
+    stress_value:
+      type: number
+      description: stress value of the portfolio in given scenario (negative means loss)
+      example: -107168880.00
+    stress_value_market_risk:
+      type: number
+      description: stress value of the portfolio in given scenario (negative means loss), the market risk part (liquidity risk not included)
+      example: -107168880.00
+    stress_value_liquidity_risk:
+      type: number
+      description: additional liquidity risk in given scenario
+      example: -1310.00
+    total_margin_requirement:
+      type: number
+      description: additional liquidity risk in given scenario
+      example: 5362113.00
+    default_fund_requirement:
+      type: number
+      description: estimated default fund contribution (always non-negative)
+      example: 16634756
+
+    default_fund_contribution:
+      type: object
+      description: Estimated contribution to the Default Fund for submitted portfolio, based on the worst global scenario
+      properties:
+        worst_global_scenario:
+          $ref: '#/components/schemas/global_scenario'
+        currency:
+          $ref: '#/components/schemas/clearing_currency'
+        stress_loss_over_margin:
+          $ref: '#/components/schemas/stress_loss_over_margin'
+        default_fund_requirement:
+          $ref: '#/components/schemas/default_fund_requirement'
+        slom_drilldown:
+          type: array
+          items:
+            type: object
+            description: Result of the global scenario
+            properties:
+              global scenario:
+                $ref: '#/components/schemas/global_scenario'
+              stress_value:
+                $ref: '#/components/schemas/stress_value'
+              total_margin_requirement:
+                $ref: '#/components/schemas/total_margin_requirement'
+              stress_loss_over_margin:
+                $ref: '#/components/schemas/stress_loss_over_margin'
+              slom_per_lg_mg:
+                type: array
+                items:
+                  type: object
+                  description: >-
+                    Result for the Liquidation Group (if ETD) or the Margin Group (if Cash Market)
+                    in given global scenario. Either the liquidation_group or margin_group is filled.
+                    Margin Classes that do not belong to a Margin Group are listed on this level
+                    as well and their margin_group_code is equal to margin_class_code prefixed by '!'.
+                  properties:
+                    liquidation_group:
+                      $ref: '#/components/schemas/liquidation_group'
+                    margin_group_code:
+                      $ref: '#/components/schemas/margin_group_code'
+                    stress_value_market_risk:
+                      $ref: '#/components/schemas/stress_value_market_risk'
+                    stress_value_liquidity_risk:
+                      $ref: '#/components/schemas/stress_value_liquidity_risk'
+                    total_margin_requirement:
+                      $ref: '#/components/schemas/total_margin_requirement'
+                    stress_loss_over_margin:
+                      $ref: '#/components/schemas/stress_loss_over_margin'
+                    slom_per_lgs_mc:
+                      type: array
+                      items:
+                        type: object
+                        description: Result for the Liquidation Group Split or Margin Class.
+                        properties:
+                          liquidation_group_split:
+                            $ref: '#/components/schemas/liquidation_group_split'
+                          margin_class_code:
+                            $ref: '#/components/schemas/margin_class_code'
+                          stress_value_market_risk:
+                            $ref: '#/components/schemas/stress_value_market_risk'
+                          stress_value_liquidity_risk:
+                            $ref: '#/components/schemas/stress_value_liquidity_risk'
+                          total_margin_requirement:
+                            $ref: '#/components/schemas/total_margin_requirement'
+                          stress_loss_over_margin:
+                            $ref: '#/components/schemas/stress_loss_over_margin'
+                          worst_system_scnid:
+                            type: number
+
+    etd_positions:
+      type: array
+      description: >-
+        Margin figures on ETD position level. Full business key is used,
+        it is not possible to map to input line_no one to one because positions may be aggregated or split.
+        Optionally contains stress values in case of `/default_fund` request.
+      items:
+        type: object
+        properties:
+          line_no:
+            $ref: '#/components/schemas/line_no'
+          product_id:
+            $ref: '#/components/schemas/product_id'
+          contract_date:
+            $ref: '#/components/schemas/contract_date'
+          maturity:
+            $ref: '#/components/schemas/maturity'
+          call_put_flag:
+            $ref: '#/components/schemas/call_put_flag'
+          exercise_price:
+            $ref: '#/components/schemas/exercise_price'
+          version_number:
+            $ref: '#/components/schemas/version_number'
+          iid:
+            $ref: '#/components/schemas/iid'
+          instrument_type:
+            $ref: '#/components/schemas/instrument_type'
+          exercise_style:
+            $ref: '#/components/schemas/exercise_style'
+          net_ls_balance:
+            $ref: '#/components/schemas/net_ls_balance'
+          liquidation_group:
+            $ref: '#/components/schemas/liquidation_group'
+          liquidation_group_split:
+            $ref: '#/components/schemas/liquidation_group_split'
+          component_margin:
+            $ref: '#/components/schemas/component_margin'
+          component_margin_currency:
+            $ref: '#/components/schemas/component_margin_currency'
+          premium_margin:
+            type: number
+            description: Premium margin for the position
+          premium_margin_currency:
+            type: string
+            description: >-
+              Currency of premium margin - currency of the
+              product, can be different from clearing currency
+          stress_values_per_global_scenario:
+            type: array
+            description: >-
+              Stress value of the position in different scenarios, in `clearing_currency`.
+              For scenario names, use GET `/global_scenarios` resource, the order corresponds to this array.
+            items:
+              type: number
+              example: 53.0

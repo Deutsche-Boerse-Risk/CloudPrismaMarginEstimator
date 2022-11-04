@@ -7,7 +7,8 @@ import sys
 
 SWAGGER_FILE = {  # "-prod" suffix will be added for PROD environment, e.g. "swagger-prod.yaml"
         '1': 'swagger.yaml',
-        '2': 'swagger2.yaml'
+        '2': 'swagger2.yaml',
+        '2-openapi3': 'swagger2-openapi3.yaml'
     }
 SWAGGERHUB_API = dict(
         DEV ='https://api.swaggerhub.com/apis/dbgservice/cPME-dev',
