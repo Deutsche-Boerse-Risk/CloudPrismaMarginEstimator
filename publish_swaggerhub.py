@@ -35,7 +35,7 @@ SWAGGERHUB_KEY = os.environ['SWAGGERHUB_KEY']
 
 for env in sys.argv[2:]:
     filename = SWAGGER_FILE[sys.argv[1]]
-    if 'PROD' in env:
+    if 'PROD' in env or 'SIMU' in env:
         filename = filename.replace('.yaml', '-prod.yaml')
     print("posting %s to %s" % (filename, env))
     with open(filename, 'r') as infile:
