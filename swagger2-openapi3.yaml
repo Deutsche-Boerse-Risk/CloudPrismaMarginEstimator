@@ -111,6 +111,8 @@ info:
 
     ## Change log
 
+    - 6.8.0 Security Basket ISIN, errors explained
+
     - 6.5.0 ETD maturity specified preferably by contract_date
 
     - 6.3.1 Indicative margin resource
@@ -363,6 +365,7 @@ paths:
                     price_unit: ABSOLUTE
                     security_subtype: EQUITY
                     margin_class_code: DB10
+                    basket_isin: false
                   - sec_id: null
                     sec_isin: CH0224397171
                     sec_type: BCNF
@@ -374,6 +377,7 @@ paths:
                     price_unit: PERCENTAGE
                     security_subtype: BOND
                     margin_class_code: S0055
+                    basket_isin: false
               schema:
                 type: object
                 properties:
@@ -410,6 +414,8 @@ paths:
                           $ref: '#/components/schemas/security_subtype'
                         margin_class_code:
                           $ref: '#/components/schemas/margin_class_code'
+                        basket_isin:
+                          $ref: '#/components/schemas/basket_isin'
   /clearing_currencies:
     get:
       summary: List All Clearing Currencies
@@ -792,9 +798,11 @@ paths:
                         $ref: '#/components/schemas/repo_json'
                       whatif_id:
                         $ref: '#/components/schemas/whatif_id'
+              required:
+                - portfolio_components 
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -891,6 +899,8 @@ paths:
                     $ref: '#/components/schemas/live_timestamp'
                   clearing_currency:
                     $ref: '#/components/schemas/clearing_currency'
+                  error:
+                    $ref: '#/components/schemas/error'                    
                   errors:
                     $ref: '#/components/schemas/errors'
                   portfolio_margin:
@@ -940,6 +950,7 @@ paths:
                           $ref: '#/components/schemas/notional_currency'
                         maturity:
                           $ref: '#/components/schemas/otc_maturity'
+
   /otc_trade_details:
     post:
       summary: OTC Trade Details
@@ -984,9 +995,11 @@ paths:
                         $ref: '#/components/schemas/otc_cb202'
                       otc_fpml:
                         $ref: '#/components/schemas/otc_fpml'
+              required:
+                - portfolio_components 
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -1012,6 +1025,11 @@ paths:
                     $ref: '#/components/schemas/live_timestamp'
                   otc_trade_details:
                     $ref: '#/components/schemas/otc_trade_details'
+                  error:
+                    $ref: '#/components/schemas/error'
+                  errors:
+                    $ref: '#/components/schemas/errors'
+
   /otc_sensitivities:
     post:
       summary: OTC Sensitivities
@@ -1061,9 +1079,11 @@ paths:
                         $ref: '#/components/schemas/otc_cb202'
                       otc_fpml:
                         $ref: '#/components/schemas/otc_fpml'
+              required:
+                - portfolio_components 
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -1110,6 +1130,11 @@ paths:
                     description: >-
                       the DV01 table as one string in format that can be
                       directly submitted to margin estimation
+                  error:
+                    $ref: '#/components/schemas/error'
+                  errors:
+                    $ref: '#/components/schemas/errors'
+
   /greeks:
     post:
       summary: Greek Calculation Request
@@ -1165,7 +1190,7 @@ paths:
                 - iids
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -1207,13 +1232,20 @@ paths:
                         Array of arrays of greeks for given instrument per greek
                         type and per underlying shift rel, in the order given by
                         type and shift vectors
-                      properties:
-                        iid:
-                          $ref: '#/components/schemas/iid'
-                        values:
+                    properties:
+                      iid:
+                        $ref: '#/components/schemas/iid'
+                      values:
+                        type: array
+                        items:
                           type: array
                           items:
                             type: number
+                  error:
+                    $ref: '#/components/schemas/error'
+                  errors:
+                    $ref: '#/components/schemas/errors'
+
   /stressmatrix:
     post:
       summary: Stress Matrix Request
@@ -1269,7 +1301,7 @@ paths:
                 - iids
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -1323,6 +1355,11 @@ paths:
                             type: array
                             items:
                               type: number
+                  error:
+                    $ref: '#/components/schemas/error'
+                  errors:
+                    $ref: '#/components/schemas/errors'
+
   /convert/etd/cp005:
     post:
       summary: >-
@@ -1353,7 +1390,7 @@ paths:
                 - xml
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               schema:
@@ -1366,8 +1403,8 @@ paths:
         Text description of a trade similar to Clarus Quick Trade format is
         converted to OTC CSV representation that can be used for margin
         calculation. Response contains also trade details. The expected trade
-        format is contains currency, notional, maturity, side and rate. E.g.
-        "USD 200m 10Y pay 1.5%".
+        format is contains currency, notional, maturity, side and optionaly rate.
+        E.g. "USD 200m 10Y pay 1.5%". When the rate is not given, CPME uses par-rate.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
       requestBody:
@@ -1384,12 +1421,14 @@ paths:
                 - otc_shorthand_lines
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  error:
+                    $ref: '#/components/schemas/error'
                   errors:
                     $ref: '#/components/schemas/errors'
                   otc_csv:
@@ -1415,7 +1454,7 @@ paths:
                 - csv
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               schema:
@@ -1481,7 +1520,7 @@ paths:
         - $ref: '#/components/parameters/business_date'
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -1527,6 +1566,7 @@ paths:
                           type: number
                         short_initial_margin_cash:
                           type: number
+  
   /config/{param}:
     get:
       summary: Read configuration parameter
@@ -1646,9 +1686,11 @@ paths:
                         $ref: '#/components/schemas/cash_json'
                       cash_csv:
                         $ref: '#/components/schemas/cash_csv'
+              required:
+                - portfolio_components 
       responses:
         '200':
-          description: OK
+          description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
           content:
             application/json:
               example:
@@ -1750,12 +1792,9 @@ paths:
                     net_ls_balance: 10
                     liquidation_group: PEQ01
                     liquidation_group_split: PEQ01_HP3
-                    component_margin: 2382.083819
-                    component_margin_currency: EUR
-                    premium_margin: 0
-                    premium_margin_currency: EUR
                     stress_value_per_global_scenario:
-                      - 53.0
+                      - gscnid: 1
+                        stress_value: 53.0
               schema:
                 type: object
                 properties:
@@ -1767,6 +1806,8 @@ paths:
                     $ref: '#/components/schemas/live_timestamp'
                   clearing_currency:
                     $ref: '#/components/schemas/clearing_currency'
+                  error:
+                    $ref: '#/components/schemas/error'
                   errors:
                     $ref: '#/components/schemas/errors'
                   portfolio_margin:
@@ -1776,12 +1817,13 @@ paths:
                   default_fund_contribution:
                     $ref: '#/components/schemas/default_fund_contribution'
                   etd_positions:
-                    $ref: '#/components/schemas/etd_positions'
+                    $ref: '#/components/schemas/etd_positions_stress'
 
   /global_scenarios:
     get:
       summary: List global scenarios used by Default Fund Estimator
-      description: The order of scenarions corresponds to `stress_value_per_global_scenario` array in `default_fund` response.
+      description: >-
+        The numerical id (gscnid) is used in `stress_value_per_global_scenario` array in POST `/default_fund` response.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
       responses:
@@ -1791,17 +1833,29 @@ paths:
             application/json:
               example:
                 business_date: 20220912
-                global_scenario:
-                  - Lehman crash 15.09.2008
+                live: false
+                live_timestamp: 0
+                scenarios:
+                  - global_scenario: Lehman crash 15.09.2008
+                    gscnid: 1
               schema:
                 type: object
                 properties:
                   business_date:
                     $ref: '#/components/schemas/business_date'
-                  global_scenarios:
+                  live:
+                    $ref: '#/components/schemas/live'
+                  live_timestamp:
+                    $ref: '#/components/schemas/live_timestamp'
+                  scenarios:
                     type: array
                     items:
-                      type: string
+                      type: object
+                      properties:
+                        global_scenario:
+                          $ref: '#/components/schemas/global_scenario'
+                        gscnid:
+                          $ref: '#/components/schemas/gscnid'
 
 
 components:
@@ -2019,6 +2073,10 @@ components:
         - SUBSCRIPTION_RIGHT
       description: security subtype
       example: EQUITY
+    basket_isin:
+      type: boolean
+      description: is the security GC-pooling basket ISIN?
+      example: false
     margin_class_code:
       type: string
       description: margin class code, up to 5 characters
@@ -2657,6 +2715,11 @@ components:
         Volatility shift type, either relative, vola 20% shifted by 0.1 relative
         = 22%, or absolute, vola 20% shifted by 0.1 absolute = 20.1%
       example: ABSOLUTE
+
+    error:
+      type: string
+      description: error message applicable to the whole request
+      example: missing portfolio_components JSON array in body JSON
     errors:
       type: array
       items:
@@ -2666,18 +2729,28 @@ components:
             type: string
           error_msg:
             type: string
+        required:
+          - error_msg
+      example:
+        - error_msg: Request data is invalid
+        - line_no: 1
+          error_msg: "portfolio array item: missing net_ls_balance integer"
 
     global_scenario:
       type: string
-      description: name of the stress scenario
+      description: name of the global stress scenario
       example: Lehman crash 15.09.2008
+    gscnid:
+      type: number
+      description: numerical id of the global scenario, used in /default_fund drilldown
+      example: 1
     stress_loss_over_margin:
       type: number
       description: stress loss over margin in given scenario (negative means loss)
       example: -101808201.00
     stress_value:
       type: number
-      description: stress value of the portfolio in given scenario (negative means loss)
+      description: stress value of the portfolio or position in given scenario (negative means loss)
       example: -107168880.00
     stress_value_market_risk:
       type: number
@@ -2770,7 +2843,6 @@ components:
       description: >-
         Margin figures on ETD position level. Full business key is used,
         it is not possible to map to input line_no one to one because positions may be aggregated or split.
-        Optionally contains stress values in case of `/default_fund` request.
       items:
         type: object
         properties:
@@ -2812,11 +2884,50 @@ components:
             description: >-
               Currency of premium margin - currency of the
               product, can be different from clearing currency
+
+    etd_positions_stress:
+      type: array
+      description: >-
+        Stress values ETD position level. Full business key is used,
+        it is not possible to map to input line_no one to one because positions may be aggregated or split.
+      items:
+        type: object
+        properties:
+          line_no:
+            $ref: '#/components/schemas/line_no'
+          product_id:
+            $ref: '#/components/schemas/product_id'
+          contract_date:
+            $ref: '#/components/schemas/contract_date'
+          maturity:
+            $ref: '#/components/schemas/maturity'
+          call_put_flag:
+            $ref: '#/components/schemas/call_put_flag'
+          exercise_price:
+            $ref: '#/components/schemas/exercise_price'
+          version_number:
+            $ref: '#/components/schemas/version_number'
+          iid:
+            $ref: '#/components/schemas/iid'
+          instrument_type:
+            $ref: '#/components/schemas/instrument_type'
+          exercise_style:
+            $ref: '#/components/schemas/exercise_style'
+          net_ls_balance:
+            $ref: '#/components/schemas/net_ls_balance'
+          liquidation_group:
+            $ref: '#/components/schemas/liquidation_group'
+          liquidation_group_split:
+            $ref: '#/components/schemas/liquidation_group_split'
           stress_values_per_global_scenario:
             type: array
             description: >-
               Stress value of the position in different scenarios, in `clearing_currency`.
-              For scenario names, use GET `/global_scenarios` resource, the order corresponds to this array.
+              For scenario names, use GET `/global_scenarios` resource and find the scenarios by gscnid.
             items:
-              type: number
-              example: 53.0
+              type: object
+              properties:
+                gscnid:
+                  $ref: '#/components/schemas/gscnid'
+                stress_value:
+                  $ref: '#/components/schemas/stress_value'
