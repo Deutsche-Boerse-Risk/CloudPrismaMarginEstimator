@@ -194,7 +194,8 @@ internalTradeID,tradeType,currency,effectiveDate,terminationDate,legType,legSpre
 
 Instead of uploading the OTC trades or sensitivities, it is possible to enter interest rate swaps
 in a simplified way called "OTC shorthand". Only the key attributes are required:
-currency, notional, maturity, pay/rec and fixed rate - e.g. `EUR 100m 25y pay 1%`.
+currency, notional, maturity and pay/rec, optionally fixed rate - e.g. `EUR 100m 25y pay 1%`.
+If the rate is left out, the swap with NPV=0 will be created.
 CPME uses default values for the remaining attributes, it is not possible to enter them.
 
 To specify trade by OTC shorthand:
@@ -203,11 +204,12 @@ To specify trade by OTC shorthand:
 2. Click "Start an empty portfolio"
 3. Switch to "OTC portfolio" tab
 4. Click "Enter OTC trades"
-5. Write one trade per line into the trade window, using "currency notional maturity pay/rec rate" format, e.g.:
+5. Write one trade per line into the trade window, using "currency notional maturity pay/rec rate(optional)" format, e.g.:
 
 ```
 USD 1b 3y rec 1.5%
 EUR 500m 10y pay 1%
+CHF 100m 20y pay
 ```
 
 6. Click "Submit" (this will replace your previous OTC portfolio, there is currently no option to add trades to the existing portfolio)
