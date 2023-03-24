@@ -94,6 +94,8 @@ info:
 
     ## Change log
 
+    - 6.8.0 Security Basket ISIN, errors explained
+
     - 6.5.0 ETD maturity specified preferably by contract_date
 
     - 6.1.1 default 1T payment period for inflation swaps, ignore unknown calendars
@@ -305,7 +307,16 @@ paths:
   /securities:
     get:
       summary: Get attributes of securities
-      description: Get attributes of securities (equities, bonds, subscription rights) for given ISIN, or all active securities known to the Risk system if ISIN is not specified
+      description: >-
+        Get attributes of securities (equities, bonds, subscription rights) for
+        given ISIN, or all active securities known to the Risk system if ISIN is
+        not specified.
+
+        The margin class returned with the security is its default margin class and
+        the currency is the default margin class currency. Bonds always have only one
+        margin class, the default one. Equities may be assigned to multiple margin
+        classes based on settlement currency of the transaction - this is intended
+        for some ETFs.
       parameters:
         - $ref: '#/parameters/x_dbp_apikey'
         - $ref: '#/parameters/business_date'
@@ -337,6 +348,7 @@ paths:
                   price_unit: ABSOLUTE
                   security_subtype: EQUITY
                   margin_class_code: DB10
+                  basket_isin: false
                 - sec_id:
                   sec_isin: CH0224397171
                   sec_type: BCNF
@@ -348,6 +360,7 @@ paths:
                   price_unit: PERCENTAGE
                   security_subtype: BOND
                   margin_class_code: S0055
+                  basket_isin: false
           schema:
             type: object
             properties:
@@ -384,6 +397,8 @@ paths:
                       $ref: '#/definitions/security_subtype'
                     margin_class_code:
                       $ref: '#/definitions/margin_class_code'
+                    basket_isin:
+                      $ref: '#/components/schemas/basket_isin'
 
 
   /clearing_currencies:
@@ -853,7 +868,9 @@ paths:
                     values:
                       type: array
                       items:
-                        type: number
+                        type: array
+                        items:
+                          type: number
 
 
   /stressmatrix:
@@ -978,13 +995,13 @@ parameters:
   live:
     name: live
     in: query
-    description: Is the snapshot live (meaning intraday or start-of-day)? False for end-of-day.
+    description: Is the snapshot live (a.k.a. intraday)? False for end-of-day.
     type: boolean
   live_timestamp:
     name: live_timestamp
     in: query
     type: number
-    description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means start-of-day.
+    description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means the first live snapshot.
 
 definitions:
   business_date:
@@ -993,11 +1010,11 @@ definitions:
     example: 20181205
   live:
     type: boolean
-    description: Is the snapshot live (meaning intraday or start-of-day)? False for end-of-day. In request, False without any date means last end-of-day.
+    description: Is the snapshot live (a.k.a. intraday)? False for end-of-day. In request, False without any date means last end-of-day.
     example: false
   live_timestamp:
     type: number
-    description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means start-of-day.
+    description: Timestamp as of which the result is calculated, in milliseconds from epoch. Zero means the first live snapshot.
     example: 0
   snapshot:
     type: object
@@ -1093,6 +1110,10 @@ definitions:
     enum: [BOND,EQUITY,SUBSCRIPTION_RIGHT]
     description: security subtype
     example: EQUITY
+  basket_isin:
+    type: boolean
+    description: is the security GC-pooling basket ISIN?
+    example: false
   margin_class_code:
     type: string
     description: margin class code, up to 5 characters

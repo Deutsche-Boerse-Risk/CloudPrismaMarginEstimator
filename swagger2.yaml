@@ -111,6 +111,8 @@ info:
 
     ## Change log
 
+    - 7.0.0 OTC portfolio can be submitted also as CC233 sensitivities report
+
     - 6.8.0 Security Basket ISIN, errors explained, upgrade to OpenAPI 3.0 description format
 
     - 6.5.0 ETD maturity specified preferably by contract_date
@@ -332,7 +334,13 @@ paths:
       description: >-
         Get attributes of securities (equities, bonds, subscription rights) for
         given ISIN, or all active securities known to the Risk system if ISIN is
-        not specified
+        not specified.
+
+        The margin class returned with the security is its default margin class and
+        the currency is the default margin class currency. Bonds always have only one
+        margin class, the default one. Equities may be assigned to multiple margin
+        classes based on settlement currency of the transaction - this is intended
+        for some ETFs.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - $ref: '#/components/parameters/business_date'
@@ -391,6 +399,8 @@ paths:
                     type: array
                     items:
                       type: object
+                      description: >-
+                        $primary_keys(sec_isin)
                       properties:
                         sec_id:
                           $ref: '#/components/schemas/sec_id'
@@ -456,7 +466,7 @@ paths:
     get:
       summary: List Available Snapshots
       description: >-
-        List of end-of-day or start-of-day snapshots that can be used in other
+        List of end-of-day or first live snapshots that can be used in other
         requests.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
@@ -484,6 +494,8 @@ paths:
                     type: array
                     items:
                       type: object
+                      description: >-
+                        $primary_keys(business_date,live)
                       properties:
                         business_date:
                           $ref: '#/components/schemas/business_date'
@@ -497,8 +509,7 @@ paths:
     get:
       summary: List Available Live Snapshots for Given Day
       description: >-
-        List of live (intraday) snapshots for given business_date. Contains also
-        start-of-day snapshot.
+        List of live (intraday) snapshots for given business_date.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - $ref: '#/components/parameters/business_date'
@@ -526,6 +537,8 @@ paths:
                     type: array
                     items:
                       type: object
+                      description: >-
+                        $primary_keys(business_date,live,live_timestamp)
                       properties:
                         business_date:
                           $ref: '#/components/schemas/business_date'
@@ -558,6 +571,7 @@ paths:
           - or `otc_sensitivities` with sensitivities in CSV format
           - or `otc_fpml`
           - or `otc_cb202`, i.e. EurexOTC CB202 or CB207 report
+          - or `otc_cc233`, i.e. EurexOTC CC233 OTC Sensitivities report
 
         - Cash Market is submitted as
           - `repo_json` JSON array of `repo_json_position` objects, see the model
@@ -772,6 +786,7 @@ paths:
                           - otc_csv
                           - otc_sensitivities
                           - otc_cb202
+                          - otc_cc233
                           - otc_fpml
                           - cash_json
                           - cash_csv
@@ -788,6 +803,8 @@ paths:
                         $ref: '#/components/schemas/otc_sensitivities'
                       otc_cb202:
                         $ref: '#/components/schemas/otc_cb202'
+                      otc_cc233:
+                        $ref: '#/components/schemas/otc_cc233'
                       otc_fpml:
                         $ref: '#/components/schemas/otc_fpml'
                       cash_json:
@@ -916,6 +933,7 @@ paths:
                     description: >-
                       Margin figures and short trade desription on OTC trade
                       level. Internal Trade Id is used as a key.
+                      $primary_keys(trade_id)
                     items:
                       type: object
                       properties:
@@ -1036,7 +1054,7 @@ paths:
       description: >-
         Return a table of DV01 (delta) sensitivities of OTC portfolio, per curve
         and maturity bucket. The sensitivity table is accepted as
-        `otc_sensitivities` input for `estimator` request and can be used
+        `otc_sensitivities` input for POST /estimator request and can be used
         instead of the whole OTC portfolio for faster margin computation.
       externalDocs:
         url: >-
@@ -1077,6 +1095,8 @@ paths:
                         $ref: '#/components/schemas/otc_csv'
                       otc_cb202:
                         $ref: '#/components/schemas/otc_cb202'
+                      otc_cc233:
+                        $ref: '#/components/schemas/otc_cc233'
                       otc_fpml:
                         $ref: '#/components/schemas/otc_fpml'
               required:
@@ -1116,7 +1136,9 @@ paths:
                     type: array
                     items:
                       type: object
-                      description: DV01 for different curves of one maturity
+                      description: >-
+                        DV01 for different curves of one maturity
+                        $primary_keys(maturity)
                       properties:
                         maturity:
                           $ref: '#/components/schemas/otc_maturity'
@@ -1232,15 +1254,16 @@ paths:
                         Array of arrays of greeks for given instrument per greek
                         type and per underlying shift rel, in the order given by
                         type and shift vectors
-                    properties:
-                      iid:
-                        $ref: '#/components/schemas/iid'
-                      values:
-                        type: array
-                        items:
+                        $primary_keys(iid)
+                      properties:
+                        iid:
+                          $ref: '#/components/schemas/iid'
+                        values:
                           type: array
                           items:
-                            type: number
+                            type: array
+                            items:
+                              type: number
                   error:
                     $ref: '#/components/schemas/error'
                   errors:
@@ -1346,6 +1369,7 @@ paths:
                         Array of arrays of prices for given instrument per
                         underlying price shift and volatility shift, in the
                         order given by price and vola shift vectors
+                        $primary_keys(iid)
                       properties:
                         iid:
                           $ref: '#/components/schemas/iid'
@@ -1480,8 +1504,8 @@ paths:
         Optionally business date can be specified to get historical indicative
         margins, by default CPME returns the most recent values. In contrast to
         estimator request, which uses end-of-day for historical calculation
-        (unless time is specified), indicative margin is always for start-of-day
-        (published in the morning to indicate margin during the day).
+        (unless time is specified), indicative margin is always for the first live
+        snapshot (published in the morning to indicate margin during the day).
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - name: clearing_house
@@ -1549,6 +1573,8 @@ paths:
                     type: array
                     items:
                       type: object
+                      description: >-
+                        $primary_keys(product_id)
                       properties:
                         liquidation_group:
                           $ref: '#/components/schemas/liquidation_group'
@@ -1851,6 +1877,8 @@ paths:
                     type: array
                     items:
                       type: object
+                      description: >-
+                        $primary_keys(gscnid)
                       properties:
                         global_scenario:
                           $ref: '#/components/schemas/global_scenario'
@@ -1895,8 +1923,7 @@ components:
       name: live
       in: query
       description: >-
-        Is the snapshot live (meaning intraday or start-of-day)? False for
-        end-of-day.
+        Is the snapshot live (a.k.a. intraday)? False for end-of-day.
       schema:
         type: boolean
     live_timestamp:
@@ -1906,7 +1933,7 @@ components:
         type: number
       description: >-
         Timestamp as of which the result is calculated, in milliseconds from
-        epoch. Zero means start-of-day.
+        epoch. Zero means the first live snapshot.
     business_date_from:
       name: business_date_from
       in: query
@@ -1930,14 +1957,14 @@ components:
     live:
       type: boolean
       description: >-
-        Is the snapshot live (meaning intraday or start-of-day)? False for
-        end-of-day. In request, False without any date means last end-of-day.
+        Is the snapshot live (a.k.a. intraday)? False for end-of-day.
+        In request, False without any date means last end-of-day.
       example: false
     live_timestamp:
       type: number
       description: >-
         Timestamp as of which the result is calculated, in milliseconds from
-        epoch. Zero means start-of-day.
+        epoch. Zero means first live snapshot of the day.
       example: 0
     otc_available:
       type: boolean
@@ -1946,7 +1973,7 @@ components:
         only ETD portfolio can be evaluated. Snapshot without ETD is not
         possible. Live snapshots can be marked as otc_available which means OTC
         portfolio will be evaluated, however the OTC market data are from
-        start-of-day, not from the particular timestamp.
+        first live snapshot of the day, not from the particular timestamp.
       example: true
     cash_available:
       type: boolean
@@ -1954,8 +1981,8 @@ components:
         Is Cash Market available in the snapshot? Cash Market was introduced
         later to CPME and is not available for earlier snapshots. Live snapshots
         can be marked as cash_available which means Repo portfolio will be
-        evaluated, however the Cash Market market data are from start-of-day,
-        not from the particular timestamp.
+        evaluated, however the Cash Market market data are from the first live
+        snapshot of the day, not from the particular timestamp.
     snapshot:
       type: object
       description: >-
@@ -2090,6 +2117,10 @@ components:
       type: number
       description: Line number, used when reporting errors
       example: 1
+    line_no_str:
+      type: string
+      description: Line number, used when reporting errors
+      example: '1'
     maturity:
       type: number
       description: >-
@@ -2207,6 +2238,7 @@ components:
         Margin on LGS level, higher levels can be summed on UI. Also initial
         margin can be calculated as a sum of all components except premium
         margin
+        $primary_keys(liquidation_group,liquidation_group_split)
       items:
         type: object
         properties:
@@ -2240,6 +2272,7 @@ components:
             type: array
             items:
               type: object
+              description: $primary_keys(rms_name)
               properties:
                 rms_name:
                   type: string
@@ -2263,6 +2296,7 @@ components:
                   type: array
                   items:
                     type: object
+                    description: $primary_keys(subsample_id)
                     properties:
                       subsample_id:
                         type: number
@@ -2289,7 +2323,9 @@ components:
 
     whatif_portfolio_margin:
       type: array
-      description: array of portfolio margins for what-if scenarios. Sent only if any portfolio component was marked with non-zero whatif_id in the estimator request
+      description: >-
+        array of portfolio margins for what-if scenarios. Sent only if any portfolio component was marked with non-zero whatif_id in the estimator request
+        $primary_keys(whatif_id)
       items:
         type: object
         properties:
@@ -2327,6 +2363,30 @@ components:
             string
       required:
         - xml
+    otc_cc233:
+      type: object
+      description: EurexOTC CC233 report with information which member/account should be selected from the report
+      properties:
+        member:
+          type: string
+          description: >-
+            select member whose trades should be processed
+            it is matched against the first part of Book column, e.g. "XYZFR" in "XYZFR_A1"
+            example: XYZFR
+        account:
+          type: string
+          description: >-
+            select account of the `member`
+            it is matched against the second part of Book column, e.g. "A1" in "XYZFR_A1"
+            example: A1
+        csv:
+          type: string
+          description: EurexOTC CC233 OTC Sensitivities report as one string, linebreaks replaced by `\n`
+          example: "Value Date: 2021-05-31\nBook,TradeID,TradeStatus,MaturityDate,ProductType,ExtendedProductType,TradeCurrency,Principal,PrincipalAmountPay,PrincipalAmountRec,ProductDescription,FinalReferenceDate,MarketDataItem,CurveType,CurveTenor,Bucket,DeltaSensitivity,Risk_Netting_Unit\nXYZFR_A1,1,VERIFIED,23/04/2032,Swap,Swap,EUR,2500000,2500000,2500000,Swap/04/23/2032/P:EUR 0.03000 /R:EUR/EURIBOR/6M,,DIS EUR ESTR ZC OFFICIAL,CurveZero,1D,3Y,2.03,"
+        required:
+          - member
+          - account
+          - csv
     otc_fpml:
       type: object
       properties:
@@ -2360,7 +2420,9 @@ components:
       type: array
       items:
         type: object
-        description: details of one OTC trade
+        description: >-
+          details of one OTC trade
+          $primary_keys(trade_id)
         properties:
           trade_id:
             $ref: '#/components/schemas/trade_id'
@@ -2378,6 +2440,8 @@ components:
             $ref: '#/components/schemas/otc_maturity'
     repo_json:
       type: array
+      description: >-
+        $primary_keys(line_no)
       items:
         $ref: '#/components/schemas/repo_json_position'
     repo_json_position:
@@ -2476,6 +2540,8 @@ components:
 
     cash_json:
       type: array
+      description: >-
+        $primary_keys(line_no,leg_type)
       items:
         $ref: '#/components/schemas/cash_json_position'
 
@@ -2526,14 +2592,18 @@ components:
           description: Indicates whether the line is cash position or security position. C for cash, S for security with Payable Cash Amount, empty security with Traded Price. Unless you are familiar with DBG Risk representation of cash market positions, use empty leg type.
 
     cash_csv:
-      type: string
-      description: >-
-        Cash market portfolio in a CSV format, first row is header and following rows are positions,
-        also called "settlements" as from risk point of view cash market position is relevant only during settlement.
-        The rows are separated by `\n` in the string, line breaks are not allowed inside JSON values.
-        The columns correspond to the attributes of `cash_json_position` object.
-      example: Security ISIN,Settlement Date,Settlement Currency,Payable Cash Amount,Traded Price,Security Quantity,CCP Trade Number,Leg Type\nDE0005810055,20220630,,,100.23,100,,
-
+      type: object
+      properties:
+        csv:
+          type: string
+          description: >-
+            Cash market portfolio in a CSV format, first row is header and following rows are positions,
+            also called "settlements" as from risk point of view cash market position is relevant only during settlement.
+            The rows are separated by `\n` in the string, line breaks are not allowed inside JSON values.
+            The columns correspond to the attributes of `cash_json_position` object.
+          example: Security ISIN,Settlement Date,Settlement Currency,Payable Cash Amount,Traded Price,Security Quantity,CCP Trade Number,Leg Type\nDE0005810055,20220630,,,100.23,100,,
+      required:
+        - csv
     rbm_margin:
       type: object
       description: >-
@@ -2547,7 +2617,9 @@ components:
           type: array
           items:
             type: object
-            description: Margin on margin class level
+            description: >-
+              Margin on margin class level
+              $primary_keys(margin_class_code)
             properties:
               margin_class_code:
                 $ref: '#/components/schemas/margin_class_code'
@@ -2584,7 +2656,9 @@ components:
                 type: array
                 items:
                   type: object
-                  description: Positions of the margin class
+                  description: >-
+                    Positions of the margin class
+                    $primary_keys(line_no)
                   properties:
                     line_no:
                       $ref: '#/components/schemas/line_no'
@@ -2785,9 +2859,11 @@ components:
           type: array
           items:
             type: object
-            description: Result of the global scenario
+            description: >-
+              Result of the global scenario
+              $primary_keys(global_scenario)
             properties:
-              global scenario:
+              global_scenario:
                 $ref: '#/components/schemas/global_scenario'
               stress_value:
                 $ref: '#/components/schemas/stress_value'
@@ -2804,6 +2880,7 @@ components:
                     in given global scenario. Either the liquidation_group or margin_group is filled.
                     Margin Classes that do not belong to a Margin Group are listed on this level
                     as well and their margin_group_code is equal to margin_class_code prefixed by '!'.
+                    $primary_keys(liquidation_group,margin_group_code)
                   properties:
                     liquidation_group:
                       $ref: '#/components/schemas/liquidation_group'
@@ -2821,7 +2898,9 @@ components:
                       type: array
                       items:
                         type: object
-                        description: Result for the Liquidation Group Split or Margin Class.
+                        description: >-
+                          Result for the Liquidation Group Split or Margin Class.
+                          $primary_keys(liquidation_group_split)
                         properties:
                           liquidation_group_split:
                             $ref: '#/components/schemas/liquidation_group_split'
@@ -2843,6 +2922,7 @@ components:
       description: >-
         Margin figures on ETD position level. Full business key is used,
         it is not possible to map to input line_no one to one because positions may be aggregated or split.
+        $primary_keys(iid,liquidation_group_split)
       items:
         type: object
         properties:
@@ -2892,6 +2972,8 @@ components:
         it is not possible to map to input line_no one to one because positions may be aggregated or split.
       items:
         type: object
+        description: >-
+          $primary_keys(iid,liquidation_group_split)
         properties:
           line_no:
             $ref: '#/components/schemas/line_no'
@@ -2924,6 +3006,7 @@ components:
             description: >-
               Stress value of the position in different scenarios, in `clearing_currency`.
               For scenario names, use GET `/global_scenarios` resource and find the scenarios by gscnid.
+              $primary_keys(gscnid)
             items:
               type: object
               properties:
@@ -2931,3 +3014,13 @@ components:
                   $ref: '#/components/schemas/gscnid'
                 stress_value:
                   $ref: '#/components/schemas/stress_value'
+
+    currency_amount:
+      type: object
+      properties:
+        currency:
+          type: string
+          example: USD
+        amount:
+          type: number
+          example: 446.37538928000043
