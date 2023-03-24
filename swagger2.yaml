@@ -263,6 +263,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: flex
+          in: query
+          description: Return also flex series? True or false. Default setting is false.
+          required: false
+          schema:
+            type: boolean
       responses:
         '200':
           description: OK

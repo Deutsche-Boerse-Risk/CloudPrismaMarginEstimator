@@ -237,6 +237,11 @@ paths:
           description: Product ID, there can be multiple instances of the parameter to request series for several products
           required: true
           type: string
+        - name: flex
+          in: query
+          description: Return also flex series? True or false. Default setting is false.
+          required: false
+          type: boolean
       responses:
         '200':
           description: OK
