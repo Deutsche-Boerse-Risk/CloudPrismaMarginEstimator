@@ -16,7 +16,7 @@ SWAGGERHUB_API = dict(
     )
 
 if len(sys.argv) < 3:
-    print("Usage: %s <version> <environment> [environment2] [environment3] ..." % sys.argv[0])
+    print("Usage: python %s <version> <environment> [environment2] [environment3] ..." % sys.argv[0])
     exit(2)
 
 if sys.argv[1] not in SWAGGER_FILE:
