@@ -398,7 +398,7 @@ paths:
                     margin_class_code:
                       $ref: '#/definitions/margin_class_code'
                     basket_isin:
-                      $ref: '#/components/schemas/basket_isin'
+                      $ref: '#/definitions/basket_isin'
 
 
   /clearing_currencies:

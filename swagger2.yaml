@@ -2383,10 +2383,10 @@ components:
           type: string
           description: EurexOTC CC233 OTC Sensitivities report as one string, linebreaks replaced by `\n`
           example: "Value Date: 2021-05-31\nBook,TradeID,TradeStatus,MaturityDate,ProductType,ExtendedProductType,TradeCurrency,Principal,PrincipalAmountPay,PrincipalAmountRec,ProductDescription,FinalReferenceDate,MarketDataItem,CurveType,CurveTenor,Bucket,DeltaSensitivity,Risk_Netting_Unit\nXYZFR_A1,1,VERIFIED,23/04/2032,Swap,Swap,EUR,2500000,2500000,2500000,Swap/04/23/2032/P:EUR 0.03000 /R:EUR/EURIBOR/6M,,DIS EUR ESTR ZC OFFICIAL,CurveZero,1D,3Y,2.03,"
-        required:
-          - member
-          - account
-          - csv
+      required:
+        - member
+        - account
+        - csv
     otc_fpml:
       type: object
       properties:
