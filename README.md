@@ -38,10 +38,11 @@ Key links:
 | - Equities, bonds               | no              | no              | no                        |
 | Input formats covered:          |                 |                 |                           |
 | - Member reports                | CB202, CP005    | CB202, CP005    | CB202                     |
-| - CSV files                     | yes             | yes             | yes                       |
-| - OTC sensitivities (CSV)       | yes             | yes             | yes                       |
+| - CSV files                     | yes             | [yes](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/docs/gui.md#otc-portfolio-csv-format)             | yes                       |
+| - OTC sensitivities (CSV)       | yes             | [yes](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/docs/gui.md#upload-otc-sensitivities)             | yes                       |
+| - OTC sensitivities (CC233)     | yes             | [yes](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/docs/gui.md#upload-otc-sensitivities)             | no                        |
 | - OTC FpML                      | yes             | yes             | no                        |
-| - OTC shorthand                 | yes             | yes             | no                        |
+| - OTC shorthand                 | yes             | [yes](https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/docs/gui.md#enter-otc-shorthand)             | no                        |
 | [Historical calculation](#is-it-possible-to-calculate-margin-as-of-a-historical-date) | yes             | yes             | yes                       |
 | Intraday calculation            | yes             | yes             | yes                       |
 | Local installation possible     | no              | no              | no                        |
@@ -61,6 +62,19 @@ There is no time restriction set, in general CPME (both GUI and API) is availabl
 ### When is end-of-day or start-of-day snapshot available?
 
 End-of-day snapshot becomes available usually before 1am, start-of-day for OTC is received in the morning, around 6am. These are usual times, actual time varies each day, CPME is dependent on production Risk systems (PRISMA, Calypso) and any delay in their snapshot processing means delay also in CPME.
+
+### What is the performance of CPME?
+
+CPME API respondes to 95% of requests in less than one second.
+
+Performance issues can arise:
+
+-	If the requests are for historical dates: CPME is prepared for current day and last end-of-day requests, but it takes several minutes to start calculation for other time points
+-	If the portfolio is large, in particular large OTC portfolios take longer to process, and if the input is large in file size (typically CB202 and CP005 reports)
+    - e.g. the calculation for 2000 OTC trades in CB202 format takes app 1min, or portfolio with 5000 ETD instruments takes app 1min 
+    - for OTC we offer fast approximate margin calculation based on aggregated DV01 sensitivity table, where calculation time is not dependent on portfolio size
+-	If the load on the API is high: it is scaling with the load but it can take several minutes to start up additional servers
+
 
 ## Submitting a calculation request to API
 
@@ -103,9 +117,9 @@ client's own making) cannot be processed by CPME.
 Yes:
 
 - in the API, see "Business date and time" section in [API definition][api-definition]
-  - dates from 18 March 2019 available, or from 11 December 2018 for ETD-only requests
+    - dates from 18 March 2019 available, or from 11 December 2018 for ETD-only requests
 - on GUI, use "Historical calculation" checkbox
-  - one-year history available
+    - one-year history available
 
 Historical requests can take several minutes to perform. A request might be refused if the
 CPME calculation cluster is busy as there is an upper limit on the

@@ -10,7 +10,7 @@
 - OTC IRS trades accepted by Eurex OTC except FX swaps uploaded
     - [in CSV format known from Margin Calculator](#upload-otc-portfolio)
     - in the format of Eurex Clearing member full inventory reports (CB202/CB207)
-    - as [DV01 sensitivity table](#upload-otc-sensitivities)
+    - as [DV01 sensitivity table or as CC233 Sensitivity report](#upload-otc-sensitivities)
     - or [entered as OTC shorthand](#enter-otc-shorthand)
 - Repo single-ISIN trades except floating rate and open-ended repos
     - [uploaded in F7 portfolio export CSV format](#upload-repo-portfolio)
@@ -138,9 +138,10 @@ Upload of OTC portfolio is similar to ETD portfolio upload:
 ## Upload OTC Sensitivities
 
 1. [launch CPME GUI](#launch-cpme-gui)
-2. Prepare DV01 sensitivity table as CSV file using [OTC sensitivities template]
-3. Click "Upload OTC Sensitivities" and select the prepared CSV file
-4. [Read the results](#read-the-results)
+2. Prepare DV01 sensitivity table as CSV file using [OTC sensitivities template], or get your "CC233 Sensitivity Report for IRS"
+    - for CC233 upload, CPME displays dialog to select an account from those available in your report
+4. Click "Upload OTC Sensitivities" and select the prepared CSV or the report file
+5. [Read the results](#read-the-results)
 
 ## OTC Portfolio CSV Format
 
