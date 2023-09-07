@@ -10,10 +10,12 @@ info:
     GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
     described here.
 
+
     The key request is `/estimator`, it is the only request you need to
     calculate the margin. Other requests provide lists or details of
     instruments, available dates etc. CPME supports also greek and stress price
     calculation - these analytical tools are not related to the margin.
+
 
     Part of the API is also Cloud Default Fund Estimator (CPDE) which
     *estimates* Default Fund contribution for an uploaded portfolio according
@@ -28,6 +30,7 @@ info:
 
     For API access please register at [Deutsche Boerse API
     website](https://console.developer.deutsche-boerse.com/apis).
+
 
     There you create your project, subscribe to "Prisma Margin Estimator" API
     and get a key. Use the key in a request header as `X-DBP-APIKEY`, e.g.:
@@ -82,14 +85,17 @@ info:
     timestamp equal or smaller than the requested time. If time is not given
     then the latest timestamp of the business date is used.
 
+
     It takes several minutes to start the instance for a specified snapshot,
     That instance can then serve subsequent requests for the same snapshot.
     After some inactive time the instance is shutdown. It is recommended not to
     specify a date and time and calculate current margin or margin as of last
     end-of-day, see below.
 
+
     Example of requesting the latest snapshot of given date, in GET and POST
     type of request:
+
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
       'https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/series?products=FGBM&business_date=20190307'
@@ -105,6 +111,7 @@ info:
     If business date is not given, the latest business date is used. If only
     live=False is specified, last end-of-day is used. Calculation instance for
     these two requests is always up, you should not experience any delay.
+
 
     Response contains identification of the selected snapshot, see attributes
     `business_date`, `live` and `live_timestamp`.
@@ -261,7 +268,12 @@ paths:
           in: query
           description: >-
             Product ID, there can be multiple instances of the parameter to
-            request series for several products
+            request series for several products.
+
+            The maximum number of specified products is limited by 2048 characters
+            limit for URL string. That translates to app 130 products. If more is
+            required, we recommend to not specify products - the response will
+            contain series of all products.
           required: true
           schema:
             type: string
@@ -341,11 +353,13 @@ paths:
       summary: Get attributes of securities
       description: >-
         Get attributes of securities (equities, bonds, subscription rights) for
-        given ISIN, or all active securities known to the Risk system if ISIN is
+        given `isin`, or all active securities known to the Risk system if `isin` is
         not specified.
 
-        The margin class returned with the security is its default margin class and
-        the currency is the default margin class currency. Bonds always have only one
+        ## Margin Class and Currency
+
+        The `margin_class_code` returned with the security is its default margin class and
+        the `currency` is the default margin class currency. Bonds always have only one
         margin class, the default one. Equities may be assigned to multiple margin
         classes based on settlement currency of the transaction - this is intended
         for some ETFs.
@@ -437,7 +451,7 @@ paths:
   /clearing_currencies:
     get:
       summary: List All Clearing Currencies
-      description: List of clearing currencies that can be used in `estimator` request.
+      description: List of clearing currencies that can be used in `/estimator` request.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - $ref: '#/components/parameters/business_date'
@@ -517,7 +531,7 @@ paths:
     get:
       summary: List Available Live Snapshots for Given Day
       description: >-
-        List of live (intraday) snapshots for given business_date.
+        List of live (intraday) snapshots for given `business_date`.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - $ref: '#/components/parameters/business_date'
@@ -735,10 +749,20 @@ paths:
 
         # What-If analysis
 
-        Estimator request allows to perform what-if analysis for ETD and OTC, i.e. it answers the question what would be the portfolio margin when a set of positions or trades is added to a base portfolio. The added trades are submitted a separate portfolio component(s) marked by non-zero whatif_id. Multiple scenarios (different sets of trades to add) can be tested with one request, the scenarios are distinguished by whatif_id.
+        Estimator request allows to perform what-if analysis for ETD and OTC,
+        i.e. it answers the question what would be the portfolio margin when
+        a set of positions or trades is added to a base portfolio. The added trades
+        are submitted a separate portfolio component(s) marked by non-zero `whatif_id`.
+        Multiple scenarios (different sets of trades to add) can be tested with one request,
+        the scenarios are distinguished by `whatif_id`.
 
-        Results for the base portfolio are returned in portfolio_margin as for standard request. Portfolio margins for the scenarios are returned in array whatif_portfolio_margin. They are total margins for the base portfolio plus the added trades. To learn the margin increase or decrease caused by the added trades, subtract margin of the base portfolio from the what-if portfolio margin. Drilldowns are returned only for the base portfolio.
 
+        Results for the base portfolio are returned in portfolio_margin as for standard request.
+        Portfolio margins for the scenarios are returned in array `whatif_portfolio_margin`.
+        They are total margins for the base portfolio plus the added trades. To learn
+        the margin increase or decrease caused by the added trades, subtract margin
+        of the base portfolio from the what-if portfolio margin. Drilldowns are returned
+        only for the base portfolio.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
       requestBody:
@@ -1026,7 +1050,7 @@ paths:
       description: >-
         Return a table of DV01 (delta) sensitivities of OTC portfolio, per curve
         and maturity bucket. The sensitivity table is accepted as
-        `otc_sensitivities` input for POST /estimator request and can be used
+        `otc_sensitivities` input for POST `/estimator` request and can be used
         instead of the whole OTC portfolio for faster margin computation.
       externalDocs:
         url: >-
@@ -1151,6 +1175,7 @@ paths:
         calculation is slightly different, therefore the result for request
         without shift may differ from result with zero shift.
 
+
         To get a position greek, the instrument greek has to be multiplied by
         position size and trade unit value (TUV).
       parameters:
@@ -1252,14 +1277,14 @@ paths:
         matrix with prices for each combination of the underlying price and
         volatility shift.
 
+        ## Volatility Shift
+
         The volatility shift can be either relative or absolute. For example,
         when current volatility is 20%:
 
         - relative shift 0.1 means the stressed volatility is 20% \* (1+0.1) =
         22%
-
         - absolute shift 0.1 means stressed volatility is 20% + 0.1% = 20.1%
-
 
         For futures, volatility shift has no effect and the underlying price
         shift changes directly the future price, theoretical pricing model is
@@ -1465,13 +1490,18 @@ paths:
         unless ECC clearing house is selected or a specific product or products
         is requested.
 
+        ## Results
+
         The resulting long_initial_margin_cash and short_initial_margin_cash is
         equivalent to the margin calculated by individual /estimator requests
         for portfolio of one long or short contract, respectively.
 
+
         The relative long_initial_margin and short_initial_margin is the cash
         margin divided by (current underlying price converted to EUR * trade
         unit value).
+
+        ## Snapshot
 
         Optionally business date can be specified to get historical indicative
         margins, by default CPME returns the most recent values. In contrast to
@@ -1479,6 +1509,8 @@ paths:
         (unless time is specified), indicative margin is by default for the first live
         snapshot (published in the morning to indicate margin during the day).
         
+        ## Time Range
+
         As an alternative to selecting one business_date, time series can be
         requested using business_date_from, business_date_to attributes.
         This is available only for JSON output format.
@@ -1552,7 +1584,9 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/single_date_products_margin'
                   - type: array
-                    description: array with indicative margins for a selected date range
+                    description:  >-
+                      array with indicative margins for a selected date range
+                      $primary_keys(business_date,live_timestamp)
                     items:
                       $ref: '#/components/schemas/single_date_products_margin'
 
@@ -2391,7 +2425,9 @@ components:
           $ref: '#/components/schemas/live_timestamp'
         list_margins:
           type: array
-          description: indicative margins per product
+          description: >-
+            indicative margins per product
+            $primary_keys(product_id,liquidation_group)
           items:
             $ref: '#/components/schemas/product_margin_long_short'
 
@@ -2548,7 +2584,7 @@ components:
           type: string
           description: >-
             Settlement date for the term leg as YYYY-MM-DD or YYYYMMDD,
-            mandatory
+            can be empty for open repo
           example: 20210413
         buy_sell_indicator:
           type: string
@@ -2571,8 +2607,12 @@ components:
           example: 500000000
         fixed_repo_rate:
           type: number
-          description: Fixed repo rate, in percent, mandatory
+          description: Fixed repo rate, in percent, either fixed_repo_rate or offset_bps must be specified
           example: 2.25
+        offset_bps:
+          type: number
+          description: Offset of variable repo rate against risk-free rate, in basis points, either fixed_repo_rate or offset_bps must be specified
+          example:
         trade_id:
           type: string
           description: user defined trade Id, optional
@@ -2586,10 +2626,8 @@ components:
         - sec_isin
         - trade_date
         - settlement_date_frontleg
-        - settlement_date_termleg
         - buy_sell_indicator
         - nominal
-        - fixed_repo_rate
     simulated_settlement_date:
       type: number
       description: >-
