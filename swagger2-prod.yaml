@@ -10,6 +10,7 @@ info:
     GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
     described here.
 
+
     The key request is `/estimator`, it is the only request you need to
     calculate the margin. Other requests provide lists or details of
     instruments, available dates etc. CPME supports also greek and stress price
@@ -22,6 +23,7 @@ info:
 
     For API access please register at [Deutsche Boerse API
     website](https://console.developer.deutsche-boerse.com/apis).
+
 
     There you create your project, subscribe to "Prisma Margin Estimator" API
     and get a key. Use the key in a request header as `X-DBP-APIKEY`, e.g.:
@@ -76,14 +78,17 @@ info:
     timestamp equal or smaller than the requested time. If time is not given
     then the latest timestamp of the business date is used.
 
+
     It takes several minutes to start the instance for a specified snapshot,
     That instance can then serve subsequent requests for the same snapshot.
     After some inactive time the instance is shutdown. It is recommended not to
     specify a date and time and calculate current margin or margin as of last
     end-of-day, see below.
 
+
     Example of requesting the latest snapshot of given date, in GET and POST
     type of request:
+
 
     <pre>curl -H 'X-DBP-APIKEY: your-key' \
       'https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/series?products=FGBM&business_date=20190307'
@@ -104,6 +109,8 @@ info:
     `business_date`, `live` and `live_timestamp`.
 
     ## Change log
+
+    - 7.1.0 Indicative margin extended; line errors contain portfolio
 
     - 7.0.0 OTC portfolio can be submitted also as CC233 sensitivities report
 
@@ -253,7 +260,12 @@ paths:
           in: query
           description: >-
             Product ID, there can be multiple instances of the parameter to
-            request series for several products
+            request series for several products.
+
+            The maximum number of specified products is limited by 2048 characters
+            limit for URL string. That translates to app 130 products. If more is
+            required, we recommend to not specify products - the response will
+            contain series of all products.
           required: true
           schema:
             type: string
@@ -333,11 +345,13 @@ paths:
       summary: Get attributes of securities
       description: >-
         Get attributes of securities (equities, bonds, subscription rights) for
-        given ISIN, or all active securities known to the Risk system if ISIN is
+        given `isin`, or all active securities known to the Risk system if `isin` is
         not specified.
 
-        The margin class returned with the security is its default margin class and
-        the currency is the default margin class currency. Bonds always have only one
+        ## Margin Class and Currency
+
+        The `margin_class_code` returned with the security is its default margin class and
+        the `currency` is the default margin class currency. Bonds always have only one
         margin class, the default one. Equities may be assigned to multiple margin
         classes based on settlement currency of the transaction - this is intended
         for some ETFs.
@@ -429,7 +443,7 @@ paths:
   /clearing_currencies:
     get:
       summary: List All Clearing Currencies
-      description: List of clearing currencies that can be used in `estimator` request.
+      description: List of clearing currencies that can be used in `/estimator` request.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - $ref: '#/components/parameters/business_date'
@@ -509,7 +523,7 @@ paths:
     get:
       summary: List Available Live Snapshots for Given Day
       description: >-
-        List of live (intraday) snapshots for given business_date.
+        List of live (intraday) snapshots for given `business_date`.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - $ref: '#/components/parameters/business_date'
@@ -727,10 +741,20 @@ paths:
 
         # What-If analysis
 
-        Estimator request allows to perform what-if analysis for ETD and OTC, i.e. it answers the question what would be the portfolio margin when a set of positions or trades is added to a base portfolio. The added trades are submitted a separate portfolio component(s) marked by non-zero whatif_id. Multiple scenarios (different sets of trades to add) can be tested with one request, the scenarios are distinguished by whatif_id.
+        Estimator request allows to perform what-if analysis for ETD and OTC,
+        i.e. it answers the question what would be the portfolio margin when
+        a set of positions or trades is added to a base portfolio. The added trades
+        are submitted a separate portfolio component(s) marked by non-zero `whatif_id`.
+        Multiple scenarios (different sets of trades to add) can be tested with one request,
+        the scenarios are distinguished by `whatif_id`.
 
-        Results for the base portfolio are returned in portfolio_margin as for standard request. Portfolio margins for the scenarios are returned in array whatif_portfolio_margin. They are total margins for the base portfolio plus the added trades. To learn the margin increase or decrease caused by the added trades, subtract margin of the base portfolio from the what-if portfolio margin. Drilldowns are returned only for the base portfolio.
 
+        Results for the base portfolio are returned in portfolio_margin as for standard request.
+        Portfolio margins for the scenarios are returned in array `whatif_portfolio_margin`.
+        They are total margins for the base portfolio plus the added trades. To learn
+        the margin increase or decrease caused by the added trades, subtract margin
+        of the base portfolio from the what-if portfolio margin. Drilldowns are returned
+        only for the base portfolio.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
       requestBody:
@@ -1054,7 +1078,7 @@ paths:
       description: >-
         Return a table of DV01 (delta) sensitivities of OTC portfolio, per curve
         and maturity bucket. The sensitivity table is accepted as
-        `otc_sensitivities` input for POST /estimator request and can be used
+        `otc_sensitivities` input for POST `/estimator` request and can be used
         instead of the whole OTC portfolio for faster margin computation.
       externalDocs:
         url: >-
@@ -1179,6 +1203,7 @@ paths:
         calculation is slightly different, therefore the result for request
         without shift may differ from result with zero shift.
 
+
         To get a position greek, the instrument greek has to be multiplied by
         position size and trade unit value (TUV).
       parameters:
@@ -1280,14 +1305,14 @@ paths:
         matrix with prices for each combination of the underlying price and
         volatility shift.
 
+        ## Volatility Shift
+
         The volatility shift can be either relative or absolute. For example,
         when current volatility is 20%:
 
         - relative shift 0.1 means the stressed volatility is 20% \* (1+0.1) =
         22%
-
         - absolute shift 0.1 means stressed volatility is 20% + 0.1% = 20.1%
-
 
         For futures, volatility shift has no effect and the underlying price
         shift changes directly the future price, theoretical pricing model is
@@ -1504,8 +1529,14 @@ paths:
         Optionally business date can be specified to get historical indicative
         margins, by default CPME returns the most recent values. In contrast to
         estimator request, which uses end-of-day for historical calculation
-        (unless time is specified), indicative margin is always for the first live
+        (unless time is specified), indicative margin is by default for the first live
         snapshot (published in the morning to indicate margin during the day).
+        
+        ## Time Range
+
+        As an alternative to selecting one business_date, time series can be
+        requested using business_date_from, business_date_to attributes.
+        This is available only for JSON output format.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
         - name: clearing_house
@@ -1532,7 +1563,8 @@ paths:
             type: string
         - name: format
           in: query
-          description: Required result format, JSON (default), XLS or XLSX spreadsheet.
+          description: >-
+            Required result format, JSON (default), XLS or XLSX spreadsheet.
           required: false
           schema:
             type: string
@@ -1542,6 +1574,18 @@ paths:
               - XLSX
             default: JSON
         - $ref: '#/components/parameters/business_date'
+        - $ref: '#/components/parameters/business_date_from'
+        - $ref: '#/components/parameters/business_date_to'
+        - $ref: '#/components/parameters/live'
+        - name: include_components
+          in: query
+          description: >-
+            Include breakdown of the initial margin to market risk and other components.
+            Also include details for market risk - results on risk measure set level.
+            Available only in JSON format.
+          required: false
+          schema:
+            type: boolean
       responses:
         '200':
           description: response from CPME API, can be error if "error" element or "errors" array is present, otherwise OK 
@@ -1561,37 +1605,14 @@ paths:
                     short_initial_margin: 0.11544631
                     short_initial_margin_cash: 1707.450925
               schema:
-                type: object
-                properties:
-                  business_date:
-                    $ref: '#/components/schemas/business_date'
-                  live:
-                    $ref: '#/components/schemas/live'
-                  live_timestamp:
-                    $ref: '#/components/schemas/live_timestamp'
-                  list_margins:
-                    type: array
+                oneOf:
+                  - $ref: '#/components/schemas/single_date_products_margin'
+                  - type: array
+                    description:  >-
+                      array with indicative margins for a selected date range
+                      $primary_keys(business_date,live_timestamp)
                     items:
-                      type: object
-                      description: >-
-                        $primary_keys(product_id)
-                      properties:
-                        liquidation_group:
-                          $ref: '#/components/schemas/liquidation_group'
-                        product_id:
-                          $ref: '#/components/schemas/product_id'
-                        prod_name:
-                          type: string
-                        margin_currency:
-                          $ref: '#/components/schemas/currency'
-                        long_initial_margin:
-                          type: number
-                        long_initial_margin_cash:
-                          type: number
-                        short_initial_margin:
-                          type: number
-                        short_initial_margin_cash:
-                          type: number
+                      $ref: '#/components/schemas/single_date_products_margin'
   
   /config/{param}:
     get:
@@ -1848,7 +1869,7 @@ components:
           empty, that means no grouping
     line_no:
       type: number
-      description: Line number, used when reporting errors
+      description: Line number, used when reporting errors or position-level results
       example: 1
     maturity:
       type: number
@@ -1961,6 +1982,48 @@ components:
           $ref: '#/components/schemas/otc_csv_string'
       required:
         - csv
+    
+    market_risk:
+      type: number
+      description: Market risk from ReportCP046
+    liquidity_addon:
+      type: number
+      description: Liqu risk from ReportCP046
+    long_option_credit:
+      type: number
+      description: Long option credit from ReportCP046
+    time_to_expiry_adjustment:
+      type: number
+      description: >-
+        Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introduced with Prisma R8.0
+    rms_name:
+      type: string
+      description: Risk Measure Set name
+    simulation_type:
+      type: string
+      enum:
+        - Historical
+        - Stress
+        - Event
+      description: Risk Measure Set type
+    rms_market_risk:
+      type: number
+      description: RMS market risk before weighting
+    weighting_factor:
+      type: number
+      description: RMS weighting factor to be applied before aggregation to LGS level
+    risk_measure_value:
+      type: number
+      description: >-
+        the main risk measure value for this RMS, e.g.
+        value-at-risk for Historical or Stress simulation_type
+    correlation_break_adjustment:
+      type: number
+      description: Correlation Break Adjustment for this RMS
+    compression_adjustment:
+      type: number
+      description: Compression Adjustment for this RMS
+
     portfolio_margin:
       type: array
       description: >-
@@ -1981,19 +2044,13 @@ components:
               Initial margin on liquidation group split level, equals to market
               risk plus add ons
           market_risk:
-            type: number
-            description: Market risk from ReportCP046
+            $ref: '#/components/schemas/market_risk'
           liquidity_addon:
-            type: number
-            description: Liqu risk from ReportCP046
+            $ref: '#/components/schemas/liquidity_addon'
           long_option_credit:
-            type: number
-            description: Long option credit from ReportCP046
+            $ref: '#/components/schemas/long_option_credit'
           time_to_expiry_adjustment:
-            type: number
-            description: >-
-              Time to Expiry Adjustment a.k.a. TEA from ReportCP046,
-              introduced with Prisma R8.0
+            $ref: '#/components/schemas/time_to_expiry_adjustment'
           premium_margin:
             type: number
             description: Premium margin from ReportCP046
@@ -2004,23 +2061,13 @@ components:
               description: $primary_keys(rms_name)
               properties:
                 rms_name:
-                  type: string
-                  description: Risk Measure Set name
+                  $ref: '#/components/schemas/rms_name'
                 simulation_type:
-                  type: string
-                  enum:
-                    - Historical
-                    - Stress
-                    - Event
-                  description: Risk Measure Set type
+                  $ref: '#/components/schemas/simulation_type'
                 rms_market_risk:
-                  type: number
-                  description: RMS market risk before weighting
+                  $ref: '#/components/schemas/rms_market_risk'
                 weighting_factor:
-                  type: number
-                  description: >-
-                    RMS weighting factor to be applied before aggregation to LGS
-                    level
+                  $ref: '#/components/schemas/weighting_factor'
                 rms_components:
                   type: array
                   items:
@@ -2033,16 +2080,94 @@ components:
                           id of the subsample (from 1 to risk horizon), or 1 if
                           the RMS is not using subsampling
                       risk_measure_value:
-                        type: number
-                        description: >-
-                          the main risk measure value for this RMS, e.g.
-                          value-at-risk for Historical or Stress simulation_type
+                        $ref: '#/components/schemas/risk_measure_value'
                       correlation_break_adjustment:
-                        type: number
-                        description: Correlation Break Adjustment for this RMS
+                        $ref: '#/components/schemas/correlation_break_adjustment'
                       compression_adjustment:
-                        type: number
-                        description: Compression Adjustment for this RMS
+                        $ref: '#/components/schemas/compression_adjustment'
+
+    im_components:
+      type: object
+      description: breakdown of initial margin to components
+      properties:
+        market_risk:
+          $ref: '#/components/schemas/market_risk'
+        liquidity_addon:
+          $ref: '#/components/schemas/liquidity_addon'
+        long_option_credit:
+          $ref: '#/components/schemas/long_option_credit'
+        time_to_expiry_adjustment:
+          $ref: '#/components/schemas/time_to_expiry_adjustment'
+        market_risk_per_rms:
+          type: array
+          description: list of risk measure sets that were used to determine market risk
+          items:
+            type: object
+            description: >-
+              breakdown for a particular risk measure set
+              if the risk measure sets has multiple subsamples (obsolete), return mean value
+              $primary_keys(rms_name)
+            properties:
+              rms_name:
+                $ref: '#/components/schemas/rms_name'
+              simulation_type:
+                $ref: '#/components/schemas/simulation_type'
+              weighting_factor:
+                $ref: '#/components/schemas/weighting_factor'
+              rms_market_risk:
+                $ref: '#/components/schemas/rms_market_risk'
+              risk_measure_value:
+                $ref: '#/components/schemas/risk_measure_value'
+              correlation_break_adjustment:
+                $ref: '#/components/schemas/correlation_break_adjustment'
+              compression_adjustment:
+                $ref: '#/components/schemas/compression_adjustment'
+
+    product_margin_long_short:
+      type: object
+      description: >-
+        indicative margin for one product, long or short position
+        $primary_keys(product_id)
+      properties:
+        liquidation_group:
+          $ref: '#/components/schemas/liquidation_group'
+        product_id:
+          $ref: '#/components/schemas/product_id'
+        prod_name:
+          type: string
+        margin_currency:
+          $ref: '#/components/schemas/currency'
+        long_initial_margin:
+          type: number
+        long_initial_margin_cash:
+          type: number
+        short_initial_margin:
+          type: number
+        short_initial_margin_cash:
+          type: number
+        im_components_long:
+          $ref: '#/components/schemas/im_components'
+        im_components_short:
+          $ref: '#/components/schemas/im_components'
+
+    single_date_products_margin:
+      type: object
+      description: indicative margin for one date
+      properties:
+        business_date:
+          $ref: '#/components/schemas/business_date'
+        live:
+          $ref: '#/components/schemas/live'
+        live_timestamp:
+          $ref: '#/components/schemas/live_timestamp'
+        list_margins:
+          type: array
+          description: >-
+            indicative margins per product
+            $primary_keys(product_id,liquidation_group)
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/product_margin_long_short'
 
     whatif_id:
       type: number
@@ -2142,7 +2267,7 @@ components:
             curves and one row for 1M maturity. Supported maturities are 1M to
             11M, 1Y, 15M, 18M, 21M, 2Y to 12Y, 15Y, 20Y, 25Y, 30Y, 40Y, 50Y
           example: >-
-            Maturity,CHF.SARON.ON,DKK.CIBOR.6M,EUR.ESTR.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.SONIA.ON,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.SOFR.ON,USD.LIBOR.1M,USD.LIBOR.3M,USD.LIBOR.6M\n1M,100,,,,,,,,,,,,,,,
+            Maturity,CHF.SARON.ON,DKK.CIBOR.6M,EUR.ESTR.ON,EUR.EURIBOR.1M,EUR.EURIBOR.1Y,EUR.EURIBOR.3M,EUR.EURIBOR.6M,GBP.SONIA.ON,JPY.TONAR.ON,NOK.NIBOR.6M,PLN.WIBOR.6M,SEK.STIBOR.3M,USD.SOFR.ON\n1M,100,,,,,,,,,,,,
       required:
         - csv
     otc_trade_details:
@@ -2530,6 +2655,13 @@ components:
         properties:
           line_no:
             type: string
+          portfolio:
+            type: string
+            enum:
+              - ETD
+              - OTC
+              - CASH
+              - REPO
           error_msg:
             type: string
         required:
@@ -2537,6 +2669,7 @@ components:
       example:
         - error_msg: Request data is invalid
         - line_no: 1
+          portfolio: ETD
           error_msg: "portfolio array item: missing net_ls_balance integer"
 
     etd_positions:
@@ -2586,3 +2719,45 @@ components:
             description: >-
               Currency of premium margin - currency of the
               product, can be different from clearing currency
+
+    product_indicative_margin:
+      type: object
+      description: >-
+        $primary_keys(product_id)
+      properties:
+        liquidation_group:
+          $ref: '#/components/schemas/liquidation_group'
+        product_id:
+          $ref: '#/components/schemas/product_id'
+        prod_name:
+          type: string
+          example: FUT ON EURO STOXX 50
+        margin_currency:
+          $ref: '#/components/schemas/currency'
+        long_initial_margin:
+          type: number
+          description: long_initial_margin_cash in EUR / (underlying price in EUR * trade unit value)
+          example: 0.0716427734211302
+        long_initial_margin_cash:
+          type: number
+          description: initial margin for one long contract in EUR
+          example: 3039.5879479382907
+        short_initial_margin:
+          type: number
+          description: short_initial_margin_cash in EUR / (underlying price in EUR * trade unit value)
+          example: 0.06737660845841252
+        short_initial_margin_cash:
+          type: number
+          description: initial margin for one short contract in EUR
+          example: 2858.587367065068
+
+    currency_amount:
+      type: object
+      properties:
+        currency:
+          type: string
+          example: USD
+        amount:
+          type: number
+          example: 446.37538928000043
+

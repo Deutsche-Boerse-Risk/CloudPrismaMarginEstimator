@@ -118,6 +118,8 @@ info:
 
     ## Change log
 
+    - x.x.x OTC indicative margin for IRS swaps
+
     - 7.1.0 Indicative margin extended; line errors contain portfolio
 
     - 7.0.0 OTC portfolio can be submitted also as CC233 sensitivities report
@@ -1483,8 +1485,10 @@ paths:
 
   /indicative_margin:
     get:
-      summary: Indicative margin for front month future contracts
+      summary: Indicative margin for front month future contracts and selected OTC swaps
       description: >-
+        ## ETD futures
+
         Get indicative margin for one future contract (front month contract of
         given future product) in EUR. By default all Eurex futures are included,
         unless ECC clearing house is selected or a specific product or products
@@ -1501,6 +1505,13 @@ paths:
         margin divided by (current underlying price converted to EUR * trade
         unit value).
 
+        ## OTC swaps
+
+        When request specifies "OTC" market, the endpoint returns margin for
+        a list of OTC swaps, the cash margin figures are for a swap
+        with +/- 100000 EUR DV01 sensitivity. The relative figures
+        are the cash margin figures divided by 100000.
+
         ## Snapshot
 
         Optionally business date can be specified to get historical indicative
@@ -1516,6 +1527,17 @@ paths:
         This is available only for JSON output format.
       parameters:
         - $ref: '#/components/parameters/x_dbp_apikey'
+        - name: market
+          in: query
+          description: >-
+            The market for which indicative margin is required.
+          required: false
+          schema:
+            type: string
+            enum:
+              - ETD
+              - OTC
+            default: ETD
         - name: clearing_house
           in: query
           description: >-
@@ -1540,7 +1562,8 @@ paths:
             type: string
         - name: format
           in: query
-          description: Required result format, JSON (default), XLS or XLSX spreadsheet.
+          description: >-
+            Required result format, JSON (default), XLS or XLSX spreadsheet.
           required: false
           schema:
             type: string
@@ -1580,6 +1603,18 @@ paths:
                     long_initial_margin_cash: 1479.062914
                     short_initial_margin: 0.11544631
                     short_initial_margin_cash: 1707.450925
+                  - liquidation_group: PFI01
+                    product_id: CHF_ON_5Y
+                    prod_name: CHF SARON ON Swap 5Y
+                    margin_currency: EUR
+                    payer_initial_margin_per_dv01: 41.0
+                    payer_initial_margin_cash: 4100000.0
+                    payer_dv01: 96000.0
+                    payer_dv01_eur: 100000.0
+                    receiver_initial_margin_per_dv01: 39.0
+                    receiver_initial_margin_cash: 3900000.0
+                    receiver_dv01: -96000.0
+                    receiver_dv01_eur: -100000.0
               schema:
                 oneOf:
                   - $ref: '#/components/schemas/single_date_products_margin'
@@ -1589,7 +1624,6 @@ paths:
                       $primary_keys(business_date,live_timestamp)
                     items:
                       $ref: '#/components/schemas/single_date_products_margin'
-
   
   /config/{param}:
     get:
@@ -2429,7 +2463,9 @@ components:
             indicative margins per product
             $primary_keys(product_id,liquidation_group)
           items:
-            $ref: '#/components/schemas/product_margin_long_short'
+            oneOf:
+              - $ref: '#/components/schemas/product_margin_long_short'
+              - $ref: '#/components/schemas/otc_product_indicative_margin'
 
     whatif_id:
       type: number
@@ -3140,6 +3176,87 @@ components:
                   $ref: '#/components/schemas/gscnid'
                 stress_value:
                   $ref: '#/components/schemas/stress_value'
+
+    product_indicative_margin:
+      type: object
+      description: >-
+        $primary_keys(product_id)
+      properties:
+        liquidation_group:
+          $ref: '#/components/schemas/liquidation_group'
+        product_id:
+          $ref: '#/components/schemas/product_id'
+        prod_name:
+          type: string
+          example: FUT ON EURO STOXX 50
+        margin_currency:
+          $ref: '#/components/schemas/currency'
+        long_initial_margin:
+          type: number
+          description: long_initial_margin_cash in EUR / (underlying price in EUR * trade unit value)
+          example: 0.0716427734211302
+        long_initial_margin_cash:
+          type: number
+          description: initial margin for one long contract in EUR
+          example: 3039.5879479382907
+        short_initial_margin:
+          type: number
+          description: short_initial_margin_cash in EUR / (underlying price in EUR * trade unit value)
+          example: 0.06737660845841252
+        short_initial_margin_cash:
+          type: number
+          description: initial margin for one short contract in EUR
+          example: 2858.587367065068
+
+    otc_product_indicative_margin:
+      type: object
+      description: >-
+        $primary_keys(product_id)
+      properties:
+        liquidation_group:
+          $ref: '#/components/schemas/liquidation_group'
+        product_id:
+          type: string
+          description: short id of the OTC product
+          example: CHF_ON_5Y
+        prod_name:
+          type: string
+          description: longer name of the OTC product
+          example: CHF SARON ON Swap 5Y
+        margin_currency:
+          $ref: '#/components/schemas/currency'
+        payer_initial_margin_per_dv01:
+          type: number
+          description: payer_initial_margin_cash / abs(payer_dv01) (both figures in EUR)
+          example: 41.0
+        payer_initial_margin_cash:
+          type: number
+          description: initial margin in EUR for trade with payer_dv01
+          example: 4100000.0
+        payer_dv01:
+          type: number
+          description: DV01 of the trade in product currency, payer side
+          example: 96000.0
+        payer_dv01_eur:
+          type: number
+          description: DV01 of the trade in EUR, payer side
+          example: 100000.0
+        receiver_initial_margin_per_dv01:
+          type: number
+          description: receiver_initial_margin_cash / abs(receiver_dv01) (both figures in EUR)
+          example: 39.0
+        receiver_initial_margin_cash:
+          type: number
+          description: initial margin in EUR for trade with receiver_dv01
+          example: 3900000.0
+        receiver_dv01:
+          type: number
+          description: DV01 of the trade in EUR, receiver side
+          example: -96000.0
+        receiver_dv01_eur:
+          type: number
+          description: DV01 of the trade in EUR, receiver side
+          example: -100000.0
 
     currency_amount:
       type: object
