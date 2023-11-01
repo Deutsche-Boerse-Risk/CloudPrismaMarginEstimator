@@ -158,7 +158,7 @@ This is an example of body for minimal estimator request with ETD CSV, API versi
     {
       "type": "etd_csv",
       "etd_csv": {
-        "csv":"Product ID,Maturity,Call Put Flag,Exercise Price,Version Number,Net LS Balance\nFEXD,203112,,,,1"
+        "csv":"Product ID,Contract Date,Call Put Flag,Exercise Price,Version Number,Net LS Balance\nFEXD,20321217,,,,1"
       }
     }
   ]
@@ -181,6 +181,16 @@ You can also submit queries to the API with a programming language, e.g. Python.
 [API documentation][api-definition] contains an example in Python to get you started.
 Python method `json.dumps()` takes care of writing valid JSON even when the attributes
 contain double quotes or line breaks.
+
+### Errors when specifying ETD positions by Maturity
+
+The "maturity" attribute is deprecated, please specify the contract by "contract_date".
+
+One of the symptoms that request failed because "maturity" was used is the following error message:
+
+```
+Line 1 contract business key or contract id isn't related to a contract; contract not found within flex options
+```
 
 ## Interpreting a margin result
 
