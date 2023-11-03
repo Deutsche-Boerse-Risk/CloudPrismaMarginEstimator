@@ -1,0 +1,22 @@
+{
+    "clearing_currency": "EUR",
+    "portfolio_components": [
+        {
+            "type": "repo_json",
+            "repo_json": [
+                {
+                    "line_no": 1,
+                    "sec_isin": "CH0127181193",
+                    "trade_date": "20230904",
+                    "settlement_date_frontleg": "20230906",
+                    "settlement_date_termleg": "20351031",
+                    "buy_sell_indicator": "BUY",
+                    "currency":"CHF",
+                    "nominal": 1000000,
+                    "fixed_repo_rate": 2.0,
+                    "trade_id": "test"
+                }
+            ]
+        }
+    ]
+}

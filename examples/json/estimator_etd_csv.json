@@ -1,0 +1,12 @@
+{
+    "clearing_currency": "USD",
+    "portfolio_components": [
+        {
+            "type": "etd_csv",
+            "etd_csv": 
+                {        
+                    "csv" : "Product ID,Expiry Year,Expiry Month,Expiry Day,Contract Date,Contract Year,Contract Month,Version Number,Product Settlement Type,Call Put Flag,Exercise Price,Exercise Style Flag,Instrument Type,Assigned/Notified Balance,Exercised/Allocated Balance,Long Balance,Short Balance\nFEXD,,,,20321217,,,0,N,,,,Future,0,0,1,0\nOEXD,,,,20321217,,,0,D,C,90,EUROPEAN,Option,0,0,0,1\n"
+                }
+        }
+    ]
+}
