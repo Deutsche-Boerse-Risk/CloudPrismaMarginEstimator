@@ -1,5 +1,4 @@
 {
-    "clearing_currency": "EUR",
     "portfolio_components": [
         {
             "type": "repo_json",

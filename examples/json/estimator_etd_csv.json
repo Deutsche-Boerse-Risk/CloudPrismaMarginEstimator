@@ -1,5 +1,4 @@
 {
-    "clearing_currency": "USD",
     "portfolio_components": [
         {
             "type": "etd_csv",
