@@ -1,0 +1,10 @@
+{
+    "portfolio_components": [
+            {
+            "type": "otc_sensitivities",
+            "otc_sensitivities": {
+                "csv": "Maturity,GBP.UK-RPI,EUR.HICPxT,EUR.FRCPIx,CHF.SARON.ON,PLN.WIBOR.6M\r\n3M,30,,,,\r\n6M,,300,,400,400\r\n10Y,,,300,,"
+                }
+            }
+    ]
+}
