@@ -1,0 +1,22 @@
+{
+    "is_cross_margined": true,
+    "portfolio_components": [
+        {
+            "type": "otc_csv",
+            "otc_csv": {
+                "csv" : "internalTradeID,tradeType,currency,payEffectiveDate,rcvEffectiveDate,terminationDate,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod,legType,legSpread,legIndex,interestFixedAmount,notional,paymentPeriod,periodStartVNS,compounding,compoundingIndexPeriod,stub,firstRate,firstInterpolationTenor,secondInterpolationTenor,dayCountMethod,businessDayConvention,paymentCalendar,adjustment,rollMethod\n1,IRS,EUR,20/12/2018,20/12/2018,20/08/2039,fixedLeg,,,,10000000,,,,,,,,,ACT/360,MODFOLLOWING,EUTA,ADJUSTED,Standard,floatingLeg,2.9,,,10000000,,,,,,,,,ACT/360,MODFOLLOWING,EUTA,ADJUSTED,Standard"
+            }
+        },
+        {
+            "type": "etd_portfolio",
+            "etd_portfolio": [
+                {
+                    "line_no": 1,
+                    "product_id": "FEU3",
+                    "contract_date": 20290917,
+                    "net_ls_balance": 500
+                }
+            ]
+        }
+    ]
+}
