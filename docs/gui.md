@@ -1,6 +1,6 @@
 # GUI User Guide
 
-[CPME GUI](https://eurexmargins.prod.dbgservice.com/estimator) offers margin calculation for:
+[CPME GUI](https://eurexmargins.prod.dbgservice.com/) offers margin calculation for:
 
 - Eurex listed derivatives (ETD)
     - [upload in a simplified CSV format](#prepare-etd-portfolio)
@@ -27,6 +27,10 @@ should be applied using the "Cross margin" checkbox.
 Repo portfolio can be submitted only separately, because the margin
 is calculated by a different methodology: Risk Based Margining (RBM)
 for Repo vs Portfolio Margining for ETD and OTC.
+
+Besides the Production environment https://eurexmargins.prod.dbgservice.com/,
+also Member Simulation environment is available at https://cpme.risk.simu.gcp.dbgservice.com/
+with results comparable to Prisma Member Simulation reports (note that the margin figures can be very different from Production).
 
 # ETD
 
