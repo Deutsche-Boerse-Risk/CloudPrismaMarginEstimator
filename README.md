@@ -243,7 +243,7 @@ currently not supported by CPME.
 
 No.
 
-The [simulation environment](https://cpme.risk.simu.dbgservice.com) has different scenarios
+The [simulation environment](https://cpme.risk.simu.gcp.dbgservice.com/) has different scenarios
 and prices compared to production, and therefore produces a
 different margin for the same portfolio.
 
@@ -256,8 +256,8 @@ the usual channels.
 
 ### Where is CPME running?
 
-CPME is deployed in Deutsche Boerse VPC (Virtual Private Cloud) within
-the Frankfurt region of Amazon Web Services.
+CPME is deployed in Deutsche Boerse VPC (Virtual Private Cloud)
+on datacentres of Amazon Web Services or Google Cloud Platform within EU.
 
 ### How is the communication designed, is it encrypted?
 
@@ -277,13 +277,13 @@ records are kept of the information processed.
 CPME is stateless, has a highly elastic architecture and fault
 tolerant setup.
 
-It runs in a highly-available Kubernetes cluster spread that is spread
-across three AWS Availability Zones in Frankfurt region.
+It runs in a highly-available Kubernetes cluster that is spread
+across the cloud provider availability zones in EU region.
 
 ### Which countries does client data pass?
 
-Since CPME runs entirely within the Frankfurt region of AWS,
-all processing takes part within Germany.
+CPME runs on datacentres of AWS or GCP within EU, so all processing
+takes part within the European Union.
 
 ## Repo
 
