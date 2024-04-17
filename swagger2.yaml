@@ -7,7 +7,7 @@ info:
     portfolio according to Eurex PRISMA methodology. The application is
     available to both members and non-members of Eurex Clearing. It can be
     accessed via web user interface, see [CPME
-    GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
+    GUI](https://cpme.eurex.com), or directly through API,
     described here.
 
 
@@ -145,7 +145,7 @@ info:
 
     - 4.1.1 historical snapshots also for list of products, series and
     currencies
-  termsOfService: https://eurexmargins.prod.dbgservice.com/terms
+  termsOfService: https://cpme.eurex.com/terms
 servers:
   - url: https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0
     description: production API with static IP

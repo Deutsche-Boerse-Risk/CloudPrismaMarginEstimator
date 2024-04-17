@@ -247,7 +247,7 @@ The [simulation environment](https://cpme.risk.simu.gcp.dbgservice.com/) has dif
 and prices compared to production, and therefore produces a
 different margin for the same portfolio.
 
-Occasionally, we set up a [what-if sandbox](https://whatif.eurexmargins.prod.dbgservice.com) with production market data
+Occasionally, we set up a [what-if sandbox](https://whatif.cpme.eurex.com) with production market data
 but with different risk model parametrization, as a testing ground
 before the new setup becomes productive. This will be announced by
 the usual channels.
@@ -257,7 +257,7 @@ the usual channels.
 ### Where is CPME running?
 
 CPME is deployed in Deutsche Boerse VPC (Virtual Private Cloud)
-on datacentres of Amazon Web Services or Google Cloud Platform within EU.
+on datacentres of Google Cloud Platform within EU.
 
 ### How is the communication designed, is it encrypted?
 
@@ -282,7 +282,7 @@ across the cloud provider availability zones in EU region.
 
 ### Which countries does client data pass?
 
-CPME runs on datacentres of AWS or GCP within EU, so all processing
+CPME runs on datacentres of GCP within EU, so all processing
 takes part within the European Union.
 
 ## Repo
@@ -305,9 +305,9 @@ The response to [estimator request] contains [rbm_margin](https://app.swaggerhub
 - for each margin class: additional margin and current liquidating margin in margin class currency, corresponding to CC750 report
 - for each ISIN/settlement date combination from the margin class: current liquidating margin, net cash position and net security position, corresponding to CC711 report
 
-[CPME-gui]:https://eurexmargins.prod.dbgservice.com
-[CPME-gui-simu]:https://cpme.risk.simu.dbgservice.com
-[CPME-gui-whatif]:https://whatif.eurexmargins.prod.dbgservice.com
+[CPME-gui]:https://cpme.eurex.com
+[CPME-gui-simu]:https://cpme.risk.simu.gcp.dbgservice.com
+[CPME-gui-whatif]:https://whatif.cpme.eurex.com
 [api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf

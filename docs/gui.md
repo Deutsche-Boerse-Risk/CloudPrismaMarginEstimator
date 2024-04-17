@@ -1,6 +1,6 @@
 # GUI User Guide
 
-[CPME GUI](https://eurexmargins.prod.dbgservice.com/) offers margin calculation for:
+[CPME GUI](https://cpme.eurex.com) offers margin calculation for:
 
 - Eurex listed derivatives (ETD)
     - [upload in a simplified CSV format](#prepare-etd-portfolio)
@@ -28,7 +28,7 @@ Repo portfolio can be submitted only separately, because the margin
 is calculated by a different methodology: Risk Based Margining (RBM)
 for Repo vs Portfolio Margining for ETD and OTC.
 
-Besides the Production environment https://eurexmargins.prod.dbgservice.com/,
+Besides the Production environment https://cpme.eurex.com,
 also Member Simulation environment is available at https://cpme.risk.simu.gcp.dbgservice.com/
 with results comparable to Prisma Member Simulation reports (note that the margin figures can be very different from Production).
 
@@ -38,7 +38,7 @@ with results comparable to Prisma Member Simulation reports (note that the margi
 
 ### Launch CPME GUI
 
-1. Navigate to [https://eurexmargins.prod.dbgservice.com].
+1. Navigate to [https://cpme.eurex.com].
 1. If you have not visited the site before, Terms of Use are shown. These must be accepted before the tool can be used.
 
 ### Prepare ETD Portfolio
@@ -314,7 +314,7 @@ select the historical calculation in GUI:
 4. if "Live" is checked, use "Select timestamp" to pick the desired time
 
 
-[https://eurexmargins.prod.dbgservice.com]:https://eurexmargins.prod.dbgservice.com
+[https://cpme.eurex.com]:https://cpme.eurex.com
 [liquidation groups]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/#what-liquidation-groups-are-there-and-what-is-liquidation-group-split
 [Excel template]:https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_trade_template.xlsm?raw=true
 [OTC template description]:https://github.com/Deutsche-Boerse-Risk/CloudPrismaMarginEstimator/blob/master/templates/otc/OTC_template_description.xls?raw=true

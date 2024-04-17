@@ -6,7 +6,7 @@ info:
     Cloud Prisma Margin Estimator (CPME) calculates margin for an uploaded portfolio
     according to Eurex PRISMA methodology. The application is available to both members
     and non-members of Eurex Clearing. It can be accessed via web user interface,
-    see [CPME GUI](https://eurexmargins.prod.dbgservice.com), or directly through API,
+    see [CPME GUI](https://cpme.eurex.com), or directly through API,
     described here.
 
     The key request is `/estimator`, it is the only request you need to calculate
@@ -112,7 +112,7 @@ info:
 
     - 4.0.0 introduction of OTC portfolio components, cross-margining and historical snapshots
 
-  termsOfService: 'https://eurexmargins.prod.dbgservice.com/terms'
+  termsOfService: 'https://cpme.eurex.com/terms'
 host: api.developer.deutsche-boerse.com
 basePath: /prod/prisma-margin-estimator/1.0.0/
 schemes:
@@ -494,7 +494,7 @@ paths:
 
         ## ETD CSV format
 
-        See the example in [GUI](https://eurexmargins.prod.dbgservice.com/estimator) for simpler CSV format that does not support flexible instruments or use the CSV format known from Margin Calculator.
+        See the example in [GUI](https://cpme.eurex.com) for simpler CSV format that does not support flexible instruments or use the CSV format known from Margin Calculator.
 
         ## OTC CSV format
 
