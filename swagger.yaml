@@ -472,7 +472,7 @@ paths:
 
         Only already existing Flex Future or Flex Option can be submitted, not a new one (e.g. different strike or expiry day).
 
-        For backward compatibility `maturity` as YYYYMM (DD added for flex) can be used instead of `contract_date`, however it is not recommended as uniqueness is not guaranteed.
+        Use of `maturity` is deprecated, always use `contract_date`.
 
         Example of minimal request with one future contract:
 
@@ -646,6 +646,7 @@ paths:
               clearing_currency: EUR
               errors:
                 - line_no: 2
+                  portfolio: ETD
                   error_msg: 'Line 1 instrument iid not recognized: 736947'
               portfolio_margin:
                 - liquidation_group: PEQ01
@@ -655,6 +656,7 @@ paths:
                   liquidity_addon: 6.442439
                   long_option_credit: 0
                   time_to_expiry_adjustment: 0
+                  portfolio_margining_adjustment: 0
                   premium_margin: 0
                   market_risk_per_rms:
                     - rms_name: FILTERED_HISTORICAL_VAR_2
@@ -1036,7 +1038,6 @@ definitions:
     type: number
     description: Contract date of the instrument in YYYYMMDD format.
       Introduced with Next Generation ETD contracts initiative as part of the series primary key.
-      Maturity (meaning contract_maturity) can still be used alternatives to contract_date, however only contract_date guarantees uniqueness.
     example: 20281215
   contract_frequency:
     type: string
@@ -1158,8 +1159,6 @@ definitions:
           $ref: '#/definitions/product_id'
         contract_date:
           $ref: '#/definitions/contract_date'
-        maturity:
-          $ref: '#/definitions/maturity'
         call_put_flag:
           $ref: '#/definitions/call_put_flag'
         exercise_price:
@@ -1246,16 +1245,20 @@ definitions:
           description: Initial margin on liquidation group split level, equals to market risk plus add ons
         market_risk:
           type: number
-          description: Market risk from ReportCP046
+          description: Market risk from ReportCP046, component of initial_margin
         liquidity_addon:
           type: number
-          description: Liqu risk from ReportCP046
+          description: Liqu risk from ReportCP046, component of initial_margin
         long_option_credit:
           type: number
-          description: Long option credit from ReportCP046
+          description: Long option credit from ReportCP046, component of initial_margin
         time_to_expiry_adjustment:
           type: number
-          description: Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introducedwith Prisma R8.0
+          description: Time to Expiry Adjustment a.k.a. TEA from ReportCP046, component of initial_margin, introducedwith Prisma R8.0
+        portfolio_margining_adjustment:
+          type: number
+          description: >-
+            Portfolio Margining Adjustment a.k.a. PMA from ReportCP046, component of initial_margin, introduced with Prisma R14.1
         premium_margin:
           type: number
           description: Premium margin from ReportCP046
@@ -1372,5 +1375,19 @@ definitions:
       properties:
         line_no:
           type: string
+        portfolio:
+          type: string
+          enum:
+            - ETD
+            - OTC
+            - CASH
+            - REPO
         error_msg:
           type: string
+      required:
+        - error_msg
+      example:
+        - error_msg: Request data is invalid
+        - line_no: 1
+          portfolio: ETD
+          error_msg: "portfolio array item: missing net_ls_balance integer"

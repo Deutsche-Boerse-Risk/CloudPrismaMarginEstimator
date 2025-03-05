@@ -118,7 +118,9 @@ info:
 
     ## Change log
 
-    - x.x.x OTC indicative margin for IRS swaps
+    - x.x.x Open and Variable Repos
+
+    - 7.2.0 OTC indicative margin for IRS swaps
 
     - 7.1.0 Indicative margin extended; line errors contain portfolio
 
@@ -627,9 +629,7 @@ paths:
         Only already existing Flex Future or Flex Option can be submitted, not a
         new one (e.g. different strike or expiry day).
 
-        For backward compatibility `maturity` as YYYYMM (DD added for flex) can
-        be used instead of `contract_date`, however it is not recommended as
-        uniqueness is not guaranteed.
+        Use of `maturity` is deprecated, always use `contract_date`.
 
         Example of minimal request with one future contract:
 
@@ -873,6 +873,7 @@ paths:
                     liquidity_addon: 6.442439
                     long_option_credit: 0
                     time_to_expiry_adjustment: 0
+                    portfolio_margining_adjustment: 0
                     premium_margin: 0
                     market_risk_per_rms:
                       - rms_name: FILTERED_HISTORICAL_VAR_2
@@ -1784,6 +1785,7 @@ paths:
                     liquidity_addon: 6.442439
                     long_option_credit: 0
                     time_to_expiry_adjustment: 0
+                    portfolio_margining_adjustment: 0
                     premium_margin: 0
                     market_risk_per_rms:
                       - rms_name: FILTERED_HISTORICAL_VAR_2
@@ -2062,8 +2064,6 @@ components:
       description: >-
         Contract date of the instrument in YYYYMMDD format. Introduced with Next
         Generation ETD contracts initiative as part of the series primary key.
-        Maturity (meaning contract_maturity) can still be used alternatives to
-        contract_date, however only contract_date guarantees uniqueness.
       example: 20281215
     contract_frequency:
       type: string
@@ -2079,7 +2079,7 @@ components:
       type: number
       description: >-
         Maturity of the instrument in YYYYMM format. Corresponds to contract
-        year/month as shown on Eurex webpage
+        year/month as shown on Eurex webpage.
       example: 202812
     expiry_maturity:
       type: number
@@ -2222,8 +2222,6 @@ components:
             $ref: '#/components/schemas/product_id'
           contract_date:
             $ref: '#/components/schemas/contract_date'
-          maturity:
-            $ref: '#/components/schemas/maturity'
           call_put_flag:
             $ref: '#/components/schemas/call_put_flag'
           exercise_price:
@@ -2282,17 +2280,21 @@ components:
     
     market_risk:
       type: number
-      description: Market risk from ReportCP046
+      description: Market risk from ReportCP046, component of initial_margin
     liquidity_addon:
       type: number
-      description: Liqu risk from ReportCP046
+      description: Liqu risk from ReportCP046, component of initial_margin
     long_option_credit:
       type: number
-      description: Long option credit from ReportCP046
+      description: Long option credit from ReportCP046, component of initial_margin
     time_to_expiry_adjustment:
       type: number
       description: >-
-        Time to Expiry Adjustment a.k.a. TEA from ReportCP046, introduced with Prisma R8.0
+        Time to Expiry Adjustment a.k.a. TEA from ReportCP046, component of initial_margin, introduced with Prisma R8.0
+    portfolio_margining_adjustment:
+      type: number
+      description: >-
+        Portfolio Margining Adjustment a.k.a. PMA from ReportCP046, component of initial_margin, introduced with Prisma R14.1
     rms_name:
       type: string
       description: Risk Measure Set name
@@ -2348,6 +2350,8 @@ components:
             $ref: '#/components/schemas/long_option_credit'
           time_to_expiry_adjustment:
             $ref: '#/components/schemas/time_to_expiry_adjustment'
+          portfolio_margining_adjustment:
+            $ref: '#/components/schemas/portfolio_margining_adjustment'
           premium_margin:
             type: number
             description: Premium margin from ReportCP046
@@ -2643,11 +2647,15 @@ components:
           example: 500000000
         fixed_repo_rate:
           type: number
-          description: Fixed repo rate, in percent, either fixed_repo_rate or offset_bps must be specified
+          description: >-
+            Fixed repo rate, in percent,
+            either fixed_repo_rate or offset_bps must be specified
           example: 2.25
         offset_bps:
           type: number
-          description: Offset of variable repo rate against risk-free rate, in basis points, either fixed_repo_rate or offset_bps must be specified
+          description: >-
+            Offset of variable repo rate against risk-free rate, in basis points,
+            either fixed_repo_rate or offset_bps must be specified
           example:
         trade_id:
           type: string
@@ -3004,7 +3012,6 @@ components:
       type: number
       description: estimated default fund contribution (always non-negative)
       example: 16634756
-
     default_fund_contribution:
       type: object
       description: Estimated contribution to the Default Fund for submitted portfolio, based on the worst global scenario
