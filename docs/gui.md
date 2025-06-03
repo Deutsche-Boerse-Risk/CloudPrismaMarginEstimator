@@ -16,6 +16,7 @@
     - [uploaded in F7 portfolio export CSV format](#upload-repo-portfolio)
     - or [entered directly in the GUI](#enter-repo-portfolio)
 
+CPME GUI assumes that clearing currency is EUR and thus calculates margin in EUR. Only CPME API allows selection of clearing currency.
 It is assumed that the uploaded portfolio belongs to one account and the positions can offset each other.
 If an OTC member report contains more members and accounts, the GUI picks the P account of the clearing member.
 
