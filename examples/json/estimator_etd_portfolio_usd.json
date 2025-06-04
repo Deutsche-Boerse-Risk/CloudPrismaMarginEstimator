@@ -1,0 +1,25 @@
+{
+    "clearing_currency": "USD",
+    "portfolio_components": [
+        {
+            "type": "etd_portfolio",
+            "etd_portfolio": [
+                {
+                    "line_no": 1,
+                    "product_id": "FMWO",
+                    "contract_date": 20300315,
+                    "net_ls_balance": 1
+                },
+                {
+                    "line_no": 2,
+                    "product_id": "OEXD",
+                    "contract_date": 20321217,
+                    "version_number": "0",
+                    "call_put_flag": "C",
+                    "exercise_price": 90.0,
+                    "net_ls_balance": -1
+                }
+            ]
+        }
+    ]
+}
