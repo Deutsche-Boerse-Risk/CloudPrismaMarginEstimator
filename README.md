@@ -13,7 +13,7 @@ Key links:
 - [CPME GUI][CPME-gui]
 - [GUI User Guide]
 - [CPME API definition at SwaggerHub][api-definition]
-- [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the API
+- [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the [CPME API](https://console.developer.deutsche-boerse.com/apis/416d7067-45dc-465b-a56a-abbabdd1467d)
 
 # Known Limitations
 
