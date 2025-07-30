@@ -14,7 +14,7 @@ import requests
 import json
 import os
 
-url_base = ("https://api.developer.deutsche-boerse.com/prod/prisma-margin-estimator-2-0/2.0.0/")
+url_base = ("https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0/")
 api_header = {"X-DBP-APIKEY": os.environ['KEY'] }
 
 series = requests.get(url_base + "series",

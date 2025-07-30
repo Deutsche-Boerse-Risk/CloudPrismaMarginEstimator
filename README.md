@@ -82,7 +82,7 @@ Performance issues can arise:
 
 Most likely you are not subscribed to the correct API in [DBG Digital Business Platform][api-digital-business-platform]:
 
--	[static IP version 2](https://console.developer.deutsche-boerse.com/apis/416d7067-45dc-465b-a56a-abbabdd1467d) base URL: https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0 (recommended)
+-	[static IP version 2](https://console.developer.deutsche-boerse.com/apis/416d7067-45dc-465b-a56a-abbabdd1467d) base URL: https://risk.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-0 **(recommended)**
 -	[dynamic IP version 2](https://console.developer.deutsche-boerse.com/apis/afdc9fa5-767a-49ac-b834-ee92ea0ac040) base URL: https://api.developer.deutsche-boerse.com/prisma-margin-estimator-2-0-2-0-0
 -	[dynamic IP version 1](https://console.developer.deutsche-boerse.com/apis/32f22119-6e49-4ed8-b171-01af969d032c) base URL: https://api.developer.deutsche-boerse.com/prisma-margin-estimator-1-0-0
 
