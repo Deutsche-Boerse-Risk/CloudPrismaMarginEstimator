@@ -221,6 +221,24 @@ CHF 100m 20y pay
 6. Click "Submit" (this will replace your previous OTC portfolio, there is currently no option to add trades to the existing portfolio)
 7. [Read the results](#read-the-results)
 
+### Custom Ids
+Each supported OTC currency has a default trade type - IRS or OIS - with default payment period.<br/>
+More specialized trades can be entered by specifying a _custom id_ instead of _currency_:
+
+Custom ID                                         | Trade type
+---                                               | ---
+(N\|S\|C\|H\|P)(3\|6)M<br/>e.g. N3M<br/>e.g. C6M  | (NOK \| SEK \| CZK \| HUF \| PLN) (3M \| 6M) BOR Index<br/>e.g. NOK IRS Nibor3M<br/>e.g. CZK IRS Pribor6M
+D(3\|6)M                                          | DKK IRS CIBOR(3\|6)M
+D(3\|6)M	DKK IRS CIBOR(3\|6)M                  |	DES	DKK OIS Destr
+E(1\|3\|6\|12)M	<br/>e.g. E1M		              | Euribor (1\|3\|6\|12)M IRS <br/>e.g. Euribor 1M IRS
+E(n)x(m) <br/>e.g. E1x7				              |	Eur FRA nxm <br/>e.g. Eur FRA starts in 1M and ends in 7M on Euribor(7-1)M=Euribor6M <br/>Only eligible values for N and M are those where M-N is in {1, 3, 6, 12}
+EHCPT								              |	Eur HICPxT ZCIS
+EST									              | Estr OIS
+EUR									              | EUR IRS Euribor6M (default option)
+FRCPI								              | Eur FRCPI ZCIS
+GBP									              |	GBP OIS Sonia
+NOK, CZK, ...						              | (default option)
+UKRPI								              | GBP UKRPI ZCIS
 
 # Repo
 
