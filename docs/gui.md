@@ -228,8 +228,8 @@ More specialized trades can be entered by specifying a _custom id_ instead of _c
 Custom ID                                         | Trade type
 ---                                               | ---
 (N\|S\|C\|H\|P)(3\|6)M<br/>e.g. N3M<br/>e.g. C6M  | (NOK \| SEK \| CZK \| HUF \| PLN) (3M \| 6M) BOR Index<br/>e.g. NOK IRS Nibor3M<br/>e.g. CZK IRS Pribor6M
+DES        	                                      |	DKK OIS Destr
 D(3\|6)M                                          | DKK IRS CIBOR(3\|6)M
-D(3\|6)M	DKK IRS CIBOR(3\|6)M                  |	DES	DKK OIS Destr
 E(1\|3\|6\|12)M	<br/>e.g. E1M		              | Euribor (1\|3\|6\|12)M IRS <br/>e.g. Euribor 1M IRS
 E(n)x(m) <br/>e.g. E1x7				              |	Eur FRA nxm <br/>e.g. Eur FRA starts in 1M and ends in 7M on Euribor(7-1)M=Euribor6M <br/>Only eligible values for N and M are those where M-N is in {1, 3, 6, 12}
 EHCPT								              |	Eur HICPxT ZCIS
@@ -238,6 +238,7 @@ EUR									              | EUR IRS Euribor6M (default option)
 FRCPI								              | Eur FRCPI ZCIS
 GBP									              |	GBP OIS Sonia
 NOK, CZK, ...						              | (default option)
+PST                                               | PLN OIS Polstr
 UKRPI								              | GBP UKRPI ZCIS
 
 # Repo
