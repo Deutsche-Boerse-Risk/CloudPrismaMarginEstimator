@@ -132,7 +132,7 @@ Net Position       | free text field to enter the position size, negative for sh
 Upload of OTC portfolio is similar to ETD portfolio upload:
 
 1. [launch CPME GUI](#launch-cpme-gui)
-2. Get your "Eurex Clearing member full inventory reports (CB202/CB207)", or prepare your [OTC trades in CSV format](#otc-portfolio-csv-format)
+2. Get your "Eurex Clearing member full inventory reports (CB202/CB207 – in xml format)", or prepare your [OTC trades in CSV format](#otc-portfolio-csv-format)
     - you can use [Excel template] to generate the CSV:
         - save the template and open it in Excel
         - use "Insert trade" to enter the trades using the Excel form, see [OTC template description]
