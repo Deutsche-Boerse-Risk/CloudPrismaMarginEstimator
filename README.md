@@ -1,9 +1,11 @@
-# Cloud Prisma Margin Estimator (CPME)
+# Cloud Prisma Margin Estimator (CPME) – F&Q
 
-Cloud Prisma Margin Estimator (CPME) calculates portfolio margin according to the [Eurex Prisma
+EUREX Cloud Prisma Margin Estimator (CPME) calculates portfolio margin according to the [Eurex Prisma
 methodology][prisma-methodology]. The application is available to both
 members and non-members of Eurex Clearing, a part of the Deutsche Boerse Group. It
 can be used via a [browser based GUI][CPME-gui] or an API.
+
+ECC Cloud Prisma Margin Estimator calculates portfolio margin according to the ECC methodology [ADD LINK]. The application is available to both members and non-members of ECC. It can be used via a [browser based GUI][ https://cpme.ecc.de/] or an API. 
 
 This GitHub repository contains documentation, examples and frequently asked
 questions.
@@ -24,7 +26,7 @@ Key links:
 
 ## Comparing Eurex Clearing Margin Simulation Tools
 
-### Summary Table
+### Summary Table  - For ECC only ETD is relevant
 
 | feature / tool                  | CPME API        | CPME GUI        |  Online Margin Calculator |
 |---------------------------------|-----------------|-----------------|---------------------------|
@@ -95,7 +97,7 @@ The user may load portfolios in the API in several formats concurrently. The use
 - Query the API with the member report CB202 to establish the baseline initial margin 
 - Call the API with the member report CB202 and additional trades in a CSV file to get the what-if initial margin
 
-Alternatively the user can prepare baseline and what-if portfolios in a single format and submit these individually.
+Alternatively, the user can prepare baseline and what-if portfolios in a single format and submit these individually.
 
 ### What to do when a request fails for a big portfolio?
 
@@ -209,7 +211,7 @@ margin methodology and may differ a few percent from official EurexOTC margin re
 Products are placed in liquidation groups depending on their characteristics, for
 instance in the listed equity liquidation group or the fixed income liquidation group. 
 A list of liquidation group and the products that are assigned to them can be found 
-at Eurex Clearing's [Risk Parameters page][risk-parameters].
+at Eurex Clearing's [Risk Parameters page][risk-parameters]. [ECC link to Liquidation Groups][https://www.ecc.de/en/risk-management/margin-methodology/#17508].
 
 A liquidation group can be further divided into liquidation group splits. This is currently only
 the case for the fixed income liquidation group PFI01, which is divided into separate liquidation group
@@ -220,6 +222,7 @@ added to give total initial margin. Liquidation group splits are also treated in
 
 ### How does cross-margining work?
 
+Only relevant for Eurex. 
 Listed fixed income/money market positions and OTC IRS derivatives belong to the
 PFI01 liquidation group. 
 
@@ -232,7 +235,7 @@ are added to get total initial margin. When cross-margining is turned on, an alg
 if any of the listed FI/MM positions are economically sensible hedges to the OTC portfolio and will move
 these to the five-day split if doing so lowers the total margin.
 
-### How to validate CPME result against Eurex reports?
+### How to validate CPME result against reports?
 
 Compare the margin on liquidation group level against the `CC050`
 report. The margin on account level (`CC060`) cannot be obtained from
@@ -247,7 +250,7 @@ The [simulation environment](https://cpme.risk.simu.gcp.dbgservice.com/) has dif
 and prices compared to production, and therefore produces a
 different margin for the same portfolio.
 
-Occasionally, we set up a [what-if sandbox](https://whatif.cpme.eurex.com) with production market data
+Occasionally, we set up a Eurex [what-if sandbox](https://whatif.cpme.eurex.com) with production market data
 but with different risk model parametrization, as a testing ground
 before the new setup becomes productive. This will be announced by
 the usual channels.
@@ -285,7 +288,7 @@ across the cloud provider availability zones in EU region.
 CPME runs on datacentres of GCP within EU, so all processing
 takes part within the European Union.
 
-## Repo
+## Repo  – only for Eurex
 
 Calculation of margin for single-ISIN (special) Repo was introduced October 2021, both for GUI and API.
 

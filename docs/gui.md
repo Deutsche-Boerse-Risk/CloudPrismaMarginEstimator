@@ -1,6 +1,6 @@
 # GUI User Guide
 
-[CPME GUI](https://cpme.eurex.com) offers margin calculation for:
+[EUREX CPME GUI](https://cpme.eurex.com) offers margin calculation for:
 
 - Eurex listed derivatives (ETD)
     - [upload in a simplified CSV format](#prepare-etd-portfolio)
@@ -16,6 +16,14 @@
     - [uploaded in F7 portfolio export CSV format](#upload-repo-portfolio)
     - or [entered directly in the GUI](#enter-repo-portfolio)
 
+[ECC CPME GUI](https://cpme.ecc.de) offers margin calculation for:
+
+- ECC listed derivatives (ETD) 
+    - [upload in a simplified CSV format](#prepare-etd-portfolio) 
+    - or [enter directly in the GUI](#enter-etd-portfolio) 
+    - or [upload](#upload-the-prepared-etd-file) Eurex Clearing ETD position report CP005 
+    - or [upload](#upload-the-prepared-etd-file) portfolio export from C7 GUI 
+
 CPME GUI assumes that clearing currency is EUR and thus calculates margin in EUR. Only CPME API allows selection of clearing currency.
 It is assumed that the uploaded portfolio belongs to one account and the positions can offset each other.
 If an OTC member report contains more members and accounts, the GUI picks the P account of the clearing member.
@@ -29,6 +37,8 @@ Repo portfolio can be submitted only separately, because the margin
 is calculated by a different methodology: Risk Based Margining (RBM)
 for Repo vs Portfolio Margining for ETD and OTC.
 
+For EUREX:
+
 Besides the Production environment https://cpme.eurex.com,
 also Member Simulation environment is available at https://cpme.risk.simu.gcp.dbgservice.com/
 with results comparable to Prisma Member Simulation reports (note that the margin figures can be very different from Production).
@@ -39,7 +49,7 @@ with results comparable to Prisma Member Simulation reports (note that the margi
 
 ### Launch CPME GUI
 
-1. Navigate to [https://cpme.eurex.com].
+1. Navigate to [https://cpme.eurex.com] for EUREX or [https://cpme.ecc.de/] for ECC.
 1. If you have not visited the site before, Terms of Use are shown. These must be accepted before the tool can be used.
 
 ### Prepare ETD Portfolio
@@ -47,7 +57,7 @@ with results comparable to Prisma Member Simulation reports (note that the margi
 If you have CP005 position report or C7 portfolio export, you can directly [upload it](#upload-the-prepared-etd-file).
 Otherwise, prepare ETD portfolio file in CSV format as follows:
 
-1. Download an example from the CPME main page by first clicking "Eurex portfolio example" followed by "Download as a CSV file".
+1. Download an example from the CPME main page by first clicking "Portfolio example" followed by "Download as a CSV file".
 1. Edit the CSV file to replace the example with the positions you wish.
 
 The columns in the CSV file are as follows:
@@ -69,6 +79,14 @@ FEXD,20311219,,,0,100
 OEXD,20311219,C,100.00,0,-100
 ```
 
+Example CSV file with one ECC product: 
+
+```csv 
+Product ID,Contract Date,Call Put Flag,Exercise Price,Version Number,Net LS Balance 
+1D03,20260903,,,,78,,,,,,, 
+```
+
+
 All the additional columns can be left empty, they are used only for special cases:
 
 - positions which expired today and were not closed before the expiry, then the net position size is entered under Net EA Balance
@@ -76,7 +94,7 @@ All the additional columns can be left empty, they are used only for special cas
 
 ### Upload the Prepared ETD File
 
-1. Click "Upload Eurex Portfolio".
+1. Click "Upload Portfolio".
 1. Select your prepared portfolio.
     - for CP005 upload, CPME displays dialog to select an account from those available in your report
 
@@ -125,7 +143,7 @@ Net Position       | free text field to enter the position size, negative for sh
 5. Click "Recalculate margin"
 6. [Read the results](#read-the-results)
 
-# OTC
+# OTC  – relevant only for EUREX
 
 ## Upload OTC Portfolio
 
@@ -241,7 +259,7 @@ NOK, CZK, ...						              | (default option)
 PST                                               | PLN OIS Polstr
 UKRPI								              | GBP UKRPI ZCIS
 
-# Repo
+# Repo   – Relevant only for Eurex
 
 ## Upload Repo portfolio
 
