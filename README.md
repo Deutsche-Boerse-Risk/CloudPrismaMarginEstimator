@@ -211,7 +211,7 @@ margin methodology and may differ a few percent from official EurexOTC margin re
 Products are placed in liquidation groups depending on their characteristics, for
 instance in the listed equity liquidation group or the fixed income liquidation group. 
 A list of liquidation group and the products that are assigned to them can be found 
-at Eurex Clearing's [Risk Parameters page][risk-parameters]. [ECC link to Liquidation Groups][https://www.ecc.de/en/risk-management/margin-methodology/#17508].
+at Eurex Clearing's [Risk Parameters page][risk-parameters]. [ECC link to Liquidation Groups](https://www.ecc.de/en/risk-management/margin-methodology/#17508).
 
 A liquidation group can be further divided into liquidation group splits. This is currently only
 the case for the fixed income liquidation group PFI01, which is divided into separate liquidation group
