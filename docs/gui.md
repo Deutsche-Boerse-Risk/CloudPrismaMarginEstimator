@@ -259,7 +259,7 @@ NOK, CZK, ...						              | (default option)
 PST                                               | PLN OIS Polstr
 UKRPI								              | GBP UKRPI ZCIS
 
-# Repo   – Relevant only for Eurex
+# Repo   – relevant only for Eurex
 
 ## Upload Repo portfolio
 
