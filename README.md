@@ -211,7 +211,7 @@ margin methodology and may differ a few percent from official EurexOTC margin re
 Products are placed in liquidation groups depending on their characteristics, for
 instance in the listed equity liquidation group or the fixed income liquidation group. 
 A list of liquidation group and the products that are assigned to them can be found 
-at Eurex Clearing's [Risk Parameters page][risk-parameters]. [ECC link to Liquidation Groups](https://www.ecc.de/en/risk-management/margin-methodology/#17508).
+at Eurex Clearing's [Risk Parameters page][risk-parameters]. Link to [ECC Risk parameters](https://www.ecc.de/en/risk-management/margin-methodology/#17508).
 
 A liquidation group can be further divided into liquidation group splits. This is currently only
 the case for the fixed income liquidation group PFI01, which is divided into separate liquidation group
@@ -314,7 +314,7 @@ The response to [estimator request] contains [rbm_margin](https://app.swaggerhub
 [api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf
-[risk-parameters]:https://www.eurexclearing.com/clearing-en/risk-management/risk-parameters
+[risk-parameters]:[https://www.eurex.com/ex-en/data/clearing-files/risk-parameters]
 [estimator request]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/default/post_estimator
 [GUI User Guide]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html
 [Upload Repo portfolio]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html#upload-repo-portfolio
