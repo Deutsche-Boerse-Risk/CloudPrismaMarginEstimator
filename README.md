@@ -314,7 +314,7 @@ The response to [estimator request] contains [rbm_margin](https://app.swaggerhub
 [api-definition]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0
 [api-digital-business-platform]:https://console.developer.deutsche-boerse.com/
 [prisma-methodology]:https://www.eurexclearing.com/resource/blob/32818/7bcf119060b658ad4e487f588744140d/data/brochure_eurex_clearing_prisma.pdf
-[risk-parameters]:[https://www.eurex.com/ex-en/data/clearing-files/risk-parameters]
+[risk-parameters]:https://www.eurex.com/ex-en/data/clearing-files/risk-parameters
 [estimator request]:https://app.swaggerhub.com/apis-docs/dbgservice/cPME/2.0#/default/post_estimator
 [GUI User Guide]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html
 [Upload Repo portfolio]:https://deutsche-boerse-risk.github.io/CloudPrismaMarginEstimator/docs/gui.html#upload-repo-portfolio
