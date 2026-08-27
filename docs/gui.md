@@ -49,7 +49,7 @@ with results comparable to Prisma Member Simulation reports (note that the margi
 
 ### Launch CPME GUI
 
-1. Navigate to [https://cpme.eurex.com] for EUREX or [https://cpme.ecc.de/] for ECC.
+1. Navigate to [https://cpme.eurex.com] for EUREX or [https://cpme.ecc.de] for ECC.
 1. If you have not visited the site before, Terms of Use are shown. These must be accepted before the tool can be used.
 
 ### Prepare ETD Portfolio
