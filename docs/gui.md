@@ -39,8 +39,14 @@ for Repo vs Portfolio Margining for ETD and OTC.
 
 For EUREX:
 
-Besides the Production environment https://cpme.eurex.com,
-also Member Simulation environment is available at https://cpme.risk.simu.gcp.dbgservice.com/
+Besides the Production environment [https://cpme.eurex.com](https://cpme.eurex.com),
+also Member Simulation environment is available at [https://cpme.risk.simu.gcp.dbgservice.com/](https://cpme.risk.simu.gcp.dbgservice.com/)
+with results comparable to Prisma Member Simulation reports (note that the margin figures can be very different from Production).
+
+For ECC:
+
+Besides the Production environment [https://cpme.ecc.de](https://cpme.ecc.de),
+also Member Simulation environment is available at [https://ecc-cpme.risk.simu.gcp.dbgservice.com/](https://ecc-cpme.risk.simu.gcp.dbgservice.com/)
 with results comparable to Prisma Member Simulation reports (note that the margin figures can be very different from Production).
 
 # ETD
