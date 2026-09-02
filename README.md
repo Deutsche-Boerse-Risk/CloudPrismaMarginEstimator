@@ -5,14 +5,14 @@ methodology][prisma-methodology]. The application is available to both
 members and non-members of Eurex Clearing, a part of the Deutsche Boerse Group. It
 can be used via a [browser based GUI][CPME-gui] or an API.
 
-ECC Cloud Prisma Margin Estimator calculates portfolio margin according to the ECC methodology [ADD LINK]. The application is available to both members and non-members of ECC. It can be used via a [browser based GUI][ https://cpme.ecc.de/] or an API. 
+ECC Cloud Prisma Margin Estimator calculates portfolio margin according to the [ECC methodology](https://www.ecc.de/en/risk-management/margin-methodology/ecc-prisma-for-commodities). The application is available to both members and non-members of ECC. It can be used via a [browser based GUI](https://cpme.ecc.de/) or an API. 
 
 This GitHub repository contains documentation, examples and frequently asked
 questions.
 
 Key links:
 
-- [CPME GUI][CPME-gui]
+- [CPME GUI][CPME-gui], [CPME GUI ECC](https://cpme.ecc.de)
 - [GUI User Guide]
 - [CPME API definition at SwaggerHub][api-definition]
 - [DBG Digital Business Platform][api-digital-business-platform] - gateway for accessing the [CPME API](https://console.developer.deutsche-boerse.com/apis/416d7067-45dc-465b-a56a-abbabdd1467d)
@@ -199,7 +199,7 @@ Line 1 contract business key or contract id isn't related to a contract; contrac
 ### What is the precision of the margin calculation?
 
 For exchange traded derivatives, the margin is calculated by code identical to the 
-one used in the production environment at Eurex Clearing. The result on liquidation group
+one used in the production environment. The result on liquidation group
 level should therefore be exactly the same as in the `CC050` report, if calculated for
 the same date and time.
 
@@ -246,8 +246,8 @@ currently not supported by CPME.
 
 No.
 
-The [simulation environment](https://cpme.risk.simu.gcp.dbgservice.com/) has different scenarios
-and prices compared to production, and therefore produces a
+The [simulation environment (Eurex)](https://cpme.risk.simu.gcp.dbgservice.com/) or [simulation environment (ECC)](https://ecc.cpme.risk.simu.gcp.dbgservice.com) have different scenarios
+and prices compared to production, and therefore produce
 different margin for the same portfolio.
 
 Occasionally, we set up a Eurex [what-if sandbox](https://whatif.cpme.eurex.com) with production market data
